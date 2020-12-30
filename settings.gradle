@@ -16,5 +16,4 @@ rootProject.name = 'finalysis'
 include 'finalysis-spider'
 include 'finalysis-start'
 include 'finalysis-common'
-include 'finalysis-python'
 
