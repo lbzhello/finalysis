@@ -1,0 +1,19 @@
+plugins {
+    id 'java'
+}
+
+group 'xyz.liujin'
+version '0.0.1-SNAPSHOT'
+
+sourceSets {
+    main {
+        resources {
+            //可以将java目录下的所有非.java资源打包到classes下
+            srcDirs = ['src/main/java', 'src/main/resources']
+        }
+    }
+}
+
+dependencies {
+    implementation project(":finalysis-common")
+}

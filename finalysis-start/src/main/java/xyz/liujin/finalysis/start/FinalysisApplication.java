@@ -1,0 +1,13 @@
+package xyz.liujin.finalysis.start;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class FinalysisApplication {
+
+	public static void main(String[] args) {
+		SpringApplication.run(FinalysisApplication.class, args);
+	}
+
+}
