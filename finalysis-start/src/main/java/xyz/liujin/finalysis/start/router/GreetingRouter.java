@@ -14,11 +14,11 @@ import xyz.liujin.finalysis.start.handler.GreetingHandler;
 @Configuration
 public class GreetingRouter {
     private static final Logger logger = LoggerFactory.getLogger(GreetingRouter.class);
+
     @Bean
     public RouterFunction<ServerResponse> route(GreetingHandler greetingHandler) {
-        logger.debug("hello");
-        logger.info("hello");
-        logger.error("hello");
+        logger.debug("create {}", GreetingRouter.class);
+
         return RouterFunctions.route(RequestPredicates.GET("/hello")
                 .and(RequestPredicates.accept(MediaType.TEXT_PLAIN)), greetingHandler::hello);
     }

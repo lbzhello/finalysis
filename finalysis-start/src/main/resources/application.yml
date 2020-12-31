@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: finalysis
+  datasource:
+    url: jdbc:postgresql://localhost:5432/stock
+    username: postgres
+    password: 191908577
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+    hibernate:
+      # 不用 jpa 删库建表
+      ddl-auto: none
+    database: POSTGRESQL
+    properties:
+      hibernate:
+        format_sql: true
