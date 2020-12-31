@@ -5,10 +5,9 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
-import java.util.Objects;
+import java.time.OffsetDateTime;
 
 @Data
 @Builder
@@ -16,8 +15,8 @@ import java.util.Objects;
 @AllArgsConstructor
 public class KLineDto {
     private Integer stockCode;
-    private Timestamp startTime;
-    private Timestamp endTime;
+    private OffsetDateTime startTime;
+    private OffsetDateTime endTime;
     private BigDecimal open;
     private BigDecimal close;
     private BigDecimal high;
