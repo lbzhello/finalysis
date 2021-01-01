@@ -18,15 +18,22 @@ public class KLineHandler {
     @Autowired
     private KLineService kLineService;
 
-    public Mono<ServerResponse> getByCode(ServerRequest serverRequest) {
+    public Mono<ServerResponse> query(ServerRequest serverRequest) {
         logger.debug("getOne {}", serverRequest);
+        String code = serverRequest.pathVariable("code");
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(kLineService.getById(10001)));
+                .body(BodyInserters.fromValue(kLineService.getById(Integer.valueOf(code))));
     }
 
-    public Mono<ServerResponse> queryAll(ServerRequest serverRequest) {
+    public Mono<ServerResponse> page(ServerRequest serverRequest) {
         logger.debug("queryAll {}", serverRequest);
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue(kLineService.list()));
+    }
+
+    public Mono<ServerResponse> hello(ServerRequest serverRequest) {
+        logger.debug("hello {}", serverRequest);
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
+                .body(BodyInserters.fromValue("hello"));
     }
 }
