@@ -3,7 +3,7 @@ package xyz.liujin.finalysis.spider;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import xyz.liujin.finalysis.spider.constant.SzsePaths;
+import xyz.liujin.finalysis.spider.constant.SzseConst;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -57,7 +57,7 @@ public class SpiderTest {
         Request request = new Request.Builder()
                 .post(body)
 //                .url("https://www.baidu.com")
-                .url(SzsePaths.POST_SEC_CHECK)
+                .url(SzseConst.POST_SEC_CHECK)
                 .build();
         Call call = httpClient.newCall(request);
         call.enqueue(new Callback() {

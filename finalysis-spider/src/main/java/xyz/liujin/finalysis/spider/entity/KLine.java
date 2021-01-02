@@ -14,10 +14,10 @@ import java.time.OffsetDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(autoResultMap = true) // 查询时 typeHandler 不生效问题
+@TableName(autoResultMap = true)
 public class KLine {
     @TableId
-    private Integer stockCode;
+    private String stockCode;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private BigDecimal open;

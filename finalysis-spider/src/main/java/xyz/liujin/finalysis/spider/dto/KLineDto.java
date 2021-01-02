@@ -14,7 +14,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class KLineDto {
-    private Integer stockCode;
+    private String stockCode;
     private OffsetDateTime startTime;
     private OffsetDateTime endTime;
     private BigDecimal open;

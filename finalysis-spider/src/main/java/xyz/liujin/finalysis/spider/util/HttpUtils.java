@@ -6,6 +6,7 @@ import io.netty.channel.internal.ChannelUtils;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -93,12 +94,12 @@ public class HttpUtils {
             return this;
         }
 
-        public boolean subscribe(Consumer<Response> onSuccess) {
-            return subscribe(onSuccess, e -> {});
-        }
-
-        public boolean subscribe(Consumer<Response> onSuccess, Consumer<IOException> onError) {
-            Flux.just(new Request.Builder())
+        /**
+         * 转成 flux 异步流
+         * @return
+         */
+        public Flux<Response> flux() {
+            return Flux.just(new Request.Builder())
                     // 请求方法, 请求体
                     .map(builder -> {
                         RequestBody body0 = null;
@@ -143,21 +144,21 @@ public class HttpUtils {
                     })
                     .map(Request.Builder::build)
                     .map(httpClient::newCall)
-                    .subscribe(call -> {
+                    .flatMap(call -> Flux.create(fluxSink -> {
                         call.enqueue(new Callback() {
                             @Override
                             public void onFailure(@NotNull Call call, @NotNull IOException e) {
-                                onError.accept(e);
+                                fluxSink.error(e);
+                                fluxSink.complete();
                             }
 
                             @Override
                             public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
-                                onSuccess.accept(response);
+                                fluxSink.next(response);
+                                fluxSink.complete();
                             }
                         });
-                    });
-
-            return true;
+                    }));
         }
     }
 }
