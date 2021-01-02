@@ -22,6 +22,9 @@ import xyz.liujin.finalysis.spider.util.HttpUtils;
 import java.time.OffsetDateTime;
 import java.util.function.Consumer;
 
+/**
+ * 深圳证券交易所数据爬取
+ */
 @Component
 public class SzseCrawler implements StockCrawler {
     private static Logger logger = LoggerFactory.getLogger(SzseCrawler.class);
