@@ -65,8 +65,8 @@ public class SzseCrawler implements StockCrawler {
                     String zqdm = jsonObject.getStr("zqdm", "");
                     // 股票名称
                     String zqjc = CharSequenceUtil.removeAny(jsonObject.getStr("zqjc"),
-                            // 去除 * ST &nbsp; 等字符
-                            StockConst.STAR, StockConst.ST, HtmlConst.SPACE);
+                            // 去除 ST *ST &nbsp; 等字符
+                            StockConst.ST, StockConst.STAR_ST, HtmlConst.SPACE);
                     // 交易板块
                     Integer board = BoardEnum.getBoardByCode(zqdm);
                     return Stock.builder().stockCode(zqdm).stockName(zqjc).board(board).build();

@@ -5,11 +5,11 @@ package xyz.liujin.finalysis.spider.constant;
  */
 public class StockConst {
     /**
-     * 有些网站名称带有 * 前缀
+     * 连续两年股东收益为负
      */
-    public static final String STAR = "*";
+    public static final String ST = "ST";
     /**
      * 标识有退市风险股票
      */
-    public static final String ST = "ST";
+    public static final String STAR_ST = "*ST";
 }
