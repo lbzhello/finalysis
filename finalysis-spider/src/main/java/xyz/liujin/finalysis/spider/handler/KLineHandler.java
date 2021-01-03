@@ -9,6 +9,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import xyz.liujin.finalysis.spider.entity.KLine;
 import xyz.liujin.finalysis.spider.service.KLineService;
 
 @Component
@@ -21,8 +22,9 @@ public class KLineHandler {
     public Mono<ServerResponse> query(ServerRequest serverRequest) {
         logger.debug("getOne {}", serverRequest);
         String code = serverRequest.pathVariable("code");
+        KLine kLine = kLineService.getById(code);
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(kLineService.getById(Integer.valueOf(code))));
+                .body(BodyInserters.fromValue(kLine == null ? "" : kLine));
     }
 
     public Mono<ServerResponse> page(ServerRequest serverRequest) {

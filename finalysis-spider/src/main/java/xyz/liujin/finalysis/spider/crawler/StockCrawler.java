@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.spider.crawler;
 
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.spider.entity.KLine;
 import xyz.liujin.finalysis.spider.entity.Stock;
 
 /**
@@ -15,8 +16,15 @@ public interface StockCrawler {
     Flux<Stock> crawlStock();
 
     /**
-     * 爬取 K 线数据
+     * 爬取日 K 线数据
      * @return
      */
-//    Flux<KLineDto> crawlKLine(Integer stockCode);
+    Flux<KLine> crawlKLine();
+
+    /**
+     * 爬取指定股票的日 K 数据，爬取所有的太慢了
+     * @param stockCode
+     * @return
+     */
+    Flux<KLine> crawlKLine(String stockCode);
 }

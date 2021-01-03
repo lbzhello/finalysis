@@ -7,10 +7,11 @@ import xyz.liujin.finalysis.spider.constant.SzseConst;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.time.OffsetDateTime;
 
 public class SpiderTest {
     public static void main(String[] args) {
-        post();
+        System.out.println(OffsetDateTime.parse("2020-12-31"));
     }
 
     @Test

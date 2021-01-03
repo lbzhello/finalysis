@@ -59,4 +59,23 @@ public final class DateUtil {
     public static final String formatISODateTime(OffsetDateTime offsetDateTime) {
         return format(offsetDateTime, ISO_DATE_TIME);
     }
+
+    /************************* str -> OffsetDateTime *****************************/
+
+
+    /**
+     * 用于拼接日期
+     */
+    public static final String ISO_UTC_PLUS_8_SUFFIX = "T00:00:00+08:00";
+
+    /**
+     * yyyy-MM-dd -> OffsetDateTime
+     *
+     * @param text
+     * @return
+     */
+    public static OffsetDateTime parseDate(String text) {
+        return OffsetDateTime.parse(text + ISO_UTC_PLUS_8_SUFFIX);
+    }
+
 }

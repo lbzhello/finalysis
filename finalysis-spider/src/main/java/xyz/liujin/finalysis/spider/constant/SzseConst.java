@@ -23,7 +23,11 @@ public final class SzseConst {
     /**
      * 日 k
      */
-    public static final String GET_HISTORY_DATA_OF_DAY =  StockSiteConst.SZSE + "/api/market/ssjjhq/getHistoryData?random=0.9198023733231868&cycleType=32&marketId=1&code=300124";
+    public static final String GET_HISTORY_DATA_OF_DAY =  StockSiteConst.SZSE + "/api/market/ssjjhq/getHistoryData" +
+            "?random=0.9198023733231868" +
+            "&cycleType=32" +
+            "&marketId=1" +
+            "&code=%s";
 
     /**
      * 周 K
