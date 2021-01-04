@@ -18,14 +18,11 @@ import xyz.liujin.finalysis.spider.constant.HtmlConst;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.constant.SzseConst;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
-import xyz.liujin.finalysis.spider.entity.KLine;
 import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.StockService;
 import xyz.liujin.finalysis.spider.util.HttpUtils;
 
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -39,16 +36,11 @@ public class SzseCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) {
-        SzseCrawler szseCrawler = new SzseCrawler();
-        szseCrawler.crawlKLine()
-                .subscribe(kLine -> {
-                    System.out.println(kLine);
-                });
 
     }
 
     @Override
-    public Flux<KLine> crawlKLine() {
+    public Flux<KLineDto> crawlKLine() {
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {
@@ -73,7 +65,7 @@ public class SzseCrawler implements StockCrawler {
      * @param stockCode
      * @return
      */
-    public Flux<KLine> crawlKLine(String stockCode) {
+    public Flux<KLineDto> crawlKLine(String stockCode) {
         logger.debug("crawlKLine {}", stockCode);
         return HttpUtils.get(SzseConst.GET_HISTORY_DATA_OF_DAY.formatted(stockCode)).flux()
                 .map(response -> {
@@ -93,17 +85,17 @@ public class SzseCrawler implements StockCrawler {
                 // ["2020-12-31", "188.86", "194.30", "184.26", "195.83", "8.30", "4.46", 505119, 9665582056]
                 .map(arr -> {
                     String date = arr.getStr(0, "");
-                    BigDecimal open = arr.getBigDecimal(1, BigDecimal.ZERO);
-                    BigDecimal close = arr.getBigDecimal(2, BigDecimal.ZERO);
-                    BigDecimal low = arr.getBigDecimal(3, BigDecimal.ZERO);
-                    BigDecimal high = arr.getBigDecimal(4, BigDecimal.ZERO);
-                    BigDecimal inc = arr.getBigDecimal(5, BigDecimal.ZERO);
-                    BigDecimal incRate = arr.getBigDecimal(6, BigDecimal.ZERO);
+                    String open = arr.getStr(1, StockConst.ZERO);
+                    String close = arr.getStr(2, StockConst.ZERO);
+                    String low = arr.getStr(3, StockConst.ZERO);
+                    String high = arr.getStr(4, StockConst.ZERO);
+                    String inc = arr.getStr(5, StockConst.ZERO);
+                    String incRate = arr.getStr(6, StockConst.ZERO);
                     Integer volume = arr.getInt(7, 0);
-                    BigDecimal amount = arr.getBigDecimal(8, BigDecimal.ZERO);
-                    return KLine.builder()
+                    String amount = arr.getStr(8, StockConst.ZERO);
+                    return KLineDto.builder()
                             .stockCode(stockCode)
-                            .dateTime(DateUtil.parseDate(date))
+                            .dateTime(date)
                             .open(open)
                             .close(close)
                             .low(low)

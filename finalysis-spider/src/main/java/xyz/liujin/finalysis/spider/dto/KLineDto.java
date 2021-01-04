@@ -5,9 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-import java.time.OffsetDateTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,18 +12,18 @@ import java.time.OffsetDateTime;
 public class KLineDto {
     private Integer id;
     private String stockCode;
-    private OffsetDateTime dateTime;
-    private BigDecimal open;
-    private BigDecimal close;
-    private BigDecimal high;
-    private BigDecimal low;
-    private BigDecimal inc;
-    private BigDecimal incRate;
+    private String dateTime;
+    private String open;
+    private String close;
+    private String high;
+    private String low;
+    private String inc;
+    private String incRate;
     private Integer volume;
-    private BigDecimal amount;
-    private BigDecimal volumeRatio;
-    private BigDecimal turn;
-    private BigDecimal committee;
-    private BigDecimal selling;
-    private BigDecimal buying;
+    private String amount;
+    private String volumeRatio;
+    private String turn;
+    private String committee;
+    private String selling;
+    private String buying;
 }

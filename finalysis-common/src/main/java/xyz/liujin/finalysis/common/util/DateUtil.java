@@ -1,5 +1,7 @@
 package xyz.liujin.finalysis.common.util;
 
+import cn.hutool.core.text.CharSequenceUtil;
+
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -75,6 +77,9 @@ public final class DateUtil {
      * @return
      */
     public static OffsetDateTime parseDate(String text) {
+        if (CharSequenceUtil.isBlank(text)) {
+            return null;
+        }
         return OffsetDateTime.parse(text + ISO_UTC_PLUS_8_SUFFIX);
     }
 

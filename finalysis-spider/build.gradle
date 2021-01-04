@@ -8,8 +8,6 @@ version '0.0.1-SNAPSHOT'
 dependencies {
     compile project(":finalysis-common")
 
-    compile 'cn.hutool:hutool-all:5.5.4'
-
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.9.0'
 
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
