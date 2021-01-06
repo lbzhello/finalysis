@@ -12,7 +12,7 @@ import xyz.liujin.finalysis.spider.util.HttpUtils;
 import java.util.Map;
 
 /**
- * tushare http api 请求参数
+ * tushare http api 请求接口封装
  * 官网：https://tushare.pro/
  *
  * 说明：
@@ -24,7 +24,7 @@ import java.util.Map;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class TushareReq {
+public class Tushare {
     /**
      * tushare token；登录后从用户中心获取
      */
@@ -74,7 +74,7 @@ public class TushareReq {
          * @return
          */
         default Flux<Response> req() {
-            return TushareReq.builder()
+            return Tushare.builder()
                     .token(TOKEN)
                     .api_name(getApiName())
                     .params(JSONUtil.parseObj(this))

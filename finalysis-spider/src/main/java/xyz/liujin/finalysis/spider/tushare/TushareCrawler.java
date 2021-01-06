@@ -31,7 +31,7 @@ public class TushareCrawler implements StockCrawler {
     @Override
     public Flux<KLineDto> crawlKLine() {
         // 爬取所有股票 K 线
-        TushareReq.Daily.builder()
+        Tushare.Daily.builder()
 //                .ts_code("")
                 .trade_date("20210104")
                 .build()
