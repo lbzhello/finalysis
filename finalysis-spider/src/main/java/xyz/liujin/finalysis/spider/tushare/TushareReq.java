@@ -53,6 +53,37 @@ public class TushareReq {
      */
     private String fields;
 
+    public Flux<Response> req() {
+        return HttpUtils.postJSON(API)
+                .body(JSONUtil.toJsonStr(this))
+                .req();
+    }
+
+    /**
+     * params 参数模型抽象
+     */
+    public interface Params {
+        /**
+         * 获取接口名字
+         * @return
+         */
+        String getApiName();
+
+        /**
+         * 根据接口发送请求
+         * @return
+         */
+        default Flux<Response> req() {
+            return TushareReq.builder()
+                    .token(TOKEN)
+                    .api_name(getApiName())
+                    .params(JSONUtil.parseObj(this))
+//                .fields("")
+                    .build()
+                    .req();
+        }
+    }
+
     /**
      * 获取日线数据
      * https://tushare.pro/document/2?doc_id=27
@@ -61,7 +92,7 @@ public class TushareReq {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static final class daily {
+    public static final class Daily implements Params {
         /**
          * 股票代码（支持多个股票同时提取，逗号分隔）
          * N: 默认全部股票
@@ -83,30 +114,10 @@ public class TushareReq {
          */
         private String end_date;
 
-        /**
-         * 获取日线数据
-         * @return
-         */
-        public Flux<Response> req() {
-            return newReq("daily", JSONUtil.parseObj(this)).req();
-
+        @Override
+        public String getApiName() {
+            return "daily";
         }
-
     }
 
-    private static TushareReq newReq(String api_name, Map<String, Object> params) {
-        return TushareReq.builder()
-                .token(TOKEN)
-                .api_name(api_name)
-                .params(params)
-//                .fields("")
-                .build();
-
-    }
-
-    private Flux<Response> req() {
-        return HttpUtils.postJSON(API)
-                .body(JSONUtil.toJsonStr(this))
-                .req();
-    }
 }
