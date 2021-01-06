@@ -67,7 +67,7 @@ public class SzseCrawler implements StockCrawler {
      */
     public Flux<KLineDto> crawlKLine(String stockCode) {
         logger.debug("crawlKLine {}", stockCode);
-        return HttpUtils.get(SzseConst.GET_HISTORY_DATA_OF_DAY.formatted(stockCode)).flux()
+        return HttpUtils.get(SzseConst.GET_HISTORY_DATA_OF_DAY.formatted(stockCode)).req()
                 .map(response -> {
                     try {
                         String bodyStr = response.body().string();
@@ -89,8 +89,8 @@ public class SzseCrawler implements StockCrawler {
                     String close = arr.getStr(2, StockConst.ZERO);
                     String low = arr.getStr(3, StockConst.ZERO);
                     String high = arr.getStr(4, StockConst.ZERO);
-                    String inc = arr.getStr(5, StockConst.ZERO);
-                    String incRate = arr.getStr(6, StockConst.ZERO);
+                    String change = arr.getStr(5, StockConst.ZERO);
+                    String pctChange = arr.getStr(6, StockConst.ZERO);
                     Integer volume = arr.getInt(7, 0);
                     String amount = arr.getStr(8, StockConst.ZERO);
                     return KLineDto.builder()
@@ -100,8 +100,8 @@ public class SzseCrawler implements StockCrawler {
                             .close(close)
                             .low(low)
                             .high(high)
-                            .inc(inc)
-                            .incRate(incRate)
+                            .change(change)
+                            .pctChange(pctChange)
                             .volume(volume)
                             .amount(amount)
                             .build();
@@ -117,7 +117,7 @@ public class SzseCrawler implements StockCrawler {
         String today = DateUtil.formatDate(OffsetDateTime.now());
         String day1231 = "2020-12-31";
         return HttpUtils.get(SzseConst.GET_REPORT.formatted(day1231, day1231, 1))
-                .flux()
+                .req()
                 // 解析响应数据
                 .map(response -> {
                     try {
@@ -144,7 +144,7 @@ public class SzseCrawler implements StockCrawler {
                 // 异步获取每页数据
                 .flatMap(page -> {
                     Flux<Response> responseFlux = HttpUtils.get(SzseConst.GET_REPORT.formatted(day1231, day1231, page))
-                            .flux()
+                            .req()
                             .subscribeOn(Schedulers.boundedElastic());
                     return retrieveStockFromResponse(responseFlux);
                 });

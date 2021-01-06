@@ -17,8 +17,8 @@ public class KLineDto {
     private String close;
     private String high;
     private String low;
-    private String inc;
-    private String incRate;
+    private String change;
+    private String pctChange;
     private Integer volume;
     private String amount;
     private String volumeRatio;

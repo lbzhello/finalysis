@@ -98,7 +98,7 @@ public class HttpUtils {
          * 转成 flux 异步流
          * @return
          */
-        public Flux<Response> flux() {
+        public Flux<Response> req() {
             return Flux.just(new Request.Builder())
                     // 请求方法, 请求体
                     .map(builder -> {

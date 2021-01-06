@@ -24,8 +24,8 @@ create table k_line (
 	close decimal(7, 2) not null default 0.00,
 	high decimal(7, 2) not null default 0.00,
 	low decimal(7, 2) not null default 0.00,
-    inc decimal(7, 2) not null default 0.00,
-    inc_rate decimal(6, 2) not null default 0.00,
+    change decimal(7, 2) not null default 0.00,
+    pct_change decimal(6, 2) not null default 0.00,
 	volume integer not null default 0,
 	amount decimal(14, 2) not null default 0.00,
 	volume_ratio decimal(6, 2) not null default 0.00,
@@ -36,7 +36,7 @@ create table k_line (
 );
 
 alter table k_line add constraint pk_k_line primary key (id);
-create unique index k_line_stock_code on k_line(stock_code, date_time);
+create unique index uk_k_line_stock_code_date_time on k_line(stock_code, date_time);
 
 comment on table k_line is '日 K 线';
 comment on column k_line.id is '自增主键';
@@ -46,8 +46,8 @@ comment on column k_line.open is '开盘价';
 comment on column k_line.close is '收盘价';
 comment on column k_line.high is '最高价';
 comment on column k_line.low is '最低价';
-comment on column k_line.inc is '增量';
-comment on column k_line.inc_rate is '增幅';
+comment on column k_line.change is '增量';
+comment on column k_line.pct_change is '增幅';
 comment on column k_line.volume is '成交量';
 comment on column k_line.amount is '成交额';
 comment on column k_line.volume_ratio is '量比';
