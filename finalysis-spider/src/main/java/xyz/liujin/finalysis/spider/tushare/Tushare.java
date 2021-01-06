@@ -53,6 +53,10 @@ public class Tushare {
      */
     private String fields;
 
+    /**
+     * 请求股票数据
+     * @return
+     */
     public Flux<Response> req() {
         return HttpUtils.postJSON(API)
                 .body(JSONUtil.toJsonStr(this))
@@ -70,7 +74,7 @@ public class Tushare {
         String getApiName();
 
         /**
-         * 根据接口发送请求
+         * 根据接口名字发送请求
          * @return
          */
         default Flux<Response> req() {
