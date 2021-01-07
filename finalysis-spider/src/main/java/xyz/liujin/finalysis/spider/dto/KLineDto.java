@@ -19,7 +19,7 @@ public class KLineDto {
     private String low;
     private String change;
     private String pctChange;
-    private Integer volume;
+    private String volume;
     private String amount;
     private String volumeRatio;
     private String turn;

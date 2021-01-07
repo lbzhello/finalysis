@@ -3,7 +3,7 @@ package xyz.liujin.finalysis.spider;
 import okhttp3.*;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
-import xyz.liujin.finalysis.spider.constant.SzseConst;
+import xyz.liujin.finalysis.spider.szse.SzseConst;
 
 import java.io.IOException;
 import java.time.Duration;

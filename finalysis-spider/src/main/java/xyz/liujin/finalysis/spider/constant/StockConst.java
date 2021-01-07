@@ -14,7 +14,27 @@ public class StockConst {
     public static final String STAR_ST = "*ST";
 
     /**
+     * 退市/停牌标识？
+     */
+    public static final String STAR = "*";
+
+    /**
      * 空或 null 字符串转成金额时，当做 0 处理
      */
     public static final String ZERO = "0";
+
+    /**
+     * 上海证券交易所简称
+     */
+    public static final String SH = "SH";
+
+    /**
+     * 深圳证券交易所简称
+     */
+    public static final String SZ = "SZ";
+
+    /**
+     * 有些股票代码上面含有 .
+     */
+    public static final String POINT = ".";
 }

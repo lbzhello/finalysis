@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.crawler;
+package xyz.liujin.finalysis.spider.szse;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONArray;
@@ -16,7 +16,7 @@ import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.util.DateUtil;
 import xyz.liujin.finalysis.spider.constant.HtmlConst;
 import xyz.liujin.finalysis.spider.constant.StockConst;
-import xyz.liujin.finalysis.spider.constant.SzseConst;
+import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
 import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.StockService;
@@ -40,7 +40,7 @@ public class SzseCrawler implements StockCrawler {
     }
 
     @Override
-    public Flux<KLineDto> crawlKLine() {
+    public Flux<KLineDto> crawlKLine(String startDate, String endDate) {
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {
@@ -57,7 +57,11 @@ public class SzseCrawler implements StockCrawler {
                 .map(Stock::getStockCode)
                 // 异步
                 .flatMap(stockCode -> crawlKLine(stockCode)
-                        .subscribeOn(Schedulers.boundedElastic()));
+                        .subscribeOn(Schedulers.boundedElastic()))
+                // 开始日期未提供则不过滤
+                .filter(kLineDto -> CharSequenceUtil.compare(startDate, kLineDto.getDateTime(), true) <= 0
+                        // 结束日期未提供则不过滤
+                        && CharSequenceUtil.compare(endDate, kLineDto.getDateTime(), false) >= 0);
     }
 
     /**
@@ -65,7 +69,7 @@ public class SzseCrawler implements StockCrawler {
      * @param stockCode
      * @return
      */
-    public Flux<KLineDto> crawlKLine(String stockCode) {
+    private Flux<KLineDto> crawlKLine(String stockCode) {
         logger.debug("crawlKLine {}", stockCode);
         return HttpUtils.get(SzseConst.GET_HISTORY_DATA_OF_DAY.formatted(stockCode)).req()
                 .map(response -> {
@@ -91,7 +95,7 @@ public class SzseCrawler implements StockCrawler {
                     String high = arr.getStr(4, StockConst.ZERO);
                     String change = arr.getStr(5, StockConst.ZERO);
                     String pctChange = arr.getStr(6, StockConst.ZERO);
-                    Integer volume = arr.getInt(7, 0);
+                    String volume = arr.getStr(7, StockConst.ZERO);
                     String amount = arr.getStr(8, StockConst.ZERO);
                     return KLineDto.builder()
                             .stockCode(stockCode)
@@ -179,7 +183,7 @@ public class SzseCrawler implements StockCrawler {
                     // 股票名称
                     String zqjc = CharSequenceUtil.removeAny(jsonObject.getStr("zqjc"),
                             // 去除 ST *ST &nbsp; 等字符
-                            StockConst.ST, StockConst.STAR_ST, HtmlConst.SPACE);
+                            StockConst.ST, StockConst.STAR_ST, StockConst.STAR, HtmlConst.SPACE);
                     // 交易板块
                     Integer board = BoardEnum.getBoardByCode(zqdm);
                     return Stock.builder().stockCode(zqdm).stockName(zqjc).board(board).build();

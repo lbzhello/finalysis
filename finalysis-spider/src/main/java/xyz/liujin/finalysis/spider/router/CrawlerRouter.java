@@ -18,7 +18,8 @@ public class CrawlerRouter {
     public RouterFunction<ServerResponse> crawlStock(CrawlerHandler crawlerHandler) {
         return RouterFunctions
                 .route(RequestPredicates.GET("/crawl/stock"), crawlerHandler::crawStock)
-                .andRoute(RequestPredicates.GET("/crawl/k"), crawlerHandler::crawKLine)
-                .andRoute(RequestPredicates.GET("/crawl/k/{stockCode}"), crawlerHandler::crawKLineByCode);
+                .andRoute(RequestPredicates.GET("/crawl/k"), crawlerHandler::crawlKLine)
+//                .andRoute(RequestPredicates.GET("/crawl/k/{stockCode}"), crawlerHandler::crawKLineByCode)
+                ;
     }
 }

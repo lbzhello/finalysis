@@ -2,7 +2,6 @@ package xyz.liujin.finalysis.spider.crawler;
 
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
-import xyz.liujin.finalysis.spider.entity.KLine;
 import xyz.liujin.finalysis.spider.entity.Stock;
 
 /**
@@ -18,14 +17,10 @@ public interface StockCrawler {
 
     /**
      * 爬取日 K 线数据
+     * @param startDate yyyy-MM-dd 开始时间，包含，为空则不过滤
+     * @param endDate   yyyy-MM-dd 结束时间，包含，为空则不过滤
      * @return
      */
-    Flux<KLineDto> crawlKLine();
+    Flux<KLineDto> crawlKLine(String startDate, String endDate);
 
-    /**
-     * 爬取指定股票的日 K 数据，爬取所有的太慢了
-     * @param stockCode
-     * @return
-     */
-    Flux<KLineDto> crawlKLine(String stockCode);
 }
