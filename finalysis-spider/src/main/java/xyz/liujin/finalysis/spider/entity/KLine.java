@@ -27,7 +27,7 @@ public class KLine {
     private BigDecimal low;
     private BigDecimal change;
     private BigDecimal pctChange;
-    private Integer volume;
+    private Long volume;
     private BigDecimal amount;
     private BigDecimal volumeRatio;
     private BigDecimal turn;

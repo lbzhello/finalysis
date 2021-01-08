@@ -61,3 +61,12 @@ comment on column k_line.selling is '卖盘/外盘';
 -- 修改列名符合常规
 alter table k_line rename inc to change;
 alter table k_line rename inc_rate to pct_change;
+
+-- 2021-01-08
+-- 成交量改为股数，int 不够存储
+alter table k_line alter column volume type bigint;
+
+-- 添加单位说明
+comment on column k_line.volume is '成交量（股）';
+comment on column k_line.amount is '成交额（元）';
+

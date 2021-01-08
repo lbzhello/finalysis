@@ -19,7 +19,7 @@ public class KLineConverter {
                 .low(toBigDecimal(kLineDto.getLow()))
                 .change(toBigDecimal(kLineDto.getChange()))
                 .pctChange(toBigDecimal(kLineDto.getPctChange()))
-                .volume(Integer.valueOf(kLineDto.getVolume()))
+                .volume(Long.valueOf(kLineDto.getVolume()))
                 .amount(toBigDecimal(kLineDto.getAmount()))
                 .volumeRatio(toBigDecimal(kLineDto.getVolumeRatio()))
                 .turn(toBigDecimal(kLineDto.getTurn()))

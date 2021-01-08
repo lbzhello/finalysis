@@ -26,7 +26,7 @@ create table k_line (
 	low decimal(7, 2) not null default 0.00,
     change decimal(7, 2) not null default 0.00,
     pct_change decimal(6, 2) not null default 0.00,
-	volume integer not null default 0,
+	volume bigint not null default 0,
 	amount decimal(14, 2) not null default 0.00,
 	volume_ratio decimal(6, 2) not null default 0.00,
 	turn decimal(6, 2) not null default 0.00,
@@ -48,8 +48,8 @@ comment on column k_line.high is '最高价';
 comment on column k_line.low is '最低价';
 comment on column k_line.change is '增量';
 comment on column k_line.pct_change is '增幅';
-comment on column k_line.volume is '成交量';
-comment on column k_line.amount is '成交额';
+comment on column k_line.volume is '成交量（股）';
+comment on column k_line.amount is '成交额（元）';
 comment on column k_line.volume_ratio is '量比';
 comment on column k_line.turn is '换手率';
 comment on column k_line.committee is '委比';
