@@ -17,8 +17,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Tushare K 线数据爬取
@@ -32,8 +34,8 @@ public class TushareCrawler implements StockCrawler {
 
     public static void main(String[] args) {
         TushareCrawler tushareCrawler = new TushareCrawler();
-        tushareCrawler.crawlKLine("2021-01-08", null)
-                .filter(kLineDto -> Objects.equals(kLineDto.getStockCode(), "002594"))
+        //沪市成立 1990-11-26
+        tushareCrawler.crawlKLine(null, null, "002594")
                 .collectList()
                 .subscribe(it -> {
                        System.out.println(it);
@@ -46,10 +48,10 @@ public class TushareCrawler implements StockCrawler {
     }
 
     @Override
-    public Flux<KLineDto> crawlKLine(String startDate, String endDate) {
+    public Flux<KLineDto> crawlKLine(String startDate, String endDate, String... codes) {
         // 爬取所有股票 K 线
         return Tushare.Daily.builder()
-//                .ts_code("")
+                .ts_code(formatCodes(codes))
                 .start_date(yyyyMMdd(startDate))
                 .end_date(yyyyMMdd(endDate))
                 .build()
@@ -64,6 +66,16 @@ public class TushareCrawler implements StockCrawler {
                     }
                     return Flux.just();
                 });
+    }
+
+    // [000001, 600001] -> 000001.SZ,600001.SH
+    private String formatCodes(String[] codes) {
+        return Optional.ofNullable(codes)
+                .stream()
+                .flatMap(Arrays::stream)
+                .map(TushareUtil::appendSuffix)
+                .collect(Collectors.joining(","));
+
     }
 
     // yyyy-MM-dd -> yyyyMMdd

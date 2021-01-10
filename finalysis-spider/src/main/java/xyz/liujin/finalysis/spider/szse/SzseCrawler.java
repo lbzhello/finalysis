@@ -40,7 +40,7 @@ public class SzseCrawler implements StockCrawler {
     }
 
     @Override
-    public Flux<KLineDto> crawlKLine(String startDate, String endDate) {
+    public Flux<KLineDto> crawlKLine(String startDate, String endDate, String... codes) {
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {

@@ -31,7 +31,7 @@ public enum BoardEnum {
      * 根据股票代码，判断所属交易板块
      * @return
      */
-    public static final int getBoardByCode(String stockCode) {
+    public static int getBoardByCode(String stockCode) {
         return Arrays.stream(values())
                 .filter(board -> stockCode.startsWith(board.pre))
                 .findFirst()

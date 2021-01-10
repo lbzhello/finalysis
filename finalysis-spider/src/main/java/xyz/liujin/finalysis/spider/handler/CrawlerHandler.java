@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.util.DateUtil;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.service.KLineService;
@@ -58,6 +59,7 @@ public class CrawlerHandler {
         String endDate = serverRequest.queryParam("endDate").orElse(DateUtil.formatDate(OffsetDateTime.now()));
         logger.debug("start crawlKLine class: {}", stockCrawler.getClass());
         stockCrawler.crawlKLine(startDate, endDate)
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(kLine -> {
                     kLineService.saveOrUpdate(kLine);
                 }, e -> logger.error("failed to crawlKLine", e));
