@@ -3,7 +3,8 @@ create table stock (
     stock_code varchar(6) not null,
     stock_name varchar(32) not null default '',
     board smallint not null default 0,
-    stat smallint not null default 0
+    stat smallint not null default 0,
+    listing_date date not null default now()
 );
 
 alter table stock add constraint stock_pk primary key (stock_code);

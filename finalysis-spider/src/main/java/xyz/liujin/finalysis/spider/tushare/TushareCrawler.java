@@ -33,18 +33,14 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) {
-        TushareCrawler tushareCrawler = new TushareCrawler();
-        //沪市成立 1990-11-26
-        tushareCrawler.crawlKLine(null, null, "002594")
-                .collectList()
-                .subscribe(it -> {
-                       System.out.println(it);
-                });
     }
 
     @Override
     public Flux<Stock> crawlStock() {
-        return Flux.just();
+        return Tushare.StockBasic.builder()
+                .build()
+                .req()
+                .map(response -> new Stock());
     }
 
     @Override

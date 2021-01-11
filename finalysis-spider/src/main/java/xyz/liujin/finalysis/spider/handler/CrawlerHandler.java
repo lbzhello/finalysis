@@ -57,8 +57,12 @@ public class CrawlerHandler {
         String startDate = serverRequest.queryParam("startDate").orElse(null);
         // 默认当前日期
         String endDate = serverRequest.queryParam("endDate").orElse(DateUtil.formatDate(OffsetDateTime.now()));
+
+        // 股票代码，例如 000001,000002
+        String codeStr = serverRequest.queryParam("codes").orElse("");
+        String[] codes = codeStr.split(",");
         logger.debug("start crawlKLine class: {}", stockCrawler.getClass());
-        stockCrawler.crawlKLine(startDate, endDate)
+        stockCrawler.crawlKLine(startDate, endDate, codes)
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(kLine -> {
                     kLineService.saveOrUpdate(kLine);

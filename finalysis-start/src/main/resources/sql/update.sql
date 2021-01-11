@@ -70,3 +70,5 @@ alter table k_line alter column volume type bigint;
 comment on column k_line.volume is '成交量（股）';
 comment on column k_line.amount is '成交额（元）';
 
+-- 2021-01-11
+alter table stock add column listing_date date not null default now();

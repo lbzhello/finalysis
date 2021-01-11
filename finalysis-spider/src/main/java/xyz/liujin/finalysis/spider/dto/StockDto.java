@@ -26,4 +26,6 @@ public class StockDto {
      * 股票状态。-1 退市；0 正常；1 融资融券；2 ST
      */
     private Integer stat;
+
+    private String listingDate;
 }
