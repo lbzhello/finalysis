@@ -6,6 +6,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
+import reactor.util.function.Tuples;
 
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
@@ -13,10 +14,37 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * json 映射器
+ * json 映射器，数据提取器
+ *
+ * json
+ * {
+ *     "code": 0,
+ *     "msg": "success"
+ *     "data": {
+ *         "date": "20210112",
+ *         "name": "hello kitty",
+ *         "description": "some test file"
+ *     }
+ * }
+ *
+ * extractor
+ * {
+ *     "code": "/code",
+ *     "time": "/data/date",
+ *     "name": "/data/name",
+ *     "info": "/data/info:empty"
+ * }
+ *
+ * json + extractor
+ * {
+ *     "code": 0,
+ *     "time": "20210112",
+ *     "name": "hello kitty",
+ *     "info": "empty
+ * }
  */
-public class JsonMapper {
-    public static final Logger logger = LoggerFactory.getLogger(JsonMapper.class);
+public class JsonExtractor {
+    public static final Logger logger = LoggerFactory.getLogger(JsonExtractor.class);
 
     public static final String NIL = "null";
     public static void main(String[] args) {
@@ -32,40 +60,72 @@ public class JsonMapper {
     }
 
     /**
-     * 将 json 数据根据 mapper 映射成 map
-     * @param json
-     * @param mapper
+     * csv 转 map
+     * @param fields csv 字段名
+     * @param values csv 数组
+     * @param extractor
      * @return
      */
-    public static Map<String, Object> toMap(Map<String, Object> json, Map<String, Object> mapper) {
-        if (Objects.isNull(mapper)) {
+    public static Flux<Map<String, String>> csvMap(Flux<String> fields, Flux<Flux<String>> values, Map<String, String> extractor) {
+        if (Objects.isNull(extractor)) {
+            return Flux.just();
+        }
+
+        return fields.index()
+                // 获取 field 对应索引
+                .collectMap(t2 -> t2.getT2(), t2 -> t2.getT1())
+                .flux()
+                .flatMap(fieldMap -> values.flatMap(Flux::collectList)
+                        .flatMap(item -> {
+                            // 每条记录转 map
+                            Map<String, Object> rstMap = new HashMap<>();
+                            return Flux.fromIterable(extractor.entrySet())
+                                    .map(entry -> {
+                                        Object vk = entry.getValue();
+                                        Long ki = fieldMap.get(vk); // 获取 field 索引
+                                        String value = item.get(ki.intValue()); // 根据索引获取 values 对应的值
+                                        return Tuples.of(entry.getKey(), value);
+                                    })
+                                    .collectMap(t2 -> t2.getT1(), t2 -> t2.getT2());
+                        }));
+
+    }
+
+    /**
+     * 将 json 数据根据 extractor 映射成 map
+     * @param json
+     * @param extractor
+     * @return
+     */
+    public static Map<String, Object> toMap(Map<String, Object> json, Map<String, Object> extractor) {
+        if (Objects.isNull(extractor)) {
             return Collections.emptyMap();
         }
 
         // 结果集
         Map<String, Object> rstMap = new HashMap<>();
 
-        Flux.fromIterable(mapper.entrySet())
+        Flux.fromIterable(extractor.entrySet())
                 .subscribe(entry -> {
                     Object pv = parseValue(json, entry.getValue());
                     rstMap.put(entry.getKey(), pv);
-                }, e -> logger.error("parse json mapper failed", e));
+                }, e -> logger.error("parse json extractor failed", e));
         return rstMap;
     }
 
     /**
-     * 将 json 根据 listMapper 映射成 list
+     * 将 json 根据 listExtractor 映射成 list
      * @param json
-     * @param listMapper
+     * @param listExtractor
      * @return
      */
     @SuppressWarnings("unchecked")
-    public static List toList(Map<String, Object> json, List listMapper) {
-        if (CollectionUtil.isEmpty(listMapper)) {
+    public static List toList(Map<String, Object> json, List listExtractor) {
+        if (CollectionUtil.isEmpty(listExtractor)) {
             return Collections.emptyList();
         }
         List list = new ArrayList();
-        Flux.fromIterable(listMapper)
+        Flux.fromIterable(listExtractor)
                 .map(v -> parseValue(json, v))
                 .subscribe(it -> {
                     list.add(it);

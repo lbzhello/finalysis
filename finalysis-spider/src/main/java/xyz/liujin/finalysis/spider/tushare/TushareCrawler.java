@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
+import xyz.liujin.finalysis.common.util.JsonExtractor;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
 import xyz.liujin.finalysis.spider.entity.Stock;
@@ -17,9 +18,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -33,6 +32,9 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) {
+        TushareCrawler tushareCrawler = new TushareCrawler();
+        tushareCrawler.crawlStock()
+                .subscribe();
     }
 
     @Override
@@ -40,7 +42,27 @@ public class TushareCrawler implements StockCrawler {
         return Tushare.StockBasic.builder()
                 .build()
                 .req()
-                .map(response -> new Stock());
+                .map(response -> {
+                    try {
+                        String bodyStr = response.body().string();
+                        TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
+                        TushareRespData data = tushareResp.getData();
+                        Map<String, String> mapper = new HashMap<>();
+                        mapper.put("stockCode", "ts_code");
+                        mapper.put("stockName", "name");
+                        mapper.put("listingDate", "list_date");
+
+                        JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
+                                Flux.fromIterable(data.getItems()).map(item -> Flux.fromIterable(item)), mapper)
+                                .subscribe(it -> {
+                                    System.out.println(it);
+                                });
+                        System.out.println();
+                    } catch (IOException e) {
+                        logger.error("crawlStock failed", e);
+                    }
+                    return new Stock();
+                });
     }
 
     @Override
