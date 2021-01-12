@@ -14,7 +14,7 @@ buildscript {
 	}
 
 	dependencies {
-		// springboot 插件；依赖管理，启动类自动配置等
+		// springboot 插件；依赖管理，构建配置（比如启动类）等
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
 	}
 }
