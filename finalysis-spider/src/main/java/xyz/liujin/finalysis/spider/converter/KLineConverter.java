@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.spider.converter;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import xyz.liujin.finalysis.common.util.DateUtil;
+import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
 import xyz.liujin.finalysis.spider.entity.KLine;
 
@@ -12,7 +12,7 @@ public class KLineConverter {
         return KLine.builder()
                 .id(kLineDto.getId())
                 .stockCode(kLineDto.getStockCode())
-                .dateTime(DateUtil.parseDate(kLineDto.getDateTime()))
+                .dateTime(DateUtils.parseDate(kLineDto.getDateTime()))
                 .open(toBigDecimal(kLineDto.getOpen()))
                 .close(toBigDecimal(kLineDto.getClose()))
                 .high(toBigDecimal(kLineDto.getHigh()))

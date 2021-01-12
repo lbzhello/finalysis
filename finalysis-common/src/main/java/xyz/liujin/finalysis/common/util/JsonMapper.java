@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.common.util;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.text.CharSequenceUtil;
 import org.slf4j.Logger;
@@ -36,7 +37,7 @@ public class JsonMapper {
      * @param mapper
      * @return
      */
-    public static <V extends Object> Map<String, Object> toMap(Map<String, Object> json, Map<String, V> mapper) {
+    public static Map<String, Object> toMap(Map<String, Object> json, Map<String, Object> mapper) {
         if (Objects.isNull(mapper)) {
             return Collections.emptyMap();
         }
@@ -46,18 +47,52 @@ public class JsonMapper {
 
         Flux.fromIterable(mapper.entrySet())
                 .subscribe(entry -> {
-                    String k = entry.getKey();
-                    Object v = entry.getValue();
-                    if (v instanceof Map) {
-                        // 递归获取值
-                        rstMap.put(k, toMap(json, (Map<String, V>) v));
-                    } else if (v instanceof String) {
-                        rstMap.put(k, parseDSL(json, String.valueOf(v)));
-                    } else {
-                        rstMap.put(k, v);
-                    }
+                    Object pv = parseValue(json, entry.getValue());
+                    rstMap.put(entry.getKey(), pv);
                 }, e -> logger.error("parse json mapper failed", e));
         return rstMap;
+    }
+
+    /**
+     * 将 json 根据 listMapper 映射成 list
+     * @param json
+     * @param listMapper
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public static List toList(Map<String, Object> json, List listMapper) {
+        if (CollectionUtil.isEmpty(listMapper)) {
+            return Collections.emptyList();
+        }
+        List list = new ArrayList();
+        Flux.fromIterable(listMapper)
+                .map(v -> parseValue(json, v))
+                .subscribe(it -> {
+                    list.add(it);
+                }, e -> logger.error("parse list mapper failed", e));
+        return list;
+    }
+
+    /**
+     * 解析值映射语句
+     * @param json
+     * @param v
+     * @return
+     */
+    private static Object parseValue(Map<String, Object> json, Object v) {
+        if (v instanceof String) {
+            return parseDSL(json, String.valueOf(v));
+        } else if (v instanceof Map) {
+            // 递归获取值
+            return toMap(json, (Map<String, Object>) v);
+        } else if (v instanceof List) {
+            return toList(json, (List) v);
+        } else if (ArrayUtils.isArray(v)) {
+            Object[] vArr = ArrayUtils.asArray(v, Object[].class);
+            return toList(json, Arrays.asList(vArr));
+        } else {
+            return v;
+        }
     }
 
     /**

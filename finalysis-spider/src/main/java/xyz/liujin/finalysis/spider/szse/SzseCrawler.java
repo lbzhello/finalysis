@@ -13,7 +13,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
-import xyz.liujin.finalysis.common.util.DateUtil;
+import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.constant.HtmlConst;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
@@ -118,7 +118,7 @@ public class SzseCrawler implements StockCrawler {
      */
     @Override
     public Flux<Stock> crawlStock() {
-        String today = DateUtil.formatDate(OffsetDateTime.now());
+        String today = DateUtils.formatDate(OffsetDateTime.now());
         String day1231 = "2020-12-31";
         return HttpUtils.get(SzseConst.GET_REPORT.formatted(day1231, day1231, 1))
                 .req()

@@ -5,7 +5,7 @@ import cn.hutool.core.text.CharSequenceUtil;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 
-public final class DateUtil {
+public final class DateUtils {
     public static final String DATE = "yyyy-MM-dd";
     public static final String ISO_DATE = "yyyy-MM-ddXXX";
 

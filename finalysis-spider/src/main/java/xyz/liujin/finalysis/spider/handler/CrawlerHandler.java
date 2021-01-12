@@ -11,7 +11,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.common.util.DateUtil;
+import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.service.KLineService;
 import xyz.liujin.finalysis.spider.service.StockService;
@@ -56,7 +56,7 @@ public class CrawlerHandler {
         // yyyy-MM-dd
         String startDate = serverRequest.queryParam("startDate").orElse(null);
         // 默认当前日期
-        String endDate = serverRequest.queryParam("endDate").orElse(DateUtil.formatDate(OffsetDateTime.now()));
+        String endDate = serverRequest.queryParam("endDate").orElse(DateUtils.formatDate(OffsetDateTime.now()));
 
         // 股票代码，例如 000001,000002
         String codeStr = serverRequest.queryParam("codes").orElse("");
