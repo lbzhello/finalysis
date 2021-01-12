@@ -1,9 +1,6 @@
-plugins {
-    id 'java'
-}
-
-group 'xyz.liujin'
-version '0.0.1-SNAPSHOT'
+apply plugin: 'java'
+// springboot 启动类配置插件，自动识别 mainClassName
+apply plugin: 'org.springframework.boot'
 
 dependencies {
     implementation project(":finalysis-spider")

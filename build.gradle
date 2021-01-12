@@ -1,43 +1,35 @@
-plugins {
-	id 'org.springframework.boot' version '2.4.1'
-	id 'io.spring.dependency-management' version '1.0.10.RELEASE'
-	id 'java'
-}
+// 构建脚本，最先运行，必须放在 plugins 前面
+buildscript {
+	print("hello finalysis")
 
-group = 'xyz.liujin'
-version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '15'
+	ext {
+		springBootVersion = '2.4.1'
+	}
+
+	repositories {
+		maven {
+			url 'https://maven.aliyun.com/repository/public'
+		}
+		jcenter()
+	}
+
+	dependencies {
+		// springboot 插件；依赖管理，启动类自动配置等
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+	}
+}
 
 // 所有项目共享配置
 allprojects {
 	apply plugin: "java"
+	// springboot 依赖管理插件，可以不指定版本号
+	apply plugin: "io.spring.dependency-management"
 
-	ext {
-		springBootVersion = "2.4.1"
-	}
+	group = 'xyz.liujin'
+	version = '0.0.1-SNAPSHOT'
+	sourceCompatibility = '15'
 
-	dependencies {
-		compile 'cn.hutool:hutool-all:5.5.4'
-
-		compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
-
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc', version: springBootVersion
-
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux', version: springBootVersion
-
-		testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: springBootVersion
-
-		compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
-
-		testCompile group: 'junit', name: 'junit', version: '4.12'
-
-		// gradle 集成 lombok
-		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-	}
-
+	// 字符编码
 	tasks.withType(JavaCompile) {
 		options.encoding = 'UTF-8'
 	}
@@ -48,6 +40,12 @@ allprojects {
 				//可以将java目录下的所有非.java资源打包到classes下
 				srcDir "src/main/java"
 			}
+		}
+	}
+
+	dependencyManagement {
+		imports {
+			mavenBom "org.springframework.boot:spring-boot-starter-parent:${springBootVersion}"
 		}
 	}
 
@@ -78,6 +76,30 @@ allprojects {
 		jcenter()
 //		maven { url 'https://repo.spring.io/milestone' }
 //		maven { url 'https://repo.spring.io/snapshot' }
+	}
+}
+
+subprojects {
+	dependencies {
+		compile 'cn.hutool:hutool-all:5.5.4'
+
+		compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
+
+		compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+
+		compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+
+		testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
+
+		compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+
+		testCompile group: 'junit', name: 'junit', version: '4.12'
+
+		// gradle 集成 lombok
+		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+		testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
 	}
 }
 

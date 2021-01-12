@@ -1,9 +1,4 @@
-plugins {
-    id 'java'
-}
-
-group 'xyz.liujin'
-version '0.0.1-SNAPSHOT'
+apply plugin: 'java'
 
 dependencies {
     compile project(":finalysis-common")
