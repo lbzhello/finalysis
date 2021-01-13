@@ -83,32 +83,35 @@ public class JsonExtractor {
                     // 每条记录转 map
                     return Flux.fromIterable(extractor.entrySet())
                             .map(entry -> {
-                                Object vk = entry.getValue();
+                                try {
+                                    Object vk = entry.getValue();
 
-                                // 以 ‘/’ 开头为 dsl 语句，如 /name /2
-                                if (Objects.nonNull(vk)
-                                        && vk instanceof String
-                                        && ((String) vk).startsWith("/")) {
-                                    // 去掉开头的 ‘/’，获取 dsl
-                                    String kDsl = ((String) vk).substring(1);
-                                    Long ki;
-                                    try {
-                                        // 直接使用索引，如 /2
-                                        ki = Long.parseLong(kDsl);
-                                    } catch (NumberFormatException e) {
-                                        // 根据标题名字获取索引，如 /name
-                                        ki = fieldMap.get(kDsl);
+                                    // 以 ‘/’ 开头为 dsl 语句，如 /name /2
+                                    if (Objects.nonNull(vk)
+                                            && vk instanceof String
+                                            && ((String) vk).startsWith("/")) {
+                                        // 去掉开头的 ‘/’，获取 dsl
+                                        String kDsl = ((String) vk).substring(1);
+                                        Long ki;
+                                        try {
+                                            // 直接使用索引，如 /2
+                                            ki = Long.parseLong(kDsl);
+                                        } catch (NumberFormatException e) {
+                                            // 根据标题名字获取索引，如 /name
+                                            ki = fieldMap.get(kDsl);
+                                        }
+
+                                        // 根据索引获取 values 对应的值
+                                        String value = item.get(ki.intValue());
+                                        return Tuples.of(entry.getKey(), value);
                                     }
-
-                                    // 根据索引获取 values 对应的值
-                                    String value = item.get(ki.intValue());
-                                    return Tuples.of(entry.getKey(), value);
-                                } else
-                                    return Tuples.of(entry.getKey(), entry.getValue());
-
+                                } catch (Exception e) {
+                                    logger.error("failed execute csvMap", e);
+                                }
+                                return Tuples.of(entry.getKey(), entry.getValue());
                             })
                             .collectMap(Tuple2::getT1, Tuple2::getT2);
-                });
+                }, 10, 100000);
 
     }
 

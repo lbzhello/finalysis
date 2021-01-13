@@ -9,9 +9,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
-import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.common.util.JsonExtractor;
-import xyz.liujin.finalysis.common.util.StockUtils;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
@@ -22,9 +20,9 @@ import xyz.liujin.finalysis.spider.service.StockService;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -37,12 +35,16 @@ public class TushareCrawler implements StockCrawler {
     @Autowired
     private StockService stockService;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
+        AtomicInteger count = new AtomicInteger(0);
         TushareCrawler tushareCrawler = new TushareCrawler();
         tushareCrawler.crawlStock()
+                .doOnNext(it -> count.addAndGet(1))
                 .subscribe(it -> {
                     System.out.println(it);
                 });
+        Thread.sleep(20*1000);
+        System.out.println(count.get());
     }
 
     @Override
@@ -66,7 +68,7 @@ public class TushareCrawler implements StockCrawler {
                                 Flux.fromIterable(data.getItems()).map(item -> Flux.fromIterable(item)), mapper)
                                 .map(it -> JSONUtil.toBean(JSONUtil.parseObj(it), StockDto.class))
                                 .map(stockDto -> toStock(stockDto));
-                    } catch (IOException e) {
+                    } catch (Exception e) {
                         logger.error("crawlStock failed", e);
                     }
                     return Flux.just();
@@ -106,7 +108,7 @@ public class TushareCrawler implements StockCrawler {
             stat = StockConst.PAUSE_LISTING;
         }
         String dateStr = stockDto.getListingDate();
-        OffsetDateTime offsetDate = DateUtils.parseDate(dateStr, "yyyyMMdd");
+        LocalDate offsetDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
 
         return Stock.builder()
                 .stockCode(parseCode(stockDto.getStockCode()))

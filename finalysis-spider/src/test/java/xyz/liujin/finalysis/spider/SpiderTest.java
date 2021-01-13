@@ -1,8 +1,8 @@
 package xyz.liujin.finalysis.spider;
 
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
+import org.springframework.lang.NonNull;
 import xyz.liujin.finalysis.spider.szse.SzseConst;
 
 import java.io.IOException;
@@ -33,12 +33,12 @@ public class SpiderTest {
         Call call = httpClient.newCall(request);
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.getMessage());
             }
 
             @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String body = response.body().string();
                 System.out.println(body);
             }
@@ -54,7 +54,7 @@ public class SpiderTest {
                 .build();
         // application/octet-stream
         //application/x-www-form-urlencoded
-        RequestBody body = RequestBody.create("keyword=300124", MediaType.parse("application/x-www-form-urlencoded"));
+        RequestBody body = RequestBody.create(MediaType.parse("application/x-www-form-urlencoded"), "keyword=300124");
         Request request = new Request.Builder()
                 .post(body)
 //                .url("https://www.baidu.com")
@@ -63,12 +63,12 @@ public class SpiderTest {
         Call call = httpClient.newCall(request);
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
                 System.out.println(e.getMessage());
             }
 
             @Override
-            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String body = response.body().string();
 //                String body = new String(bytes, 0, bytes.length, "utf-8");
                 System.out.println(body);

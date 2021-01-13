@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 /**
  * 沪深股票信息
@@ -41,5 +41,5 @@ public class Stock {
     /**
      * 上市日期
      */
-    private OffsetDateTime listingDate;
+    private LocalDate listingDate;
 }

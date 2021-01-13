@@ -2,20 +2,20 @@ package xyz.liujin.finalysis.spider.util;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import io.netty.channel.internal.ChannelUtils;
 import okhttp3.*;
-import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.FluxSink;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 public class HttpUtils {
+    private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
+
     public static final String GET = "get";
     public static final String POST = "post";
     public static final String PUT = "put";
@@ -104,7 +104,7 @@ public class HttpUtils {
                     .map(builder -> {
                         RequestBody body0 = null;
                         if (this.body != null) {
-                            body0 = RequestBody.create(this.body, MediaType.parse(this.contentType));
+                            body0 = RequestBody.create(MediaType.parse(this.contentType), this.body);
                         }
                         return switch (this.httpMethod) {
                             case GET -> builder.get();
@@ -147,13 +147,13 @@ public class HttpUtils {
                     .flatMap(call -> Flux.create(fluxSink -> {
                         call.enqueue(new Callback() {
                             @Override
-                            public void onFailure(@NotNull Call call, @NotNull IOException e) {
+                            public void onFailure(Call call, IOException e) {
                                 fluxSink.error(e);
                                 fluxSink.complete();
                             }
 
                             @Override
-                            public void onResponse(@NotNull Call call, @NotNull Response response) throws IOException {
+                            public void onResponse(Call call, Response response) throws IOException {
                                 fluxSink.next(response);
                                 fluxSink.complete();
                             }
