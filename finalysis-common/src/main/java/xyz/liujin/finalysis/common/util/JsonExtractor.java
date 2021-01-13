@@ -3,7 +3,6 @@ package xyz.liujin.finalysis.common.util;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
@@ -77,38 +76,39 @@ public class JsonExtractor {
                 // 获取 field 对应索引
                 .collectMap(Tuple2::getT2, Tuple2::getT1)
                 .flux()
-                .flatMap(fieldMap -> values.flatMap(Flux::collectList)
-                        .flatMap(item -> {
-                            // 每条记录转 map
-                            Map<String, Object> rstMap = new HashMap<>();
-                            return Flux.fromIterable(extractor.entrySet())
-                                    .map(entry -> {
-                                        Object vk = entry.getValue();
+                .flatMap(fieldMap -> values.flatMap(Flux::collectList).map(items -> Tuples.of(fieldMap, items)))
+                .flatMap(tuple -> {
+                    Map<String, Long> fieldMap = tuple.getT1();
+                    List<String> item = tuple.getT2();
+                    // 每条记录转 map
+                    return Flux.fromIterable(extractor.entrySet())
+                            .map(entry -> {
+                                Object vk = entry.getValue();
 
-                                        // 以 ‘/’ 开头为 dsl 语句，如 /name /2
-                                        if (Objects.nonNull(vk)
-                                                && vk instanceof String
-                                                && ((String) vk).startsWith("/")) {
-                                            // 去掉开头的 ‘/’，获取 dsl
-                                            String kDsl = ((String) vk).substring(1);
-                                            Long ki;
-                                            try {
-                                                // 直接使用索引，如 /2
-                                                ki = Long.parseLong(kDsl);
-                                            } catch (NumberFormatException e) {
-                                                // 根据标题名字获取索引，如 /name
-                                                ki = fieldMap.get(kDsl);
-                                            }
+                                // 以 ‘/’ 开头为 dsl 语句，如 /name /2
+                                if (Objects.nonNull(vk)
+                                        && vk instanceof String
+                                        && ((String) vk).startsWith("/")) {
+                                    // 去掉开头的 ‘/’，获取 dsl
+                                    String kDsl = ((String) vk).substring(1);
+                                    Long ki;
+                                    try {
+                                        // 直接使用索引，如 /2
+                                        ki = Long.parseLong(kDsl);
+                                    } catch (NumberFormatException e) {
+                                        // 根据标题名字获取索引，如 /name
+                                        ki = fieldMap.get(kDsl);
+                                    }
 
-                                            // 根据索引获取 values 对应的值
-                                            String value = item.get(ki.intValue());
-                                            return Tuples.of(entry.getKey(), value);
-                                        } else
-                                        return Tuples.of(entry.getKey(), entry.getValue());
+                                    // 根据索引获取 values 对应的值
+                                    String value = item.get(ki.intValue());
+                                    return Tuples.of(entry.getKey(), value);
+                                } else
+                                    return Tuples.of(entry.getKey(), entry.getValue());
 
-                                    })
-                                    .collectMap(Tuple2::getT1, Tuple2::getT2);
-                        }));
+                            })
+                            .collectMap(Tuple2::getT1, Tuple2::getT2);
+                });
 
     }
 
