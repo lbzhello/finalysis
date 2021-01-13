@@ -2,7 +2,10 @@ package xyz.liujin.finalysis.common.util;
 
 import cn.hutool.core.text.CharSequenceUtil;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 public final class DateUtils {
@@ -71,16 +74,33 @@ public final class DateUtils {
     public static final String ISO_UTC_PLUS_8_SUFFIX = "T00:00:00+08:00";
 
     /**
+     * 北京时间偏移
+     */
+    public static ZoneOffset ZONE_OFFSET_8 = ZoneOffset.ofHours(8);
+
+    /**
      * yyyy-MM-dd -> OffsetDateTime
      *
      * @param text
      * @return
      */
     public static OffsetDateTime parseDate(String text) {
+        return parseDate(text, DATE);
+    }
+
+
+    /**
+     * 日期转 OffsetDateTime
+     * @param text
+     * @param pattern
+     * @return
+     */
+    public static OffsetDateTime parseDate(String text, String pattern) {
         if (CharSequenceUtil.isBlank(text)) {
             return null;
         }
-        return OffsetDateTime.parse(text + ISO_UTC_PLUS_8_SUFFIX);
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern))
+                .atTime(0, 0, 0).atOffset(ZONE_OFFSET_8);
     }
 
 }

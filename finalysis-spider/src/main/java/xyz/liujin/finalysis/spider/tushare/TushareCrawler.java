@@ -8,15 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
+import xyz.liujin.finalysis.common.constant.BoardEnum;
+import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.common.util.JsonExtractor;
+import xyz.liujin.finalysis.common.util.StockUtils;
+import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
+import xyz.liujin.finalysis.spider.dto.StockDto;
 import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.StockService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,7 +40,9 @@ public class TushareCrawler implements StockCrawler {
     public static void main(String[] args) {
         TushareCrawler tushareCrawler = new TushareCrawler();
         tushareCrawler.crawlStock()
-                .subscribe();
+                .subscribe(it -> {
+                    System.out.println(it);
+                });
     }
 
     @Override
@@ -42,28 +50,26 @@ public class TushareCrawler implements StockCrawler {
         return Tushare.StockBasic.builder()
                 .build()
                 .req()
-                .map(response -> {
+                .flatMap(response -> {
                     try {
                         String bodyStr = response.body().string();
                         TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
                         TushareRespData data = tushareResp.getData();
                         Map<String, Object> mapper = new HashMap<>();
-                        mapper.put("stockCode", "/ts_code");
+                        mapper.put("stockCode", "/symbol");
                         mapper.put("stockName", "/name");
+                        mapper.put("board", "");
+                        mapper.put("stat", ""); // L 上市， D 退市， P 暂停，
                         mapper.put("listingDate", "/list_date");
-                        mapper.put("first", "/0");
-                        mapper.put("lite", "hello");
 
-                        JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
+                        return JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
                                 Flux.fromIterable(data.getItems()).map(item -> Flux.fromIterable(item)), mapper)
-                                .subscribe(it -> {
-                                    System.out.println(it);
-                                });
-                        System.out.println();
+                                .map(it -> JSONUtil.toBean(JSONUtil.parseObj(it), StockDto.class))
+                                .map(stockDto -> toStock(stockDto));
                     } catch (IOException e) {
                         logger.error("crawlStock failed", e);
                     }
-                    return new Stock();
+                    return Flux.just();
                 });
     }
 
@@ -86,6 +92,34 @@ public class TushareCrawler implements StockCrawler {
                     }
                     return Flux.just();
                 });
+    }
+
+    private Stock toStock(StockDto stockDto) {
+        // 股票状态
+        String statStr = stockDto.getStat();
+        int stat = 0;
+        if (Objects.equals(statStr, "L")) {
+            stat = StockConst.NORMAL;
+        } else if (Objects.equals(statStr, "D")) {
+            stat = StockConst.DE_LISTING;
+        } else if (Objects.equals(statStr, "P")) {
+            stat = StockConst.PAUSE_LISTING;
+        }
+        String dateStr = stockDto.getListingDate();
+        OffsetDateTime offsetDate = DateUtils.parseDate(dateStr, "yyyyMMdd");
+
+        return Stock.builder()
+                .stockCode(parseCode(stockDto.getStockCode()))
+                .stockName(stockDto.getStockName())
+                .board(BoardEnum.getBoardByCode(stockDto.getStockCode()))
+                .stat(stat)
+                .listingDate(offsetDate)
+                .build();
+    }
+
+    // 000001.SZ -> 000001
+    private String parseCode(String code) {
+        return CharSequenceUtil.removeAny(code, StockConst.POINT, StockConst.SH, StockConst.SZ);
     }
 
     // [000001, 600001] -> 000001.SZ,600001.SH

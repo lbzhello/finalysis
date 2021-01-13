@@ -37,4 +37,12 @@ public class StockConst {
      * 有些股票代码上面含有 .
      */
     public static final String POINT = ".";
+
+    // 股票状态
+    // 正常
+    public static final int NORMAL = 0;
+    // 退市
+    public static final int DE_LISTING = -1;
+    // 暂停上市
+    public static final int PAUSE_LISTING = 1;
 }

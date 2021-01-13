@@ -34,7 +34,7 @@ public class Stock {
      */
     private Integer board;
     /**
-     * 股票状态。-1 退市；0 正常；1 融资融券；2 ST
+     * 股票状态。-1 退市；0 正常；1 暂停上市；2 ST；3 融资融券；
      */
     private Integer stat;
 
