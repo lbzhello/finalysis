@@ -3,9 +3,11 @@ package xyz.liujin.finalysis.common.util;
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.lang.Dict;
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.NumberUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
+import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
 import java.lang.reflect.Array;
@@ -66,14 +68,14 @@ public class JsonExtractor {
      * @param extractor
      * @return
      */
-    public static Flux<Map<String, String>> csvMap(Flux<String> fields, Flux<Flux<String>> values, Map<String, String> extractor) {
+    public static Flux<Map<String, Object>> csvMap(Flux<String> fields, Flux<Flux<String>> values, Map<String, Object> extractor) {
         if (Objects.isNull(extractor)) {
             return Flux.just();
         }
 
         return fields.index()
                 // 获取 field 对应索引
-                .collectMap(t2 -> t2.getT2(), t2 -> t2.getT1())
+                .collectMap(Tuple2::getT2, Tuple2::getT1)
                 .flux()
                 .flatMap(fieldMap -> values.flatMap(Flux::collectList)
                         .flatMap(item -> {
@@ -82,11 +84,30 @@ public class JsonExtractor {
                             return Flux.fromIterable(extractor.entrySet())
                                     .map(entry -> {
                                         Object vk = entry.getValue();
-                                        Long ki = fieldMap.get(vk); // 获取 field 索引
-                                        String value = item.get(ki.intValue()); // 根据索引获取 values 对应的值
-                                        return Tuples.of(entry.getKey(), value);
+
+                                        // 以 ‘/’ 开头为 dsl 语句，如 /name /2
+                                        if (Objects.nonNull(vk)
+                                                && vk instanceof String
+                                                && ((String) vk).startsWith("/")) {
+                                            // 去掉开头的 ‘/’，获取 dsl
+                                            String kDsl = ((String) vk).substring(1);
+                                            Long ki;
+                                            try {
+                                                // 直接使用索引，如 /2
+                                                ki = Long.parseLong(kDsl);
+                                            } catch (NumberFormatException e) {
+                                                // 根据标题名字获取索引，如 /name
+                                                ki = fieldMap.get(kDsl);
+                                            }
+
+                                            // 根据索引获取 values 对应的值
+                                            String value = item.get(ki.intValue());
+                                            return Tuples.of(entry.getKey(), value);
+                                        } else
+                                        return Tuples.of(entry.getKey(), entry.getValue());
+
                                     })
-                                    .collectMap(t2 -> t2.getT1(), t2 -> t2.getT2());
+                                    .collectMap(Tuple2::getT1, Tuple2::getT2);
                         }));
 
     }

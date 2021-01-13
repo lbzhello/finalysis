@@ -47,10 +47,12 @@ public class TushareCrawler implements StockCrawler {
                         String bodyStr = response.body().string();
                         TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
                         TushareRespData data = tushareResp.getData();
-                        Map<String, String> mapper = new HashMap<>();
-                        mapper.put("stockCode", "ts_code");
-                        mapper.put("stockName", "name");
-                        mapper.put("listingDate", "list_date");
+                        Map<String, Object> mapper = new HashMap<>();
+                        mapper.put("stockCode", "/ts_code");
+                        mapper.put("stockName", "/name");
+                        mapper.put("listingDate", "/list_date");
+                        mapper.put("first", "/0");
+                        mapper.put("lite", "hello");
 
                         JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
                                 Flux.fromIterable(data.getItems()).map(item -> Flux.fromIterable(item)), mapper)
