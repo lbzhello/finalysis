@@ -78,11 +78,20 @@ public class Tushare {
          * @return
          */
         default Flux<Response> req() {
+            return req("");
+        }
+
+        /**
+         * 根据接口名字发送请求
+         * @param fields 请求字段
+         * @return
+         */
+        default Flux<Response> req(String fields) {
             return Tushare.builder()
                     .token(TOKEN)
                     .api_name(getApiName())
                     .params(JSONUtil.parseObj(this))
-//                .fields("")
+                    .fields(fields)
                     .build()
                     .req();
         }

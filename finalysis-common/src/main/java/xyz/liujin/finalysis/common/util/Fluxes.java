@@ -21,13 +21,13 @@ public class Fluxes {
     }
 
     /**
-     * 创建流，若含有空元素则用 empty 替代
+     * 创建流，若含有空元素则用 ifEmpty 替代
      * @param iterable
-     * @param empty
+     * @param ifEmpty
      * @param <T>
      * @return
      */
-    public static <T> Flux<T> nullable(Iterable<T> iterable, T empty) {
+    public static <T> Flux<T> nullable(Iterable<T> iterable, T ifEmpty) {
         if (Objects.isNull(iterable)) {
             return Flux.just();
         }
@@ -37,7 +37,7 @@ public class Fluxes {
                 if (Objects.nonNull(t)) {
                     fluxSink.next(t);
                 } else {
-                    fluxSink.next(empty);
+                    fluxSink.next(ifEmpty);
                 }
             }
             fluxSink.complete();

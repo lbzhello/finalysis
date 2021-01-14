@@ -53,7 +53,7 @@ public class TushareCrawler implements StockCrawler {
     public Flux<Stock> crawlStock() {
         return Tushare.StockBasic.builder()
                 .build()
-                .req()
+                .req("symbol,name,list_status,list_date")
                 .flatMap(response -> {
                     try {
                         String bodyStr = response.body().string();
@@ -63,13 +63,13 @@ public class TushareCrawler implements StockCrawler {
                         mapper.put("stockCode", "/symbol");
                         mapper.put("stockName", "/name");
                         mapper.put("board", "");
-                        mapper.put("stat", ""); // L 上市， D 退市， P 暂停，
+                        mapper.put("stat", "/list_status"); // L 上市， D 退市， P 暂停，
                         mapper.put("listingDate", "/list_date");
 
                         return JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
                                 Flux.fromIterable(data.getItems()).map(item -> Fluxes.nullable(item, "")), mapper)
                                 .map(it -> JSONUtil.toBean(JSONUtil.parseObj(it), StockDto.class))
-                                .map(stockDto -> toStock(stockDto));
+                                .map(this::toStock);
                     } catch (Exception e) {
                         logger.error("crawlStock failed", e);
                     }
