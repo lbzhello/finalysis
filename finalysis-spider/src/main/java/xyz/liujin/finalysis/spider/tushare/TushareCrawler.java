@@ -162,7 +162,7 @@ public class TushareCrawler implements StockCrawler {
                             case "high" -> kLineDto.setHigh(value);
                             case "low" -> kLineDto.setLow(value);
                             case "close" -> kLineDto.setClose(value);
-                            case "pre_close" -> System.out.println();
+                            case "pre_close" -> emptyMethod();
                             case "change" -> kLineDto.setChange(value);
                             case "pct_chg" -> kLineDto.setPctChange(value);
                             case "vol" -> kLineDto.setVolume(getVolShares(value));
@@ -172,6 +172,9 @@ public class TushareCrawler implements StockCrawler {
                     return kLineDto;
                 });
     }
+
+    // 空方法
+    public void emptyMethod() {}
 
     // yyyyMMdd -> yyyy-MM-dd
     private String formatDate(String dateStr) {

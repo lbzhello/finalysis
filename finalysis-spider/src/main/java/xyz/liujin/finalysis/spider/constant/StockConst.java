@@ -4,6 +4,12 @@ package xyz.liujin.finalysis.spider.constant;
  * 股票中常亮
  */
 public class StockConst {
+    // 上交所成立时间
+    public static final String SH_FOUND = "1990-11-26";
+
+    // 深交所成立时间
+    public static final String SZ_FOUND = "1990-12-01";
+
     /**
      * 连续两年股东收益为负
      */

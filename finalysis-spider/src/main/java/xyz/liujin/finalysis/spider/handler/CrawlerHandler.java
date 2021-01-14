@@ -9,13 +9,17 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import xyz.liujin.finalysis.common.util.ArrayUtils;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
+import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.KLineService;
 import xyz.liujin.finalysis.spider.service.StockService;
 
+import java.time.Duration;
 import java.time.OffsetDateTime;
 
 @Component
@@ -62,11 +66,25 @@ public class CrawlerHandler {
         String codeStr = serverRequest.queryParam("codes").orElse("");
         String[] codes = codeStr.split(",");
         logger.debug("start crawlKLine class: {}", stockCrawler.getClass());
-        stockCrawler.crawlKLine(startDate, endDate, codes)
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(kLine -> {
-                    kLineService.saveOrUpdate(kLine);
-                }, e -> logger.error("failed to crawlKLine", e));
+        Flux<String> codeFlux;
+        // 提供参数，根据参数查询
+        if (ArrayUtils.isNotEmpty(codes)) {
+            codeFlux = Flux.fromArray(codes);
+        } else {
+            // 未提供日期和股票代码，爬取所有
+            codeFlux = Flux.fromIterable(stockService.list())
+                    .map(Stock::getStockCode);
+        }
+
+        // 每分钟最多调用 500 次（每秒最多调用 8 次）
+        codeFlux.delayElements(Duration.ofMillis(1000 / 8))
+                .subscribe(code -> {
+                    stockCrawler.crawlKLine(startDate, endDate, code)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe(kLine -> {
+                                kLineService.saveOrUpdate(kLine);
+                            }, e -> logger.error("failed to crawlKLine", e));
+                });
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
                 .body(BodyInserters.fromValue("running..."));
 

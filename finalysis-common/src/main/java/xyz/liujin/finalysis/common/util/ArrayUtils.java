@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.common.util;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 
 public class ArrayUtils {
     /**
@@ -30,5 +31,25 @@ public class ArrayUtils {
                 : (T[]) Array.newInstance(newType.getComponentType(), len);
         System.arraycopy(objArr, 0, newArr, 0, len);
         return newArr;
+    }
+
+    /**
+     * 判断数组为空或 null
+     * @param arr
+     * @param <T>
+     * @return
+     */
+    public static <T> boolean isEmpty(T[] arr) {
+        return Objects.isNull(arr) || arr.length == 0;
+    }
+
+    /**
+     * 判断数组非空并且非 null
+     * @param arr
+     * @param <T>
+     * @return
+     */
+    public static <T> boolean isNotEmpty(T[] arr) {
+        return !isEmpty(arr);
     }
 }
