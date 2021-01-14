@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.spider.handler;
 
+import cn.hutool.core.text.CharSequenceUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.common.util.ArrayUtils;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.entity.Stock;
@@ -63,12 +63,13 @@ public class CrawlerHandler {
         String endDate = serverRequest.queryParam("endDate").orElse(DateUtils.formatDate(OffsetDateTime.now()));
 
         // 股票代码，例如 000001,000002
-        String codeStr = serverRequest.queryParam("codes").orElse("");
-        String[] codes = codeStr.split(",");
         logger.debug("start crawlKLine class: {}", stockCrawler.getClass());
+
         Flux<String> codeFlux;
+        String codeStr = serverRequest.queryParam("codes").orElse("");
         // 提供参数，根据参数查询
-        if (ArrayUtils.isNotEmpty(codes)) {
+        if (CharSequenceUtil.isNotBlank(codeStr)) {
+            String[] codes = codeStr.split(",");
             codeFlux = Flux.fromArray(codes);
         } else {
             // 未提供日期和股票代码，爬取所有
