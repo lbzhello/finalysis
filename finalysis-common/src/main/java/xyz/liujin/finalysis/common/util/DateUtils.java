@@ -4,7 +4,6 @@ import cn.hutool.core.text.CharSequenceUtil;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.time.OffsetTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
@@ -84,8 +83,8 @@ public final class DateUtils {
      * @param text
      * @return
      */
-    public static OffsetDateTime parseDate(String text) {
-        return parseDate(text, DATE);
+    public static OffsetDateTime parseOffsetDate(String text) {
+        return parseOffsetDate(text, DATE);
     }
 
 
@@ -95,12 +94,25 @@ public final class DateUtils {
      * @param pattern
      * @return
      */
-    public static OffsetDateTime parseDate(String text, String pattern) {
+    public static OffsetDateTime parseOffsetDate(String text, String pattern) {
         if (CharSequenceUtil.isBlank(text)) {
             return null;
         }
         return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern))
                 .atTime(0, 0, 0).atOffset(ZONE_OFFSET_8);
+    }
+
+    /**
+     * str 转 LocalDate
+     * @param text
+     * @param pattern
+     * @return
+     */
+    public static LocalDate parseDate(String text, String pattern) {
+        if (CharSequenceUtil.isBlank(text)) {
+            return null;
+        }
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(pattern));
     }
 
 }

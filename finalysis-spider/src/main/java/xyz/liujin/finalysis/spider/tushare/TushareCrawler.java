@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
+import xyz.liujin.finalysis.common.util.DateUtils;
+import xyz.liujin.finalysis.common.util.Fluxes;
 import xyz.liujin.finalysis.common.util.JsonExtractor;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
@@ -43,7 +45,7 @@ public class TushareCrawler implements StockCrawler {
                 .subscribe(it -> {
                     System.out.println(it);
                 });
-        Thread.sleep(20*1000);
+
         System.out.println(count.get());
     }
 
@@ -65,7 +67,7 @@ public class TushareCrawler implements StockCrawler {
                         mapper.put("listingDate", "/list_date");
 
                         return JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
-                                Flux.fromIterable(data.getItems()).map(item -> Flux.fromIterable(item)), mapper)
+                                Flux.fromIterable(data.getItems()).map(item -> Fluxes.nullable(item, "")), mapper)
                                 .map(it -> JSONUtil.toBean(JSONUtil.parseObj(it), StockDto.class))
                                 .map(stockDto -> toStock(stockDto));
                     } catch (Exception e) {
@@ -108,7 +110,7 @@ public class TushareCrawler implements StockCrawler {
             stat = StockConst.PAUSE_LISTING;
         }
         String dateStr = stockDto.getListingDate();
-        LocalDate offsetDate = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("yyyyMMdd"));
+        LocalDate offsetDate = DateUtils.parseDate(dateStr, "yyyyMMdd");
 
         return Stock.builder()
                 .stockCode(parseCode(stockDto.getStockCode()))

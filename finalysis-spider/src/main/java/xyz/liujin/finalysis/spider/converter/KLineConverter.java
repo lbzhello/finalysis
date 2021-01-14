@@ -12,7 +12,7 @@ public class KLineConverter {
         return KLine.builder()
                 .id(kLineDto.getId())
                 .stockCode(kLineDto.getStockCode())
-                .dateTime(DateUtils.parseDate(kLineDto.getDateTime()))
+                .dateTime(DateUtils.parseOffsetDate(kLineDto.getDateTime()))
                 .open(toBigDecimal(kLineDto.getOpen()))
                 .close(toBigDecimal(kLineDto.getClose()))
                 .high(toBigDecimal(kLineDto.getHigh()))
