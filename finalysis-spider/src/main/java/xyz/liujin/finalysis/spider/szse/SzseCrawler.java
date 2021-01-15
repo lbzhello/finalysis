@@ -59,9 +59,9 @@ public class SzseCrawler implements StockCrawler {
                 .flatMap(stockCode -> crawlKLine(stockCode)
                         .subscribeOn(Schedulers.boundedElastic()))
                 // 开始日期未提供则不过滤
-                .filter(kLineDto -> CharSequenceUtil.compare(startDate, kLineDto.getDateTime(), true) <= 0
+                .filter(kLineDto -> CharSequenceUtil.compare(startDate, kLineDto.getDate(), true) <= 0
                         // 结束日期未提供则不过滤
-                        && CharSequenceUtil.compare(endDate, kLineDto.getDateTime(), false) >= 0);
+                        && CharSequenceUtil.compare(endDate, kLineDto.getDate(), false) >= 0);
     }
 
     /**
@@ -99,7 +99,7 @@ public class SzseCrawler implements StockCrawler {
                     String amount = arr.getStr(8, StockConst.ZERO);
                     return KLineDto.builder()
                             .stockCode(stockCode)
-                            .dateTime(date)
+                            .date(date)
                             .open(open)
                             .close(close)
                             .low(low)

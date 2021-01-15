@@ -9,7 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Data
 @Builder
@@ -20,7 +20,7 @@ public class KLine {
     @TableId(type = IdType.AUTO )
     private Integer id;
     private String stockCode;
-    private OffsetDateTime dateTime;
+    private LocalDate date;
     private BigDecimal open;
     private BigDecimal close;
     private BigDecimal high;

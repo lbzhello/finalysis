@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class KLineDto {
     private Integer id;
     private String stockCode;
-    private String dateTime;
+    private String date;
     private String open;
     private String close;
     private String high;

@@ -18,7 +18,7 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
         KLine kLine = KLineConverter.toKLine(kLineDto);
         // 同一股票，同一时间不重复
         lambdaQuery().eq(KLine::getStockCode, kLine.getStockCode())
-                .eq(KLine::getDateTime, kLine.getDateTime())
+                .eq(KLine::getDate, kLine.getDate())
                 .oneOpt()
                 .ifPresent(exist -> {
                     kLine.setId(exist.getId());

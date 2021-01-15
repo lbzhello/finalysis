@@ -20,7 +20,7 @@ drop table if exists k_line;
 create table k_line (
     id bigserial,
 	stock_code varchar(6) not null,
-	date_time timestamp(0) with time zone not null default now(),
+	date date not null default now(),
 	open decimal(7, 2) not null default 0.00,
 	close decimal(7, 2) not null default 0.00,
 	high decimal(7, 2) not null default 0.00,
@@ -37,12 +37,12 @@ create table k_line (
 );
 
 alter table k_line add constraint pk_k_line primary key (id);
-create unique index uk_k_line_stock_code_date_time on k_line(stock_code, date_time);
+create unique index uk_k_line_stock_code_date on k_line(stock_code, date);
 
 comment on table k_line is '日 K 线';
 comment on column k_line.id is '自增主键';
 comment on column k_line.stock_code is '股票代码';
-comment on column k_line.date_time is '日期';
+comment on column k_line.date is '日期';
 comment on column k_line.open is '开盘价';
 comment on column k_line.close is '收盘价';
 comment on column k_line.high is '最高价';

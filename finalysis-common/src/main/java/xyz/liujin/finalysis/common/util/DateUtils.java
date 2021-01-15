@@ -102,6 +102,10 @@ public final class DateUtils {
                 .atTime(0, 0, 0).atOffset(ZONE_OFFSET_8);
     }
 
+    public static LocalDate parseDate(String text) {
+        return LocalDate.parse(text, DateTimeFormatter.ofPattern(DATE));
+    }
+
     /**
      * str 转 LocalDate
      * @param text

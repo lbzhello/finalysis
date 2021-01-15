@@ -72,3 +72,12 @@ comment on column k_line.amount is '成交额（元）';
 
 -- 2021-01-11
 alter table stock add column listing_date date not null default now();
+
+-- 2021-01-15
+-- 修改列类型
+alter table k_line alter column date_time type date;
+alter table k_line rename column date_time to date;
+
+-- 重命名索引
+drop index if exists uk_k_line_stock_code_date_time;
+create unique index uk_k_line_stock_code_date on k_line(stock_code, date);

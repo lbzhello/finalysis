@@ -157,7 +157,7 @@ public class TushareCrawler implements StockCrawler {
                         String value = item.get(i); // 字段名对应的字段值
                         switch (field) {
                             case "ts_code" -> kLineDto.setStockCode(TushareUtil.removeSuffix(value));
-                            case "trade_date" -> kLineDto.setDateTime(formatDate(value));
+                            case "trade_date" -> kLineDto.setDate(formatDate(value));
                             case "open" -> kLineDto.setOpen(value);
                             case "high" -> kLineDto.setHigh(value);
                             case "low" -> kLineDto.setLow(value);
