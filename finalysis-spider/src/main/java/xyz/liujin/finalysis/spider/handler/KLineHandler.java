@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.spider.entity.KLine;
 import xyz.liujin.finalysis.spider.service.KLineService;
@@ -34,8 +35,17 @@ public class KLineHandler {
     }
 
     public Mono<ServerResponse> hello(ServerRequest serverRequest) {
-        logger.debug("hello {}", serverRequest);
-        return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue("hello"));
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_NDJSON)
+                .body(Flux.create(sink -> {
+                    sink.next("1234");
+                    sink.next("1234");
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    sink.next("1234");
+                    sink.complete();
+                }), String.class);
     }
 }

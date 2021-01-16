@@ -77,6 +77,11 @@ allprojects {
 //		maven { url 'https://repo.spring.io/milestone' }
 //		maven { url 'https://repo.spring.io/snapshot' }
 	}
+
+	// 使用 JUnit 单元测试
+	test {
+		useJUnitPlatform()
+	}
 }
 
 subprojects {
@@ -103,6 +108,3 @@ subprojects {
 	}
 }
 
-test {
-	useJUnitPlatform()
-}

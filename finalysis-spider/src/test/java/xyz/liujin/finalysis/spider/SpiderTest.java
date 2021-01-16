@@ -1,8 +1,9 @@
 package xyz.liujin.finalysis.spider;
 
 import okhttp3.*;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
+import org.springframework.web.reactive.function.client.WebClient;
 import xyz.liujin.finalysis.spider.szse.SzseConst;
 
 import java.io.IOException;
@@ -15,7 +16,15 @@ public class SpiderTest {
     }
 
     @Test
-    public void commonTest() {
+    public void commonTest() throws InterruptedException {
+        WebClient.create().get().uri("http://localhost:8080/k/2022/hello")
+                .retrieve()
+                .bodyToMono(String.class)
+                .subscribe(it -> {
+                    System.out.println(it);
+                });
+
+        Thread.sleep(2*1000);
         System.out.println("hello");
     }
 
