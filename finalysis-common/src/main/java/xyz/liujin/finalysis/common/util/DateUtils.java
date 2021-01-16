@@ -103,7 +103,11 @@ public final class DateUtils {
     }
 
     public static LocalDate parseDate(String text) {
-        return LocalDate.parse(text, DateTimeFormatter.ofPattern(DATE));
+        return LocalDate.parse(text, DateTimeFormatter.ISO_DATE);
+    }
+
+    public static void main(String[] args) {
+        System.out.println();
     }
 
     /**

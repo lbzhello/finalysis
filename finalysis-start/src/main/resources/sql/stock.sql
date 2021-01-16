@@ -34,10 +34,7 @@ create table k_line (
 	committee decimal(5, 2) not null default 0.00,
 	selling decimal(14, 2) not null default 0.00,
 	buying decimal(14, 2) not null default 0.00
-);
-
-alter table k_line add constraint pk_k_line primary key (id);
-create unique index uk_k_line_stock_code_date on k_line(stock_code, date);
+) partition by range (date);
 
 comment on table k_line is '日 K 线';
 comment on column k_line.id is '自增主键';
@@ -57,3 +54,15 @@ comment on column k_line.committee is '委比';
 comment on column k_line.buying is '买盘/内盘';
 comment on column k_line.selling is '卖盘/外盘';
 
+-- 创建分区
+create table k_line_1990_2019 partition of k_line
+for values from ('1990-01-01') to ('2020-01-01');
+
+alter table k_line_1990_2019 add constraint pk_k_line_1990_2019 primary key (id);
+create unique index uk_k_line_1990_2019_stock_code_date on k_line_1990_2019(stock_code, date);
+
+create table k_line_2020_2039 partition of k_line
+for values from ('2020-01-01') to ('2039-01-01');
+
+alter table k_line_2020_2039 add constraint pk_k_line_2020_2039 primary key (id);
+create unique index uk_k_line_2020_2039_stock_code_date on k_line_2020_2039(stock_code, date);

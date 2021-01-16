@@ -4,20 +4,13 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import xyz.liujin.finalysis.common.constant.HttpHeaderValues;
-import xyz.liujin.finalysis.spider.util.HttpUtils;
 
-import java.io.BufferedReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-//@RunWith(SpringRunner.class)
+@RunWith(SpringRunner.class)
 @SpringBootTest
 class FinalysisApplicationTests {
 

@@ -72,7 +72,7 @@ public class CrawlerHandler {
             String[] codes = codeStr.split(",");
             codeFlux = Flux.fromArray(codes);
         } else {
-            // 未提供日期和股票代码，爬取所有
+            // 未提供股票代码，爬取所有
             codeFlux = Flux.fromIterable(stockService.list())
                     .map(Stock::getStockCode);
         }

@@ -81,3 +81,32 @@ alter table k_line rename column date_time to date;
 -- 重命名索引
 drop index if exists uk_k_line_stock_code_date_time;
 create unique index uk_k_line_stock_code_date on k_line(stock_code, date);
+
+-- 2021-01-16
+-- k_line 创建分区表
+create table k_line_1990_2019 (like k_line including defaults including constraints);
+create table k_line_2020_2039 (like k_line including defaults including constraints);
+
+-- 2020-01-17
+-- check 约束，避免加入分区时全表扫描
+alter table k_line_1990_2019 add constraint ck_k_line_1990_2019_date
+    check ( date >= date '1990-01-01' and date < date '2020-01-01');
+
+alter table k_line_1990_2019 add constraint pk_k_line_1990_2019 primary key (id);
+create unique index uk_k_line_1990_2019_stock_code_date on k_line_1990_2019(stock_code, date);
+
+-- 加入 k_line 分区
+alter table k_line attach partition k_line_1990_2019
+    for values from ('1990-01-01') to ('2020-01-01');
+
+-- check 约束，避免加入分区时全表扫描
+alter table k_line_2020_2039 add constraint ck_k_line_2020_2039
+    check ( date >= date '2020-01-01' and date < date '2040-01-01');
+
+alter table k_line_2020_2039 add constraint pk_k_line_2020_2039 primary key (id);
+
+create unique index uk_k_line_2020_2039_stock_code_date on k_line_2020_2039(stock_code, date);
+
+-- 加入 k_line 分区
+alter table k_line attach partition k_line_2020_2039
+    for values from ('2020-01-01') to ('2040-01-01');
