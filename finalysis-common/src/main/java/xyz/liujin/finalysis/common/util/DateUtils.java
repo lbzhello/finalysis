@@ -28,6 +28,10 @@ public final class DateUtils {
         return DateTimeFormatter.ofPattern(pattern).format(offsetDateTime);
     }
 
+    public static final String format(LocalDate localDate, String pattern) {
+        return DateTimeFormatter.ofPattern(pattern).format(localDate);
+    }
+
     /**
      * -> yyyy-MM-dd
      * @param offsetDateTime
@@ -35,6 +39,15 @@ public final class DateUtils {
      */
     public static final String formatDate(OffsetDateTime offsetDateTime) {
         return format(offsetDateTime, DATE);
+    }
+
+    /**
+     * -> yyyy-MM-dd
+     * @param localDate
+     * @return
+     */
+    public static final String formatDate(LocalDate localDate) {
+        return format(localDate, DATE);
     }
 
     /**

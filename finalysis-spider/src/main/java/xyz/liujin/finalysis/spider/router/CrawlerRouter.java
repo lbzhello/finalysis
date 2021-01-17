@@ -17,9 +17,8 @@ public class CrawlerRouter {
     @Bean
     public RouterFunction<ServerResponse> crawlStock(CrawlerHandler crawlerHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/crawl/stock"), crawlerHandler::crawStock)
+                .route(RequestPredicates.GET("/crawl/stock"), crawlerHandler::crawlStock)
                 .andRoute(RequestPredicates.GET("/crawl/k"), crawlerHandler::crawlKLine)
-//                .andRoute(RequestPredicates.GET("/crawl/k/{stockCode}"), crawlerHandler::crawKLineByCode)
                 ;
     }
 }
