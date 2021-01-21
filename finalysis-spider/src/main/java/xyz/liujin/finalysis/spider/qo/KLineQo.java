@@ -18,5 +18,5 @@ public class KLineQo {
     /**
      * K 线类型：day
      */
-    private String type = "day";
+    private String type;
 }

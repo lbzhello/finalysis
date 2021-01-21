@@ -1,0 +1,6 @@
+stockCode: /symbol
+stockName: /name
+board: ''
+# L 上市， D 退市， P 暂停，
+stat: /list_status
+listingDate: /list_date

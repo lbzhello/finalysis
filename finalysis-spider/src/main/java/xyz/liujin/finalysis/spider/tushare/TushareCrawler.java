@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
@@ -21,9 +22,13 @@ import xyz.liujin.finalysis.spider.service.StockService;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -37,11 +42,10 @@ public class TushareCrawler implements StockCrawler {
     @Autowired
     private StockService stockService;
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws Exception {
         AtomicInteger count = new AtomicInteger(0);
         TushareCrawler tushareCrawler = new TushareCrawler();
         tushareCrawler.crawlStock()
-                .doOnNext(it -> count.addAndGet(1))
                 .subscribe(it -> {
                     System.out.println(it);
                 });
@@ -59,16 +63,12 @@ public class TushareCrawler implements StockCrawler {
                         String bodyStr = response.body().string();
                         TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
                         TushareRespData data = tushareResp.getData();
-                        Map<String, Object> mapper = new HashMap<>();
-                        mapper.put("stockCode", "/symbol");
-                        mapper.put("stockName", "/name");
-                        mapper.put("board", "");
-                        mapper.put("stat", "/list_status"); // L 上市， D 退市， P 暂停，
-                        mapper.put("listingDate", "/list_date");
-
+                        // 获取映射文件
+                        Path path = ResourceUtils.getFile("classpath:tushare/stock_basic.yml").toPath();
                         return JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
-                                Flux.fromIterable(data.getItems()).map(item -> Fluxes.nullable(item, "")), mapper)
-                                .map(it -> JSONUtil.toBean(JSONUtil.parseObj(it), StockDto.class))
+                                Flux.fromIterable(data.getItems()).map(item -> Fluxes.nullable(item, "")),
+                                path,
+                                StockDto.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
                         logger.error("crawlStock failed", e);
