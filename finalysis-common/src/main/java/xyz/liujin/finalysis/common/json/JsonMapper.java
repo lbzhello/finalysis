@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.common.json;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,7 +29,12 @@ public interface JsonMapper {
      * @param json
      * @return
      */
-    Object eval(Map<String, Object> json);
+    Object eval(Map<String, ?> json);
+
+    default <T> T eval(Map<String, ?> json, Class<T> clazz) {
+        Object obj = eval(json);
+        return JSONUtil.toBean(JSONUtil.parseObj(obj), clazz);
+    }
 
     /**
      * 解析 obj 的值，生成映射
@@ -171,7 +177,7 @@ public interface JsonMapper {
         }
 
         @Override
-        public Object eval(Map<String, Object> json) {
+        public Object eval(Map<String, ?> json) {
             Map<String, Object> rstMap = new HashMap<>();
             Mono.justOrEmpty(map)
                     .flatMapIterable(map -> map.entrySet())
@@ -204,7 +210,7 @@ public interface JsonMapper {
         }
 
         @Override
-        public Object eval(Map<String, Object> json) {
+        public Object eval(Map<String, ?> json) {
             List<Object> rstList = new ArrayList<>();
             Mono.justOrEmpty(list)
                     .flux()
@@ -246,7 +252,7 @@ public interface JsonMapper {
          * @return
          */
         @Override
-        public Object eval(Map<String, Object> json) {
+        public Object eval(Map<String, ?> json) {
             if (!(json instanceof Map)) {
                 return defaultValue;
             }
