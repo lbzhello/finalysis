@@ -1,12 +1,17 @@
 package xyz.liujin.finalysis.common.json;
 
+import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Pair;
+import cn.hutool.core.lang.TypeReference;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.util.annotation.Nullable;
 import reactor.util.function.Tuple2;
 
+import java.io.InputStream;
+import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -33,14 +38,54 @@ public class CsvMapper {
     // csv 标题和索引对应关系， eval 方法执行后才可用
     private Map<String, Long> fieldIndex;
 
-    public static CsvMapper parse(String fieldPath, String itemsPath, Map<String, ?> mapper) {
-        return new CsvMapper(fieldPath, itemsPath, mapper);
-    }
+    private static CsvMapper EMPTY_MAPPER = new CsvMapper(null, null, null) {
+        @Override
+        public <T> Flux<T> eval(Map<String, ?> json, Class<T> clazz) {
+            return Flux.just();
+        }
+    };
 
-    public CsvMapper(String fieldPath, String itemsPath, Map<String, ?> mapper) {
+    private CsvMapper(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
         this.fieldPath = JsonMapper.parseExpr(fieldPath);
         this.itemsPath = JsonMapper.parseExpr(itemsPath);
         this.mapper = parseMap(mapper);
+    }
+
+    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Reader reader) {
+        if (Objects.isNull(reader)) {
+            return EMPTY_MAPPER;
+        }
+        String mapper = IoUtil.read(reader);
+        return parse(fieldPath, itemsPath, mapper);
+    }
+
+    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable String jsonMapper) {
+        return parse(fieldPath, itemsPath, JSONUtil.parseObj(jsonMapper));
+    }
+
+    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
+        return new CsvMapper(fieldPath, itemsPath, mapper);
+    }
+
+    /**
+     * 提取 csv 中记录
+     * @param csvJson csv 格式的 json
+     *      格式示例
+     *      {
+     *          "fields": ["name", "price", "author", "sum"],
+     *          "items": [
+     *                ["RHEL", "21.23", "hm", "998"],
+     *                ["ubuntu", "33.44", "ut", "899"],
+     *                ["xiao", "22.88", "x", "699"]
+     *          ]
+     *      }
+     * @param cls csv 记录需要转成的实体 class
+     * @param <T> 实体
+     * @return
+     */
+    public <T> Flux<T> eval(String csvJson, Class<T> cls) {
+        Map<String, ?> csvMap = JSONUtil.toBean(csvJson, new TypeReference<>() {}, false);
+        return eval(csvMap, cls);
     }
 
     /**
@@ -149,7 +194,8 @@ public class CsvMapper {
         }
 
         public Object get(List<?> item) {
-            return Optional.ofNullable(fieldIndex.get(name))
+            return Optional.ofNullable(fieldIndex)
+                    .map(it -> it.get(name))
                     .map(Long::intValue)
                     .map(item::get)
                     .orElse(null);
