@@ -66,7 +66,7 @@ public class CrawlerHandler {
                 .body(Flux.create(sink -> {
                     sink.next("start to crawl k line\n");
                     // yyyy-MM-dd
-                    String startDate = serverRequest.queryParam("startDate").orElse(null);
+                    String startDate = serverRequest.queryParam("startDate").orElse(DateUtils.formatDate(OffsetDateTime.now()));
                     // 默认当前日期
                     String endDate = serverRequest.queryParam("endDate").orElse(DateUtils.formatDate(OffsetDateTime.now()));
 
