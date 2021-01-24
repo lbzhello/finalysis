@@ -24,7 +24,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -132,40 +131,6 @@ public class TushareCrawler implements StockCrawler {
         kLineDto.setAmount(getAmountYuan(kLineDto.getAmount()));
         return kLineDto;
     }
-
-    /**
-     * 日线请求转成 k 线数据
-     * ts_code trade_date open high low close pre_close change pct_chg vol amount
-     * @return
-     */
-    @Deprecated
-    private Flux<KLineDto> toKLineDto(TushareResp resp) {
-        List<String> fields = resp.getData().getFields();
-        return Flux.fromIterable(resp.getData().getItems())
-                .map(item -> {
-                    KLineDto kLineDto = new KLineDto();
-                    // 循环设置每个字段
-                    for (int i = 0; i < fields.size(); i++) {
-                        String field = fields.get(i); // 字段名
-                        String value = item.get(i); // 字段名对应的字段值
-                        switch (field) {
-                            case "ts_code" -> kLineDto.setStockCode(TushareUtil.removeSuffix(value));
-                            case "trade_date" -> kLineDto.setDate(formatDate(value));
-                            case "open" -> kLineDto.setOpen(value);
-                            case "high" -> kLineDto.setHigh(value);
-                            case "low" -> kLineDto.setLow(value);
-                            case "close" -> kLineDto.setClose(value);
-                            case "change" -> kLineDto.setChange(value);
-                            case "pct_chg" -> kLineDto.setPctChange(value);
-                            case "vol" -> kLineDto.setVolume(getVolShares(value));
-                            case "amount" -> kLineDto.setAmount(getAmountYuan(value));
-                            default -> emptyMethod();
-                        }
-                    }
-                    return kLineDto;
-                });
-    }
-
 
     // 000001.SZ -> 000001
     private String parseCode(String code) {

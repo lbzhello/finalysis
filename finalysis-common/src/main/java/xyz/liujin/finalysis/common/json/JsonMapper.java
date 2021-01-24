@@ -22,32 +22,33 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 从 json 中提取需要的数据
- * json 数据:
+ * json 映射器，从 json 中提取需要的数据
+ *
+ * json
  * {
- *     "name": "xiaoming",
- *     "age": 15,
- *     "class": {
- *         "name": "xiaoxue",
- *         "grade": 9,
- *         "author": "laoshi"
+ *     "code": 0,
+ *     "msg": "success"
+ *     "data": {
+ *         "date": "20210112",
+ *         "name": "hello kitty",
+ *         "description": "some test file"
  *     }
  * }
  *
- * mapper:
+ * mapper
  * {
- *     "name": "/name",
- *     "age": "/age",
- *     "className": "/class/name",
- *     "classAuthor": "/class/author"
+ *     "code": "/code",
+ *     "time": "/data/date",
+ *     "name": "/data/name",
+ *     "info": "/data/info:empty"
  * }
  *
- * 映射结果：
+ * json + mapper
  * {
- *     "name": "xiaoming",
- *     "age": 15,
- *     "className": "xiaoxue",
- *     "classAuthor": "laoshi"
+ *     "code": 0,
+ *     "time": "20210112",
+ *     "name": "hello kitty",
+ *     "info": "empty
  * }
  */
 public interface JsonMapper {
