@@ -129,7 +129,7 @@ public class TushareCrawler implements StockCrawler {
      */
     private List<String> splitCodes(String startDate, String endDate, String[] codes) {
         if (ArrayUtil.isEmpty(codes)) {
-
+            return Collections.singletonList("");
         }
         String strs = formatCodes(codes);
         return Collections.singletonList(strs);
