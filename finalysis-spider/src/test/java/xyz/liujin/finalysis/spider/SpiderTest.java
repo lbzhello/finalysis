@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.client.WebClient;
 import xyz.liujin.finalysis.spider.szse.SzseConst;
+import xyz.liujin.finalysis.spider.tushare.TushareCrawler;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -13,6 +14,27 @@ import java.time.OffsetDateTime;
 public class SpiderTest {
     public static void main(String[] args) {
         System.out.println(OffsetDateTime.parse("2020-12-31"));
+    }
+
+    @Test
+    public void tushareDailyTest() {
+        TushareCrawler tushareCrawler = new TushareCrawler();
+        tushareCrawler.crawlKLine("2021-01-16", null, "000155")
+                .subscribe(it -> {
+                    System.out.println(it);
+                });
+
+        System.out.println();
+    }
+
+    @Test
+    public void tushareStockTest() {
+        TushareCrawler tushareCrawler = new TushareCrawler();
+        tushareCrawler.crawlStock()
+                .subscribe(it -> {
+                    System.out.println(it);
+                });
+        System.out.println();
     }
 
     @Test

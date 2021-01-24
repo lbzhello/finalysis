@@ -6,9 +6,9 @@ import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
+import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.util.annotation.Nullable;
 import reactor.util.function.Tuple2;
 import xyz.liujin.finalysis.common.util.YamlUtils;
 

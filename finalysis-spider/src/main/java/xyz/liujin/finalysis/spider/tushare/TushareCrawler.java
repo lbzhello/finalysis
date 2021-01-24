@@ -1,14 +1,13 @@
 package xyz.liujin.finalysis.spider.tushare;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.json.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
-import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.json.CsvMapper;
 import xyz.liujin.finalysis.common.util.DateUtils;
@@ -28,7 +27,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -42,14 +40,13 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) throws Exception {
-        AtomicInteger count = new AtomicInteger(0);
         TushareCrawler tushareCrawler = new TushareCrawler();
         tushareCrawler.crawlStock()
                 .subscribe(it -> {
                     System.out.println(it);
                 });
+        System.out.println();
 
-        System.out.println(count.get());
     }
 
     @Override
@@ -61,33 +58,12 @@ public class TushareCrawler implements StockCrawler {
                     try {
                         String bodyStr = response.body().string();
                         // 获取映射文件
-                        File file = ResourceUtils.getFile("classpath:tushare/stock_basic_to_stock_dto.yml");
-                        return CsvMapper.yamlFile("/data/fields", "/data/items", file)
+                        File file = ResourceUtils.getFile("classpath:tushare/stock_basic_2_stock.yml");
+                        return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
                                 .eval(bodyStr, StockDto.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
                         logger.error("crawlStock failed", e);
-                    }
-                    return Flux.just();
-                });
-    }
-
-    @Override
-    public Flux<KLineDto> crawlKLine(String startDate, String endDate, String... codes) {
-        // 爬取所有股票 K 线
-        return Tushare.Daily.builder()
-                .ts_code(formatCodes(codes))
-                .start_date(yyyyMMdd(startDate))
-                .end_date(yyyyMMdd(endDate))
-                .build()
-                .req()
-                .flatMap(response -> {
-                    try {
-                        String body = response.body().string();
-                        TushareResp tushareResp = JSONUtil.toBean(body, TushareResp.class);
-                        return toKLineDto(tushareResp);
-                    } catch (IOException e) {
-                        logger.error("failed to call tushare.daily");
                     }
                     return Flux.just();
                 });
@@ -116,6 +92,81 @@ public class TushareCrawler implements StockCrawler {
                 .build();
     }
 
+    @Override
+    public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes) {
+        // 爬取所有股票 K 线
+        return Tushare.Daily.builder()
+                .ts_code(formatCodes(codes))
+                .start_date(yyyyMMdd(startDate))
+                .end_date(yyyyMMdd(endDate))
+                .build()
+                .req()
+                .flatMap(response -> {
+                    try {
+                        String body = response.body().string();
+                        // 获取映射文件
+                        File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
+                        return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
+                                .eval(body, KLineDto.class)
+                                .map(this::format);
+                    } catch (IOException e) {
+                        logger.error("failed to call tushare.daily");
+                    }
+                    return Flux.just();
+                });
+    }
+
+    /**
+     * 格式化字段格式
+     * @param kLineDto
+     * @return
+     */
+    private KLineDto format(KLineDto kLineDto) {
+        // 000001.SZ -> 000001
+        kLineDto.setStockCode(TushareUtil.removeSuffix(kLineDto.getStockCode()));
+        // yyyyMMdd -> yyyy-MM-dd
+        kLineDto.setDate(formatDate(kLineDto.getDate()));
+        // 成交量 tushare 单位是手, 改为股
+        kLineDto.setVolume(getVolShares(kLineDto.getVolume()));
+        // 成交额 tushare 单位：千元，改为 元
+        kLineDto.setAmount(getAmountYuan(kLineDto.getAmount()));
+        return kLineDto;
+    }
+
+    /**
+     * 日线请求转成 k 线数据
+     * ts_code trade_date open high low close pre_close change pct_chg vol amount
+     * @return
+     */
+    @Deprecated
+    private Flux<KLineDto> toKLineDto(TushareResp resp) {
+        List<String> fields = resp.getData().getFields();
+        return Flux.fromIterable(resp.getData().getItems())
+                .map(item -> {
+                    KLineDto kLineDto = new KLineDto();
+                    // 循环设置每个字段
+                    for (int i = 0; i < fields.size(); i++) {
+                        String field = fields.get(i); // 字段名
+                        String value = item.get(i); // 字段名对应的字段值
+                        switch (field) {
+                            case "ts_code" -> kLineDto.setStockCode(TushareUtil.removeSuffix(value));
+                            case "trade_date" -> kLineDto.setDate(formatDate(value));
+                            case "open" -> kLineDto.setOpen(value);
+                            case "high" -> kLineDto.setHigh(value);
+                            case "low" -> kLineDto.setLow(value);
+                            case "close" -> kLineDto.setClose(value);
+                            case "change" -> kLineDto.setChange(value);
+                            case "pct_chg" -> kLineDto.setPctChange(value);
+                            case "vol" -> kLineDto.setVolume(getVolShares(value));
+                            case "amount" -> kLineDto.setAmount(getAmountYuan(value));
+                            default -> emptyMethod();
+                        }
+                    }
+                    return kLineDto;
+                });
+    }
+
+
     // 000001.SZ -> 000001
     private String parseCode(String code) {
         return CharSequenceUtil.removeAny(code, StockConst.POINT, StockConst.SH, StockConst.SZ);
@@ -134,38 +185,6 @@ public class TushareCrawler implements StockCrawler {
     // yyyy-MM-dd -> yyyyMMdd
     private String yyyyMMdd(@Nullable String dateStr) {
         return CharSequenceUtil.removeAny(dateStr, "-");
-    }
-
-    /**
-     * 日线请求转成 k 线数据
-     * ts_code trade_date open high low close pre_close change pct_chg vol amount
-     * @return
-     */
-    private Flux<KLineDto> toKLineDto(TushareResp resp) {
-        List<String> fields = resp.getData().getFields();
-        return Flux.fromIterable(resp.getData().getItems())
-                .map(item -> {
-                    KLineDto kLineDto = new KLineDto();
-                    // 循环设置每个字段
-                    for (int i = 0; i < fields.size(); i++) {
-                        String field = fields.get(i); // 字段名
-                        String value = item.get(i); // 字段名对应的字段值
-                        switch (field) {
-                            case "ts_code" -> kLineDto.setStockCode(TushareUtil.removeSuffix(value));
-                            case "trade_date" -> kLineDto.setDate(formatDate(value));
-                            case "open" -> kLineDto.setOpen(value);
-                            case "high" -> kLineDto.setHigh(value);
-                            case "low" -> kLineDto.setLow(value);
-                            case "close" -> kLineDto.setClose(value);
-                            case "pre_close" -> emptyMethod();
-                            case "change" -> kLineDto.setChange(value);
-                            case "pct_chg" -> kLineDto.setPctChange(value);
-                            case "vol" -> kLineDto.setVolume(getVolShares(value));
-                            case "amount" -> kLineDto.setAmount(getAmountYuan(value));
-                        }
-                    }
-                    return kLineDto;
-                });
     }
 
     // 空方法

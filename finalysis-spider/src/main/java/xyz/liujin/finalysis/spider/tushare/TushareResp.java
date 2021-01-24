@@ -13,6 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class TushareResp {
+    // 响应 csv 字段 fields 在 json 中的位置
+    public static final String FIELDS_PATH = "/data/fields";
+    // 响应 csv 记录 items 在 json 的位置
+    public static final String ITEMS_PATH = "/data/items";
     // 接口返回码，2002表示权限问题
     private Integer code;
     // 错误信息，比如“系统内部错误”，“没有权限”等

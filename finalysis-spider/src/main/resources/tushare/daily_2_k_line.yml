@@ -1,0 +1,10 @@
+stockCode: /ts_code # 000001.SZ
+date: /trade_date #20210124
+open: /open
+high: /high
+low: /low
+close: /close
+change: /change
+pctChange: /pct_chg
+volume: /vol # 单位：手
+amount: /amount # 单位：千元
