@@ -1,8 +1,8 @@
 package xyz.liujin.finalysis.common.json;
 
-import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.TypeReference;
+import cn.hutool.core.util.NumberUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.Data;
 import reactor.core.publisher.Flux;
@@ -10,15 +10,47 @@ import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 import reactor.util.function.Tuple2;
 
-import java.io.InputStream;
-import java.io.Reader;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
 /**
+ * 用于从 csv 格式的 json 中提取数据
+ * 例如
+ * csv 格式的 json:
+ *      {
+ *          "fields": ["name", "price", "author", "sum"],
+ *          "items": [
+ *                ["zhao", "21.23", "lbz", "998"],
+ *                ["qian", "33.44", "lbz", "899"],
+ *                ["sun", "22.88", "lbz", "699"]
+ *          ]
+ *      }
  *
+ * mapper:
+ *      {
+ *          "bookName": "/name",
+ *          "price": "/price",
+ *          "count": "/sum
+ *      }
+ *
+ * 提取出的 JSON 数据:
+ *      [
+ *          {
+ *              "bookName": "zhao",
+ *              "price": "21.23",
+ *              "count": "998"
+ *          }, {
+ *              "bookName": "qian",
+ *              "price": "33.44",
+ *              "count": "899"
+ *          }, {
+ *              "bookName": "sun",
+ *              "price": "22.88",
+ *              "count": "699"
+ *          }
+ *      ]
  */
 @Data
 public class CsvMapper {
@@ -38,33 +70,48 @@ public class CsvMapper {
     // csv 标题和索引对应关系， eval 方法执行后才可用
     private Map<String, Long> fieldIndex;
 
-    private static CsvMapper EMPTY_MAPPER = new CsvMapper(null, null, null) {
+    public static CsvMapper EMPTY_MAPPER = new CsvMapper() {
         @Override
         public <T> Flux<T> eval(Map<String, ?> json, Class<T> clazz) {
             return Flux.just();
         }
     };
 
-    private CsvMapper(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
-        this.fieldPath = JsonMapper.parseExpr(fieldPath);
-        this.itemsPath = JsonMapper.parseExpr(itemsPath);
-        this.mapper = parseMap(mapper);
+    /**
+     * 由于未提供 fieldPath 因此 mapper 的表达式只能是数字索引
+     * @param itemsPath
+     * @param mapper
+     * {
+     *     "name": "/1",
+     *     "age": "/2",
+     *     "count": "/3"
+     * }
+     * @return
+     */
+    public static CsvMapper create(@Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
+        CsvMapper csvMapper = new CsvMapper();
+        csvMapper.setItemsPath(JsonMapper.parseExpr(itemsPath));
+        csvMapper.parseMap(mapper);
+        return csvMapper;
     }
 
-    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Reader reader) {
-        if (Objects.isNull(reader)) {
-            return EMPTY_MAPPER;
-        }
-        String mapper = IoUtil.read(reader);
-        return parse(fieldPath, itemsPath, mapper);
-    }
-
-    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable String jsonMapper) {
-        return parse(fieldPath, itemsPath, JSONUtil.parseObj(jsonMapper));
-    }
-
-    public static CsvMapper parse(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
-        return new CsvMapper(fieldPath, itemsPath, mapper);
+    /**
+     * 创建一个 Mapper 用于从 CSV 格式 JSON 提取数据
+     * @param fieldPath
+     * @param itemsPath
+     * @param mapper
+     *      {
+     *          "bookName": "/name",
+     *          "price": "/price",
+     *          "sum": "/count
+     *      }
+     */
+    public static CsvMapper create(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
+        CsvMapper csvMapper = new CsvMapper();
+        csvMapper.setFieldPath(JsonMapper.parseExpr(fieldPath));
+        csvMapper.setItemsPath(JsonMapper.parseExpr(itemsPath));
+        csvMapper.parseMap(mapper);
+        return csvMapper;
     }
 
     /**
@@ -94,12 +141,14 @@ public class CsvMapper {
      * @return
      */
     public <T> Flux<T> eval(Map<String, ?> json, Class<T> clazz) {
-        // 初始化字段索引对应关系
-        List<String> fields = (List<String>) fieldPath.eval(json);
-        fieldIndex = Flux.fromIterable(fields)
-                .index()
-                .collectMap(Tuple2::getT2, Tuple2::getT1)
-                .block();
+        // fieldIndex 可以直接提供，若为 null 则从 fieldPath 获取
+        if (Objects.nonNull(this.fieldPath)) {
+            List<String> fields = (List<String>) this.fieldPath.eval(json);
+            this.fieldIndex = Flux.fromIterable(fields)
+                    .index()
+                    .collectMap(Tuple2::getT2, Tuple2::getT1)
+                    .block();
+        }
 
         List<List<?>> items = (List<List<?>>) itemsPath.eval(json);
         return Flux.fromIterable(items)
@@ -117,34 +166,48 @@ public class CsvMapper {
 
 
 
-    private Map<String, ?> parseMap(Map<String, ?> map) {
-        return Mono.justOrEmpty(map)
+    private void parseMap(Map<String, ?> map) {
+        this.mapper = Mono.justOrEmpty(map)
                 .flatMapIterable(Map::entrySet)
-                .map(entry -> Pair.of(entry.getKey(), parseExpr((String) entry.getValue())))
+                .map(entry -> Pair.of(entry.getKey(), this.parseExpr((String) entry.getValue())))
                 .collectMap(Pair::getKey, Pair::getValue)
                 .block();
     }
 
     /**
      * 实际的解析逻辑
+     * name  非表达式，直接返回
      * /name 获取 csv 中标题名为 name 对应的值
      * /1    获取 csv 中第 2 个索引位置的值
+     *
      * @param pathExpr
      * @return
      */
+    private static final Node EMPTY_NODE = Node.literal(null);
     private Node parseExpr(String pathExpr) {
-        return null;
+        if (Objects.isNull(pathExpr)) {
+            return EMPTY_NODE;
+        }
+
+        if (!isExpr(pathExpr)) {
+            return Node.literal(pathExpr);
+        }
+
+        // 去掉开头的 "/"
+        String field = pathExpr.substring(1);
+        if (NumberUtil.isInteger(field)) {
+            Integer index = Integer.valueOf(field);
+            return new IndexNode(index);
+        }
+
+        return new NameNode(field);
     }
 
     // 判断 value 是否是一个表达式；nonNull && isString && startWith("/")
-    private boolean isExpr(Object value) {
+    private static boolean isExpr(Object value) {
         if (Objects.nonNull(value)
                 && value instanceof String
                 && ((String) value).startsWith("/")) {
-            return true;
-        }
-        // 或者本身就是一个路径表达式
-        if (Objects.nonNull(value) && value instanceof Node) {
             return true;
         }
 
@@ -166,7 +229,7 @@ public class CsvMapper {
 
         /**
          * 从一行记录 item 中获取值
-         * @param item
+         * @param item 数据记录
          * @return
          */
         Object get(List<?> item);

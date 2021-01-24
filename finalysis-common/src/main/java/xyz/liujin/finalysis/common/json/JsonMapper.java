@@ -17,6 +17,35 @@ import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 从 json 中提取需要的数据
+ * json 数据:
+ * {
+ *     "name": "xiaoming",
+ *     "age": 15,
+ *     "class": {
+ *         "name": "xiaoxue",
+ *         "grade": 9,
+ *         "author": "laoshi"
+ *     }
+ * }
+ *
+ * mapper:
+ * {
+ *     "name": "/name",
+ *     "age": "/age",
+ *     "className": "/class/name",
+ *     "classAuthor": "/class/author"
+ * }
+ *
+ * 映射结果：
+ * {
+ *     "name": "xiaoming",
+ *     "age": 15,
+ *     "className": "xiaoxue",
+ *     "classAuthor": "laoshi"
+ * }
+ */
 public interface JsonMapper {
     Logger logger = LoggerFactory.getLogger(JsonMapper.class);
 
@@ -65,8 +94,11 @@ public interface JsonMapper {
 
     /**
      * 解析 map 生成映射
-     *
      * @param map
+     * {
+     *     "name": "/path/to/name",
+     *     "age": "/path/to/age"
+     * }
      * @return
      */
     static JsonMapper parseMap(Map<String, ?> map) {
@@ -75,8 +107,8 @@ public interface JsonMapper {
 
     /**
      * 解析 list 生成映射
-     *
      * @param list
+     * ["/path/to", "/path/to/name", "/path/to/age"]
      * @return
      */
     static JsonMapper parseList(List<?> list) {

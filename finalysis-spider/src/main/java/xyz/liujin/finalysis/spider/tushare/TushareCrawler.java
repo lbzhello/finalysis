@@ -11,8 +11,8 @@ import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.util.DateUtils;
-import xyz.liujin.finalysis.common.util.Fluxes;
-import xyz.liujin.finalysis.common.util.JsonExtractor;
+import xyz.liujin.finalysis.common.util.JsonUtils;
+import xyz.liujin.finalysis.common.util.YamlUtils;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
@@ -65,10 +65,8 @@ public class TushareCrawler implements StockCrawler {
                         TushareRespData data = tushareResp.getData();
                         // 获取映射文件
                         Path path = ResourceUtils.getFile("classpath:tushare/stock_basic.yml").toPath();
-                        return JsonExtractor.csvMap(Flux.fromIterable(data.getFields()),
-                                Flux.fromIterable(data.getItems()).map(item -> Fluxes.nullable(item, "")),
-                                path,
-                                StockDto.class)
+                        return JsonUtils.csvMapper("/data/fields", "/data/items", YamlUtils.parse(path).block())
+                                .eval(bodyStr, StockDto.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
                         logger.error("crawlStock failed", e);

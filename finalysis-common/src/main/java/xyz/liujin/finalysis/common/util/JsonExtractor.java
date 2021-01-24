@@ -1,16 +1,16 @@
 package xyz.liujin.finalysis.common.util;
 
-import cn.hutool.core.lang.Dict;
 import cn.hutool.json.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
-import xyz.liujin.finalysis.common.json.JsonMapper;
 
 import java.nio.file.Path;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 /**
  * json 映射器，数据提取器
@@ -47,18 +47,7 @@ public class JsonExtractor {
 
     public static final String NIL = "null";
     public static void main(String[] args) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("data", Dict.of("name", "hh", "size", 5.6));
-        map.put("arr", new Object[]{"v1", "v2", Dict.of("arr", "arrInv")});
 
-        Dict mapper = Dict.of("name", "/data/name", "arr0", "/arr[0]", "arrv", "/arr[2]/arr", "data", "/data", "nil", "/data/hello=99");
-
-        Object obj = JsonMapper.parse(mapper).eval(map);
-
-        JsonMapper listMapper = JsonMapper.parse(Arrays.asList("name", "/data/name", "arr0", "/arr[0]", "arrv", "/arr[2]/arr", "data", "/data", "nil", "/data/hello=99"));
-        Object obj2 = listMapper.eval(map);
-
-        System.out.println();
     }
 
     /**
