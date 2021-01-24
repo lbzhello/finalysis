@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.spider.tushare;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import cn.hutool.core.util.ArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,9 +24,7 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -91,6 +90,13 @@ public class TushareCrawler implements StockCrawler {
                 .build();
     }
 
+    /**
+     * 每分钟最多调用 500 次（每秒最多调用 8 次）
+     * @param startDate yyyy-MM-dd 开始时间，包含，为空则不过滤; 例如 2021-01-01
+     * @param endDate   yyyy-MM-dd 结束时间，包含，为空则不过滤; 例如 2021-01-02
+     * @param codes     股票代码列表，为空则表示所有，例如 [000001, 000002]
+     * @return
+     */
     @Override
     public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes) {
         // 爬取所有股票 K 线
@@ -113,6 +119,20 @@ public class TushareCrawler implements StockCrawler {
                     }
                     return Flux.just();
                 });
+    }
+
+    /**
+     * todo
+     * tushare 最多返回 5000 条记录, 为了不使请求数据丢失，
+     * 这里将 codes 分割，使其在 规定的日期内最多返回 5000 条数据
+     * @return
+     */
+    private List<String> splitCodes(String startDate, String endDate, String[] codes) {
+        if (ArrayUtil.isEmpty(codes)) {
+
+        }
+        String strs = formatCodes(codes);
+        return Collections.singletonList(strs);
     }
 
     /**
