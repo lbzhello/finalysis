@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.common.json;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.text.CharSequenceUtil;
 import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
@@ -7,12 +8,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.common.util.ArrayUtils;
+import xyz.liujin.finalysis.common.util.YamlUtils;
 
+import java.io.File;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -49,6 +53,8 @@ import java.util.stream.Collectors;
 public interface JsonMapper {
     Logger logger = LoggerFactory.getLogger(JsonMapper.class);
 
+    static final JsonMapper EMPTY_MAPPER = JsonMapper.literal(null);
+
     // 表达式前缀
     static final String EXPR_PRE = "/";
 
@@ -66,6 +72,42 @@ public interface JsonMapper {
     }
 
     /**
+     * 从 yamlFile 中获取 mapper
+     * @param yamlFile
+     * @return
+     */
+    static JsonMapper yamlFile(@Nullable File yamlFile) {
+        if (Objects.isNull(yamlFile)) {
+            return EMPTY_MAPPER;
+        }
+        return YamlUtils.parse(yamlFile.toPath())
+                .map(JsonMapper::json)
+                .or(Mono.just(EMPTY_MAPPER))
+                .block();
+    }
+
+    /**
+     * 从 jsonFile 创建 mapper
+     * @param jsonFile
+     * @return
+     */
+    static JsonMapper jsonFile(@Nullable File jsonFile) {
+        if (Objects.isNull(jsonFile)) {
+            return EMPTY_MAPPER;
+        }
+        return jsonString(FileUtil.readUtf8String(jsonFile));
+    }
+
+    /**
+     * 根据 json 字符串生成 mapper
+     * @param json
+     * @return
+     */
+    static JsonMapper jsonString(@Nullable String json) {
+        return json(JSONUtil.parseObj(json));
+    }
+
+    /**
      * 解析 obj 的值，生成映射
      *
      * @param obj
@@ -73,11 +115,11 @@ public interface JsonMapper {
      */
     static JsonMapper parse(Object obj) {
         if (JsonMapper.isExpr(obj)) {
-            return JsonMapper.parseExpr((String) obj);
+            return JsonMapper.pathExpr((String) obj);
         } else if (obj instanceof List) {
-            return JsonMapper.parseList((List<?>) obj);
+            return JsonMapper.list((List<?>) obj);
         } else if (obj instanceof Map) {
-            return JsonMapper.parseMap((Map<String, ?>) obj);
+            return JsonMapper.json((Map<String, ?>) obj);
         }
 
         return JsonMapper.literal(obj);
@@ -101,7 +143,7 @@ public interface JsonMapper {
      * }
      * @return
      */
-    static JsonMapper parseMap(Map<String, ?> map) {
+    static JsonMapper json(@Nullable Map<String, ?> map) {
         return new MapMapper(map);
     }
 
@@ -111,7 +153,7 @@ public interface JsonMapper {
      * ["/path/to", "/path/to/name", "/path/to/age"]
      * @return
      */
-    static JsonMapper parseList(List<?> list) {
+    static JsonMapper list(@Nullable List<?> list) {
         return new ListMapper(list);
     }
 
@@ -126,8 +168,7 @@ public interface JsonMapper {
      * @return
      */
     String NIL = "null";
-
-    static JsonMapper parseExpr(String pathStr) {
+    static JsonMapper pathExpr(@Nullable String pathStr) {
         if (CharSequenceUtil.isBlank(pathStr)) {
             return JsonMapper.literal(pathStr);
         }
@@ -199,7 +240,9 @@ public interface JsonMapper {
         private Map<String, ?> map;
 
         public MapMapper(Map<String, ?> map) {
-            this.map = map.entrySet().stream()
+            this.map = Optional.ofNullable(map)
+                    .stream()
+                    .flatMap(it -> it.entrySet().stream())
                     // 将 value 转成 Mapper
                     .map(entry -> {
                         Object value = JsonMapper.parse(entry.getValue());

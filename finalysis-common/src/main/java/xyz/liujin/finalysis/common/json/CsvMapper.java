@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.common.json;
 
+import cn.hutool.core.io.FileUtil;
 import cn.hutool.core.lang.Pair;
 import cn.hutool.core.lang.TypeReference;
 import cn.hutool.core.util.NumberUtil;
@@ -9,7 +10,9 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.annotation.Nullable;
 import reactor.util.function.Tuple2;
+import xyz.liujin.finalysis.common.util.YamlUtils;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -78,21 +81,39 @@ public class CsvMapper {
     };
 
     /**
-     * 由于未提供 fieldPath 因此 mapper 的表达式只能是数字索引
-     * @param itemsPath
-     * @param mapper
-     * {
-     *     "name": "/1",
-     *     "age": "/2",
-     *     "count": "/3"
-     * }
+     * 从 jsonFile 创建 mapper
+     * @param jsonFile json 格式文件
      * @return
      */
-    public static CsvMapper create(@Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
-        CsvMapper csvMapper = new CsvMapper();
-        csvMapper.setItemsPath(JsonMapper.parseExpr(itemsPath));
-        csvMapper.parseMap(mapper);
-        return csvMapper;
+    public static CsvMapper jsonFile(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable File jsonFile) {
+        return Optional.ofNullable(jsonFile)
+                .map(file -> jsonString(fieldPath, itemsPath, FileUtil.readUtf8String(jsonFile)))
+                .orElse(EMPTY_MAPPER);
+    }
+
+    /**
+     * 从 yaml 文件中获取 Mapper
+     * @param yamlFile yaml 格式文件
+     */
+    public static CsvMapper yamlFile(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable File yamlFile) {
+        if (Objects.isNull(yamlFile)) {
+            return CsvMapper.EMPTY_MAPPER;
+        }
+        Map<String, Object> mapper = YamlUtils.parse(yamlFile.toPath()).block();
+        return create(fieldPath, itemsPath, mapper);
+    }
+
+    /**
+     * 从 JSON String 中获取 mapper
+     * @param jsonMapper
+     *      {
+     *          "bookName": "/name",
+     *          "price": "/price",
+     *          "sum": "/count
+     *      }
+     */
+    public static CsvMapper jsonString(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable String jsonMapper) {
+        return create(fieldPath, itemsPath, JSONUtil.parseObj(jsonMapper));
     }
 
     /**
@@ -103,13 +124,13 @@ public class CsvMapper {
      *      {
      *          "bookName": "/name",
      *          "price": "/price",
-     *          "sum": "/count
+     *          "sum": "/3"
      *      }
      */
     public static CsvMapper create(@Nullable String fieldPath, @Nullable String itemsPath, @Nullable Map<String, ?> mapper) {
         CsvMapper csvMapper = new CsvMapper();
-        csvMapper.setFieldPath(JsonMapper.parseExpr(fieldPath));
-        csvMapper.setItemsPath(JsonMapper.parseExpr(itemsPath));
+        csvMapper.setFieldPath(JsonMapper.pathExpr(fieldPath));
+        csvMapper.setItemsPath(JsonMapper.pathExpr(itemsPath));
         csvMapper.parseMap(mapper);
         return csvMapper;
     }
@@ -142,12 +163,15 @@ public class CsvMapper {
      */
     public <T> Flux<T> eval(Map<String, ?> json, Class<T> clazz) {
         // fieldIndex 可以直接提供，若为 null 则从 fieldPath 获取
-        if (Objects.nonNull(this.fieldPath)) {
+        // fieldPath 可空，可以直接通过索引获取值
+        if (Objects.nonNull(this.fieldPath) && Objects.nonNull(this.fieldPath)) {
             List<String> fields = (List<String>) this.fieldPath.eval(json);
-            this.fieldIndex = Flux.fromIterable(fields)
-                    .index()
-                    .collectMap(Tuple2::getT2, Tuple2::getT1)
-                    .block();
+            if (Objects.nonNull(fields)) {
+                this.fieldIndex = Flux.fromIterable(fields)
+                        .index()
+                        .collectMap(Tuple2::getT2, Tuple2::getT1)
+                        .block();
+            }
         }
 
         List<List<?>> items = (List<List<?>>) itemsPath.eval(json);

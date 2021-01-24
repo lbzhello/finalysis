@@ -2,7 +2,7 @@ package finalysis;
 
 import cn.hutool.core.lang.Dict;
 import org.junit.jupiter.api.Test;
-import xyz.liujin.finalysis.common.util.JsonUtils;
+import xyz.liujin.finalysis.common.json.JsonMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -26,9 +26,9 @@ public class CommonTest {
 
         Dict mapper = Dict.of("name", "/data/name", "arr0", "/arr[0]", "arrv", "/arr[2]/arr", "data", "/data", "nil", "/data/hello=99");
 
-        Object mapObj = JsonUtils.jsonMapper(mapper).eval(map);
+        Object mapObj = JsonMapper.json(mapper).eval(map);
 
-        Object listObj = JsonUtils.jsonMapper(Arrays.asList("name", "/data/name", "arr0", "/arr[0]", "arrv", "/arr[2]/arr", "data", "/data", "nil", "/data/hello=99"))
+        Object listObj = JsonMapper.list(Arrays.asList("name", "/data/name", "arr0", "/arr[0]", "arrv", "/arr[2]/arr", "data", "/data", "nil", "/data/hello=99"))
                 .eval(map);
         System.out.println();
     }

@@ -47,7 +47,12 @@ public class JsonExtractor {
 
     public static final String NIL = "null";
     public static void main(String[] args) {
+        String obj = (String) getObj();
+        System.out.println();
+    }
 
+    public static Object getObj() {
+        return null;
     }
 
     /**

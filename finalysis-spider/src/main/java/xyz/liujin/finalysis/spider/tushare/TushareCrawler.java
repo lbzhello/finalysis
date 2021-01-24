@@ -10,9 +10,8 @@ import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.util.annotation.Nullable;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
+import xyz.liujin.finalysis.common.json.CsvMapper;
 import xyz.liujin.finalysis.common.util.DateUtils;
-import xyz.liujin.finalysis.common.util.JsonUtils;
-import xyz.liujin.finalysis.common.util.YamlUtils;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
@@ -20,9 +19,9 @@ import xyz.liujin.finalysis.spider.dto.StockDto;
 import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.StockService;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
@@ -61,11 +60,9 @@ public class TushareCrawler implements StockCrawler {
                 .flatMap(response -> {
                     try {
                         String bodyStr = response.body().string();
-                        TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
-                        TushareRespData data = tushareResp.getData();
                         // 获取映射文件
-                        Path path = ResourceUtils.getFile("classpath:tushare/stock_basic.yml").toPath();
-                        return JsonUtils.csvMapper("/data/fields", "/data/items", YamlUtils.parse(path).block())
+                        File file = ResourceUtils.getFile("classpath:tushare/stock_basic_to_stock_dto.yml");
+                        return CsvMapper.yamlFile("/data/fields", "/data/items", file)
                                 .eval(bodyStr, StockDto.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
