@@ -115,6 +115,11 @@ public final class DateUtils {
                 .atTime(0, 0, 0).atOffset(ZONE_OFFSET_8);
     }
 
+    /**
+     * yyyy-MM-dd -> LocalDate
+     * @param text
+     * @return
+     */
     public static LocalDate parseDate(String text) {
         return LocalDate.parse(text, DateTimeFormatter.ISO_DATE);
     }

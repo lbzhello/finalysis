@@ -9,6 +9,8 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.json.CsvMapper;
 import xyz.liujin.finalysis.common.util.DateUtils;
@@ -24,7 +26,10 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -38,13 +43,10 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) throws Exception {
-        TushareCrawler tushareCrawler = new TushareCrawler();
-        tushareCrawler.crawlStock()
+        splitCodes("2000-01-20", "2021-01-26", new String[]{"a", "b", "c", "d", "e"})
                 .subscribe(it -> {
-                    System.out.println(it);
+                    System.out.println(it.getT1() + " " + it.getT2() + " " + it.getT3());
                 });
-        System.out.println();
-
     }
 
     @Override
@@ -100,39 +102,85 @@ public class TushareCrawler implements StockCrawler {
     @Override
     public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes) {
         // 爬取所有股票 K 线
-        return Tushare.Daily.builder()
-                .ts_code(formatCodes(codes))
-                .start_date(yyyyMMdd(startDate))
-                .end_date(yyyyMMdd(endDate))
-                .build()
-                .req()
-                .flatMap(response -> {
-                    try {
-                        String body = response.body().string();
-                        // 获取映射文件
-                        File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
-                        return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
-                                .eval(body, KLineDto.class)
-                                .map(this::format);
-                    } catch (IOException e) {
-                        logger.error("failed to call tushare.daily");
-                    }
-                    return Flux.just();
-                });
+        return splitCodes(startDate, endDate, codes)
+                .flatMap(tuple -> Tushare.Daily.builder()
+                        .ts_code(formatCodes(tuple.getT3()))
+                        .start_date(yyyyMMdd(tuple.getT1()))
+                        .end_date(yyyyMMdd(tuple.getT2()))
+                        .build()
+                        .req()
+                        .flatMap(response -> {
+                            try {
+                                String body = response.body().string();
+                                // 获取映射文件
+                                File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
+                                return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
+                                        .eval(body, KLineDto.class)
+                                        .map(this::format);
+                            } catch (IOException e) {
+                                logger.error("failed to call tushare.daily");
+                            }
+                            return Flux.just();
+                        }));
     }
 
     /**
-     * todo
      * tushare 最多返回 5000 条记录, 为了不使请求数据丢失，
      * 这里将 codes 分割，使其在 规定的日期内最多返回 5000 条数据
-     * @return
+     * @return startDate, endDate, codes
      */
-    private List<String> splitCodes(String startDate, String endDate, String[] codes) {
+    private static final long MAX_ITEMS = 5000L;
+    private static Flux<Tuple3<String, String, String[]>> splitCodes(String startDate, String endDate, String[] codes) {
         if (ArrayUtil.isEmpty(codes)) {
-            return Collections.singletonList("");
+            return Flux.just(Tuples.of(startDate, endDate, new String[]{}));
         }
-        String strs = formatCodes(codes);
-        return Collections.singletonList(strs);
+
+        return Flux.create(sink -> {
+            LocalDate start = DateUtils.parseDate(startDate);
+            LocalDate end = DateUtils.parseDate(endDate);
+
+            // 最多间隔 5000 天（每天一条数据）
+            long diff;
+            while ((diff = start.until(end, ChronoUnit.DAYS)) >= MAX_ITEMS) {
+                // 没个 code 生成 MAX_ITEMS 条数据
+                String from = DateUtils.formatDate(start);
+                String to = DateUtils.formatDate(start.plusDays(MAX_ITEMS - 1));
+                Flux.fromArray(codes)
+                        .subscribe(code -> {
+                            sink.next(Tuples.of(from, to, new String[]{code}));
+                        });
+
+                // 继续校验是否超过
+                start = start.plusDays(MAX_ITEMS);
+            }
+
+            // 获取日期区间
+            String startStr = DateUtils.formatDate(start);
+            String endStr = DateUtils.formatDate(end);
+
+            // 计算每次循环的 codes 数
+            int div = Math.toIntExact(MAX_ITEMS / diff);
+            int len = codes.length;
+
+            int from = 0;
+            int to = div;
+            while (to <= len) {
+                String[] range = Arrays.copyOfRange(codes, from, to);
+                sink.next(Tuples.of(startStr, endStr, range));
+                from = to;
+                to = to + div;
+            }
+
+            // 剩余的 codes
+            if (from < len) {
+                String[] range = Arrays.copyOfRange(codes, from, len);
+                sink.next(Tuples.of(startStr, endStr, range));
+            }
+
+            sink.complete();
+        });
+
+
     }
 
     /**
