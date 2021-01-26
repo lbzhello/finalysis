@@ -2,7 +2,9 @@ package xyz.liujin.finalysis.common.util;
 
 import java.util.concurrent.Semaphore;
 
-
+/**
+ * 同步工具类
+ */
 public class SyncUtils {
     private static Semaphore semaphore = new Semaphore(1);
 
