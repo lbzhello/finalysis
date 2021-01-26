@@ -12,7 +12,7 @@ public class SyncUtils {
      * 方法启动后，最少等待 {@param millis} 后才允许其他方法执行
      * 用于控制方法执行速率
      *
-     * @param millis 再锁上最少需要等待的事件
+     * @param millis 在锁上最少需要等待的时间
      * @throws InterruptedException
      */
     public static void waitMillis(long millis) throws InterruptedException {
