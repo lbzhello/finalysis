@@ -18,7 +18,7 @@ import java.util.Map;
  * 说明：
  * N 表示非必填
  * Y 表示必填
- * 默认  Y 必填
+ * 默认  N 非必填
  */
 @Data
 @Builder
@@ -107,6 +107,7 @@ public class Tushare {
     public static class StockBasic implements Params {
         /**
          * 股票代码
+         * 示例：000001.SZ
          */
         private String ts_code;
 
@@ -139,9 +140,10 @@ public class Tushare {
     @Builder
     @NoArgsConstructor
     @AllArgsConstructor
-    public static final class Daily implements Params {
+    public static class Daily implements Params {
         /**
          * 股票代码（支持多个股票同时提取，逗号分隔）
+         * 示例：000001.SZ
          * N: 默认全部股票
          */
         private String ts_code;
@@ -164,6 +166,50 @@ public class Tushare {
         @Override
         public String getApiName() {
             return "daily";
+        }
+    }
+
+    /**
+     * 复权因子
+     *
+     * 类型	    算法	                                    参数标识
+     * 不复权	无	                                    空或None
+     * 前复权	当日收盘价 × 当日复权因子 / 最新复权因子	    qfq
+     * 后复权	当日收盘价 × 当日复权因子	                hfq
+     *
+     * https://tushare.pro/document/2?doc_id=28
+     */
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static final class AdjFactor implements Params {
+
+        /**
+         * 股票代码
+         * 000001.SZ
+         * Y
+         */
+        private String ts_code;
+
+        /**
+         * 交易日期（YYYYMMDD）
+         */
+        private String trade_date;
+
+        /**
+         * 开始日期(YYYYMMDD)
+         */
+        private String start_date;
+
+        /**
+         * 结束日期(YYYYMMDD)
+         */
+        private String end_date;
+
+        @Override
+        public String getApiName() {
+            return "adj_factor";
         }
     }
 
