@@ -17,7 +17,6 @@ public class SyncUtils {
      */
     public static void waitMillis(long millis) throws InterruptedException {
         semaphore.acquire();
-        System.out.println("acquire 1");
         // 再另一个线程中等待 millis 后释放锁
         Runnable runnable = () -> {
             try {
@@ -26,7 +25,6 @@ public class SyncUtils {
                 e.printStackTrace();
             } finally {
                 semaphore.release();
-                System.out.println("release 1");
             }
         };
         new Thread(runnable).start();
