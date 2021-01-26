@@ -18,7 +18,6 @@ import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.KLineService;
 import xyz.liujin.finalysis.spider.service.StockService;
 
-import java.time.Duration;
 import java.time.OffsetDateTime;
 
 @Component
@@ -73,27 +72,23 @@ public class CrawlerHandler {
                     // 股票代码，例如 000001,000002
                     logger.debug("start crawlKLine class: {}", stockCrawler.getClass());
 
-                    Flux<String> codeFlux;
+                    String[] codes;
                     String codeStr = serverRequest.queryParam("codes").orElse("");
                     // 提供参数，根据参数查询
                     if (CharSequenceUtil.isNotBlank(codeStr)) {
-                        String[] codes = codeStr.split(",");
-                        codeFlux = Flux.fromArray(codes);
+                        codes = codeStr.split(",");
                     } else {
                         // 未提供股票代码，爬取所有
-                        codeFlux = Flux.fromIterable(stockService.list())
-                                .map(Stock::getStockCode);
+                        codes = stockService.list().stream()
+                                .map(Stock::getStockCode)
+                                .toArray(i -> new String[i]);
                     }
 
-                    // 每分钟最多调用 500 次（每秒最多调用 8 次）
-                    codeFlux.delayElements(Duration.ofMillis(1000 / 8))
-                            .subscribe(code -> {
-                                stockCrawler.crawlKLine(startDate, endDate, code)
-                                        .subscribeOn(Schedulers.boundedElastic())
-                                        .subscribe(kLine -> {
-                                            kLineService.saveOrUpdate(kLine);
-                                        }, e -> logger.error("failed to crawlKLine", e));
-                            });
+                    stockCrawler.crawlKLine(startDate, endDate, codes)
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .subscribe(kLine -> kLineService.saveOrUpdate(kLine),
+                                    e -> logger.error("failed to crawlKLine", e));
+
 
                     sink.next("job running...\n");
                     sink.complete();

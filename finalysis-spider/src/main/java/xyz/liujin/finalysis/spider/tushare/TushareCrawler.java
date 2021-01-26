@@ -14,6 +14,7 @@ import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.json.CsvMapper;
 import xyz.liujin.finalysis.common.util.DateUtils;
+import xyz.liujin.finalysis.common.util.SyncUtils;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.dto.KLineDto;
@@ -103,25 +104,33 @@ public class TushareCrawler implements StockCrawler {
     public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes) {
         // 爬取所有股票 K 线
         return splitCodes(startDate, endDate, codes)
-                .flatMap(tuple -> Tushare.Daily.builder()
-                        .ts_code(formatCodes(tuple.getT3()))
-                        .start_date(yyyyMMdd(tuple.getT1()))
-                        .end_date(yyyyMMdd(tuple.getT2()))
-                        .build()
-                        .req()
-                        .flatMap(response -> {
-                            try {
-                                String body = response.body().string();
-                                // 获取映射文件
-                                File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
-                                return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
-                                        .eval(body, KLineDto.class)
-                                        .map(this::format);
-                            } catch (IOException e) {
-                                logger.error("failed to call tushare.daily");
-                            }
-                            return Flux.just();
-                        }));
+                .flatMap(tuple -> {
+                    // 每分钟最多调用 500 次（每秒最多调用 8 次）
+                    try {
+                        SyncUtils.waitMillis(1000/8);
+                    } catch (InterruptedException e) {
+                        logger.error("Interrupted", e);
+                    }
+                    return Tushare.Daily.builder()
+                            .ts_code(formatCodes(tuple.getT3()))
+                            .start_date(yyyyMMdd(tuple.getT1()))
+                            .end_date(yyyyMMdd(tuple.getT2()))
+                            .build()
+                            .req()
+                            .flatMap(response -> {
+                                try {
+                                    String body = response.body().string();
+                                    // 获取映射文件
+                                    File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
+                                    return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
+                                            .eval(body, KLineDto.class)
+                                            .map(this::format);
+                                } catch (IOException e) {
+                                    logger.error("failed to call tushare.daily");
+                                }
+                                return Flux.just();
+                            });
+                });
     }
 
     /**
@@ -129,7 +138,10 @@ public class TushareCrawler implements StockCrawler {
      * 这里将 codes 分割，使其在 规定的日期内最多返回 5000 条数据
      * @return startDate, endDate, codes
      */
+    // 返回最大记录数，日线每日 1 条，最多 5000 条
     private static final long MAX_ITEMS = 5000L;
+    // 每次请求 codes 最大值
+    private static final int MAX_CODES = 100;
     private static Flux<Tuple3<String, String, String[]>> splitCodes(String startDate, String endDate, String[] codes) {
         if (ArrayUtil.isEmpty(codes)) {
             return Flux.just(Tuples.of(startDate, endDate, new String[]{}));
@@ -159,7 +171,8 @@ public class TushareCrawler implements StockCrawler {
             String endStr = DateUtils.formatDate(end);
 
             // 计算每次循环的 codes 数
-            int div = Math.toIntExact(MAX_ITEMS / diff);
+            // codes
+            int div = Math.min(Math.toIntExact(MAX_ITEMS / diff), MAX_CODES);
             int len = codes.length;
 
             int from = 0;
