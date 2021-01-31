@@ -4,5 +4,5 @@ apply plugin: 'org.springframework.boot'
 
 dependencies {
     implementation project(":finalysis-spider")
-    implementation project(":finalysis-common")
+    implementation project(":finalysis-analysis")
 }

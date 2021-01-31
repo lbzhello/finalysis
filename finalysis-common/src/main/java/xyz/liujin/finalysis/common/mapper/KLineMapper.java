@@ -6,5 +6,5 @@ import xyz.liujin.finalysis.common.entity.KLine;
 import java.util.List;
 
 public interface KLineMapper extends BaseMapper<KLine> {
-    List<KLine> findAll();
+    List<KLine> findOne();
 }
