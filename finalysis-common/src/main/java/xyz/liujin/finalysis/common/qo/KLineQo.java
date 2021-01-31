@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.qo;
+package xyz.liujin.finalysis.common.qo;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

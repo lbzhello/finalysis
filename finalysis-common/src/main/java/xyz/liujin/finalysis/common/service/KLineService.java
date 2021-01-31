@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.service;
+package xyz.liujin.finalysis.common.service;
 
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -8,11 +8,11 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.common.converter.KLineConverter;
 import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.entity.KLine;
 import xyz.liujin.finalysis.common.mapper.KLineMapper;
-import xyz.liujin.finalysis.spider.converter.KLineConverter;
-import xyz.liujin.finalysis.spider.qo.KLineQo;
+import xyz.liujin.finalysis.common.qo.KLineQo;
 
 import java.time.LocalDate;
 

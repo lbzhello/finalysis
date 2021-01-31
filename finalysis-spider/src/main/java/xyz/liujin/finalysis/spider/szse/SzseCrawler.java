@@ -15,11 +15,11 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.entity.Stock;
+import xyz.liujin.finalysis.common.service.StockService;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.constant.HtmlConst;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
-import xyz.liujin.finalysis.spider.service.StockService;
 import xyz.liujin.finalysis.spider.util.HttpUtils;
 
 import java.time.OffsetDateTime;

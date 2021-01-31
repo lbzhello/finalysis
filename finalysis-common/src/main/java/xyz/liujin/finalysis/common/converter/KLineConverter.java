@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.converter;
+package xyz.liujin.finalysis.common.converter;
 
 import cn.hutool.core.text.CharSequenceUtil;
 import xyz.liujin.finalysis.common.dto.KLineDto;

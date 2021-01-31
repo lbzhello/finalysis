@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.service;
+package xyz.liujin.finalysis.common.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;

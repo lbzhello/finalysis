@@ -16,11 +16,11 @@ import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.dto.StockDto;
 import xyz.liujin.finalysis.common.entity.Stock;
 import xyz.liujin.finalysis.common.json.CsvMapper;
+import xyz.liujin.finalysis.common.service.StockService;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.common.util.SyncUtils;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
-import xyz.liujin.finalysis.spider.service.StockService;
 
 import java.io.File;
 import java.io.IOException;
