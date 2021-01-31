@@ -48,14 +48,19 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * 计算均线（5， 10， 20， 30）入库
      */
     public void refreshAvgLine(AvgLineQo avgLineQo) {
-        calculateAvgLine(avgLineQo.getStartDate(), avgLineQo.getEndDate(), avgLineQo.getStockCodes())
+        LocalDate start = avgLineQo.getStartDate();
+        LocalDate end = avgLineQo.getEndDate();
+        // 30 日均线需要需要知道前 30 天的数据
+        calculateAvgLine(start.minusDays(30L), end, avgLineQo.getStockCodes())
+                // 包括 start 天
+                .filter(avgLine -> avgLine.getDate().isAfter(start.minusDays(1)))
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(this::putByCodeAndDate, e -> logger.error("failed to refreshAvgLine", e));
     }
 
     /**
      * 计算均线数据
-     * @param startDate 开始日期，默认当天
+     * @param startDate 开始日期，默认年初
      * @param endDate  结束日期，默认当天
      * @param codes 需要计算的股票
      * @return
@@ -69,8 +74,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
             stockFlux = stockService.queryAll();
         }
 
-        // 开始日期，默认当天
-        LocalDate start = Optional.ofNullable(startDate).orElse(LocalDate.now());
+        // 开始日期，默认年初
+        LocalDate start = Optional.ofNullable(startDate).orElse(DateUtils.beginOfYear());
 
         // 结束日期，默认当天
         LocalDate end = Optional.ofNullable(endDate).orElse(LocalDate.now());
