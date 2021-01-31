@@ -19,6 +19,14 @@ public final class DateUtils {
     }
 
     /**
+     * 获取年初日期
+     * @return
+     */
+    public static final LocalDate beginOfYear() {
+        return LocalDate.of(LocalDate.now().getYear(), 1, 1);
+    }
+
+    /**
      * 根据给定的 pattern 格式化时间
      * @param offsetDateTime
      * @param pattern

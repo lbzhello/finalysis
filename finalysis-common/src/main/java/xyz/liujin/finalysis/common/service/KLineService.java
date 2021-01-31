@@ -3,6 +3,7 @@ package xyz.liujin.finalysis.common.service;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -12,22 +13,31 @@ import xyz.liujin.finalysis.common.converter.KLineConverter;
 import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.entity.KLine;
 import xyz.liujin.finalysis.common.mapper.KLineMapper;
-import xyz.liujin.finalysis.common.qo.KLineQo;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
 public class KLineService extends ServiceImpl<KLineMapper, KLine> implements IService<KLine> {
 
-    public Flux<KLineDto> getByCode(KLineQo qo) {
-        return Flux.create(sink -> {
-            getQuery().eq(KLine::getStockCode, qo.getCode()).list()
-                    .stream()
-                    .map(KLineConverter::toKLineDto)
-                    .forEach(sink::next);
-            sink.complete();
-        });
+    /**
+     * 根据股票代码获取股票日 k 数据
+     * 默认获取 2021-01-01 以后的数据
+     * 根据日期倒叙排列
+     * @param stockCode
+     * @param startDate 开始日期
+     * @param endDate 结束日期
+     * @return
+     */
+    public Flux<KLineDto> getByCode(String stockCode, @Nullable LocalDate startDate, @Nullable LocalDate endDate) {
+        return Flux.fromIterable(lambdaQuery()
+                .eq(KLine::getStockCode, stockCode)
+                .ge(Objects.nonNull(startDate), KLine::getDate, startDate)
+                .le(Objects.nonNull(endDate), KLine::getDate, endDate)
+                .orderByDesc(KLine::getDate)
+                .list())
+                .map(KLineConverter::toKLineDto);
     }
 
     public void saveOrUpdate(KLineDto kLineDto) {
