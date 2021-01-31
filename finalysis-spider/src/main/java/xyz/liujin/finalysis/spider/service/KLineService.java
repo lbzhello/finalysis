@@ -8,10 +8,10 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.common.dto.KLineDto;
+import xyz.liujin.finalysis.common.entity.KLine;
+import xyz.liujin.finalysis.common.mapper.KLineMapper;
 import xyz.liujin.finalysis.spider.converter.KLineConverter;
-import xyz.liujin.finalysis.spider.dto.KLineDto;
-import xyz.liujin.finalysis.spider.entity.KLine;
-import xyz.liujin.finalysis.spider.mapper.KLineMapper;
 import xyz.liujin.finalysis.spider.qo.KLineQo;
 
 import java.time.LocalDate;

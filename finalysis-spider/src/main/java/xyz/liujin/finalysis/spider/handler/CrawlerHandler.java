@@ -12,9 +12,9 @@ import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import xyz.liujin.finalysis.common.entity.Stock;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
-import xyz.liujin.finalysis.spider.entity.Stock;
 import xyz.liujin.finalysis.spider.service.KLineService;
 import xyz.liujin.finalysis.spider.service.StockService;
 

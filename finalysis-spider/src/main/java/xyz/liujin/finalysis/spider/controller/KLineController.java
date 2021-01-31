@@ -3,7 +3,7 @@ package xyz.liujin.finalysis.spider.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.spider.dto.KLineDto;
+import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.spider.qo.KLineQo;
 import xyz.liujin.finalysis.spider.service.KLineService;
 

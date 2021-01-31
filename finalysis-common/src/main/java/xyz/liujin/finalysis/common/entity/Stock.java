@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.spider.entity;
+package xyz.liujin.finalysis.common.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;

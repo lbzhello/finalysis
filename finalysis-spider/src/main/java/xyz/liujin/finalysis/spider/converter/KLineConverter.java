@@ -1,9 +1,9 @@
 package xyz.liujin.finalysis.spider.converter;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import xyz.liujin.finalysis.common.dto.KLineDto;
+import xyz.liujin.finalysis.common.entity.KLine;
 import xyz.liujin.finalysis.common.util.DateUtils;
-import xyz.liujin.finalysis.spider.dto.KLineDto;
-import xyz.liujin.finalysis.spider.entity.KLine;
 
 import java.math.BigDecimal;
 import java.util.Optional;

@@ -1,7 +1,7 @@
-package xyz.liujin.finalysis.spider.mapper;
+package xyz.liujin.finalysis.common.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import xyz.liujin.finalysis.spider.entity.KLine;
+import xyz.liujin.finalysis.common.entity.KLine;
 
 import java.util.List;
 
