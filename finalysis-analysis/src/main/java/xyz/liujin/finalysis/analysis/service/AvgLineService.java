@@ -1,6 +1,6 @@
 package xyz.liujin.finalysis.analysis.service;
 
-import cn.hutool.core.util.ArrayUtil;
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -68,7 +68,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     public Flux<AvgLine> calculateAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable List<String> codes) {
         // 股票
         Flux<Stock> stockFlux;
-        if (ArrayUtil.isNotEmpty(codes)) {
+        if (CollectionUtil.isNotEmpty(codes)) {
             stockFlux = stockService.queryByCodes(codes);
         } else { // 默认计算所有股票均线
             stockFlux = stockService.queryAll();
