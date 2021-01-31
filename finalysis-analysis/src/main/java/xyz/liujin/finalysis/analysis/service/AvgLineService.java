@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.mapper.AvgLineMapper;
+import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.common.entity.Stock;
 import xyz.liujin.finalysis.common.service.KLineService;
 import xyz.liujin.finalysis.common.service.StockService;
@@ -44,22 +45,22 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
     /**
      * 刷新均线数据
-     * 重新计算均线（5， 10， 20， 30）入库
+     * 计算均线（5， 10， 20， 30）入库
      */
-    public void refreshAvgLine(String... code) {
-        calculateAvgLine(null, null, code)
+    public void refreshAvgLine(AvgLineQo avgLineQo) {
+        calculateAvgLine(avgLineQo.getStartDate(), avgLineQo.getEndDate(), avgLineQo.getStockCodes())
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(this::putByCodeAndDate, e -> logger.error("failed to refreshAvgLine", e));
     }
 
     /**
      * 计算均线数据
-     * @param startDate 开始日期，默认年初
+     * @param startDate 开始日期，默认当天
      * @param endDate  结束日期，默认当天
      * @param codes 需要计算的股票
      * @return
      */
-    public Flux<AvgLine> calculateAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, String... codes) {
+    public Flux<AvgLine> calculateAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable List<String> codes) {
         // 股票
         Flux<Stock> stockFlux;
         if (ArrayUtil.isNotEmpty(codes)) {
@@ -68,8 +69,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
             stockFlux = stockService.queryAll();
         }
 
-        // 开始日期，默认年初
-        LocalDate start = Optional.ofNullable(startDate).orElse(DateUtils.beginOfYear());
+        // 开始日期，默认当天
+        LocalDate start = Optional.ofNullable(startDate).orElse(LocalDate.now());
 
         // 结束日期，默认当天
         LocalDate end = Optional.ofNullable(endDate).orElse(LocalDate.now());

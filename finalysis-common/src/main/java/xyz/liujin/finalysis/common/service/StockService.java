@@ -10,10 +10,12 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.common.entity.Stock;
 import xyz.liujin.finalysis.common.mapper.StockMapper;
 
+import java.util.List;
+
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
 public class StockService extends ServiceImpl<StockMapper, Stock> implements IService<Stock> {
-    public Flux<Stock> queryByCodes(String... codes) {
+    public Flux<Stock> queryByCodes(List<String> codes) {
         return Flux.fromIterable(lambdaQuery().in(Stock::getStockCode, codes).list());
     }
 
