@@ -19,8 +19,8 @@ import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import java.time.LocalDate;
 
 @Configuration
-public class SpiderApplication {
-    private Logger logger = LoggerFactory.getLogger(SpiderApplication.class);
+public class SpiderApp {
+    private Logger logger = LoggerFactory.getLogger(SpiderApp.class);
 
     @Autowired
     private StockService stockService;
@@ -47,7 +47,7 @@ public class SpiderApplication {
      */
     @Scheduled(cron = "0 0 0 * * ?")
     public void refreshStockDaily() {
-        logger.debug("start refreshStockDaily {}", stockCrawler.getClass());
+        logger.debug("start refresh stock daily {}", LocalDate.now());
         stockCrawler.crawlStock()
                 .subscribeOn(Schedulers.boundedElastic())
                 .subscribe(stock -> {
@@ -68,6 +68,9 @@ public class SpiderApplication {
                 .oneOpt()
                 .map(KLine::getDate)
                 .orElse(LocalDate.now());
+
+        logger.debug("latest date in db k_line is {}", curDate);
+
         // 需要爬取的日期
         String start = DateUtils.formatDate(curDate.plusDays(1));
         String end = DateUtils.formatDate(LocalDate.now());
