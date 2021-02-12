@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
-import xyz.liujin.finalysis.common.util.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -27,16 +26,16 @@ public class AvgLineController {
     @GetMapping("/refresh")
     public Flux<String> refresh(
             @ApiParam(value = "开始日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
-            @RequestParam(name = "start", required = false) String start,
+            @RequestParam(name = "start", required = false) LocalDate start,
 
             @ApiParam(value = "结束日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
-            @RequestParam(name = "end", required = false) String end,
+            @RequestParam(name = "end", required = false) LocalDate end,
 
             @ApiParam(value = "股票代码；默认所有股票", example = "000001,000002")
             @RequestParam(name = "codes", required = false) String codes) {
         AvgLineQo qo = AvgLineQo.builder()
-                .startDate(Optional.ofNullable(start).map(DateUtils::parseDate).orElse(LocalDate.now()))
-                .endDate(Optional.ofNullable(end).map(DateUtils::parseDate).orElse(LocalDate.now()))
+                .startDate(Optional.ofNullable(start).orElse(LocalDate.now()))
+                .endDate(Optional.ofNullable(end).orElse(LocalDate.now()))
                 .stockCodes(Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of()))
                 .build();
         avgLineService.refreshAvgLine(qo);
