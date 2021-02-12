@@ -17,6 +17,8 @@ import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Configuration
 public class SpiderApp {
@@ -76,9 +78,9 @@ public class SpiderApp {
         String end = DateUtils.formatDate(LocalDate.now());
 
         // 未提供股票代码，爬取所有
-        String[] codes = stockService.list().stream()
+        List<String> codes = stockService.list().stream()
                 .map(Stock::getStockCode)
-                .toArray(i -> new String[i]);
+                .collect(Collectors.toList());
 
         // 爬取股票信息
         stockCrawler.crawlKLine(start, end, codes)

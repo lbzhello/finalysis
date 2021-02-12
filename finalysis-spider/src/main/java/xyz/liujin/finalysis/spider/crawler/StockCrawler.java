@@ -5,6 +5,8 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.entity.Stock;
 
+import java.util.List;
+
 /**
  * 股票数据爬虫
  */
@@ -23,6 +25,6 @@ public interface StockCrawler {
      * @param endDate   yyyy-MM-dd 结束时间，包含，为空则不过滤; 例如 2021-01-02
      * @return
      */
-    Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes);
+    Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, @Nullable List<String> codes);
 
 }

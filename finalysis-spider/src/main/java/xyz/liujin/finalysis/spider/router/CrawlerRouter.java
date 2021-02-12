@@ -10,6 +10,9 @@ import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import xyz.liujin.finalysis.spider.handler.CrawlerHandler;
 
+/**
+ * 此类仅用于测试 webflux 函数式编程测试
+ */
 @Configuration
 public class CrawlerRouter {
     public static final Logger logger = LoggerFactory.getLogger(CrawlerRouter.class);
@@ -17,8 +20,8 @@ public class CrawlerRouter {
     @Bean
     public RouterFunction<ServerResponse> crawlStock(CrawlerHandler crawlerHandler) {
         return RouterFunctions
-                .route(RequestPredicates.GET("/crawl/stock"), crawlerHandler::crawlStock)
-                .andRoute(RequestPredicates.GET("/crawl/k"), crawlerHandler::crawlKLine)
+                .route(RequestPredicates.GET("/test/crawl/stock"), crawlerHandler::crawlStock)
+                .andRoute(RequestPredicates.GET("/test/crawl/k"), crawlerHandler::crawlKLine)
                 ;
     }
 }

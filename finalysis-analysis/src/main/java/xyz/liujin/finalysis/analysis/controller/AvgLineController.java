@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.analysis.controller;
 
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,12 +22,12 @@ public class AvgLineController {
     private AvgLineService avgLineService;
 
     /**
-     * 重新计算均线并入库
      * @param start 开始日期 yyyy-MM-dd
      * @param end 结束日期 yyyy-MM-dd
      * @param code 股票代码
      * @return
      */
+    @ApiOperation("更新均线并入库")
     @GetMapping("/refresh")
     public Flux<String> refresh(
             @RequestParam(name = "start", required = false) String start,

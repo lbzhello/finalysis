@@ -28,7 +28,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -44,7 +44,7 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) throws Exception {
-        splitCodes("2000-01-20", "2021-01-26", new String[]{"a", "b", "c", "d", "e"})
+        splitCodes("2000-01-20", "2021-01-26", List.of("a", "b", "c", "d", "e"))
                 .subscribe(it -> {
                     System.out.println(it.getT1() + " " + it.getT2() + " " + it.getT3());
                 });
@@ -101,16 +101,13 @@ public class TushareCrawler implements StockCrawler {
      * @return
      */
     @Override
-    public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, String... codes) {
+    public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, List<String> codes) {
         // 爬取所有股票 K 线
         return splitCodes(startDate, endDate, codes)
                 .flatMap(tuple -> {
                     // 每分钟最多调用 500 次（每秒最多调用 8 次）
-                    try {
-                        SyncUtils.waitMillis(1000/8);
-                    } catch (InterruptedException e) {
-                        logger.error("Interrupted", e);
-                    }
+                    SyncUtils.waitMillis(1000/8);
+
                     return Tushare.Daily.builder()
                             .ts_code(formatCodes(tuple.getT3()))
                             .start_date(yyyyMMdd(tuple.getT1()))
@@ -142,9 +139,9 @@ public class TushareCrawler implements StockCrawler {
     private static final long MAX_ITEMS = 5000L;
     // 每次请求 codes 最大值
     private static final int MAX_CODES = 100;
-    private static Flux<Tuple3<String, String, String[]>> splitCodes(String startDate, String endDate, String[] codes) {
+    private static Flux<Tuple3<String, String, List<String>>> splitCodes(String startDate, String endDate, List<String> codes) {
         if (ArrayUtil.isEmpty(codes)) {
-            return Flux.just(Tuples.of(startDate, endDate, new String[]{}));
+            return Flux.just(Tuples.of(startDate, endDate, List.of()));
         }
 
         return Flux.create(sink -> {
@@ -157,9 +154,9 @@ public class TushareCrawler implements StockCrawler {
                 // 没个 code 生成 MAX_ITEMS 条数据
                 String from = DateUtils.formatDate(start);
                 String to = DateUtils.formatDate(start.plusDays(MAX_ITEMS - 1));
-                Flux.fromArray(codes)
+                Flux.fromIterable(codes)
                         .subscribe(code -> {
-                            sink.next(Tuples.of(from, to, new String[]{code}));
+                            sink.next(Tuples.of(from, to, List.of(code)));
                         });
 
                 // 继续校验是否超过
@@ -173,12 +170,13 @@ public class TushareCrawler implements StockCrawler {
             // 计算每次循环的 codes 数
             // codes
             int div = Math.min(Math.toIntExact(MAX_ITEMS / diff), MAX_CODES);
-            int len = codes.length;
+            int len = codes.size();
 
             int from = 0;
             int to = div;
             while (to <= len) {
-                String[] range = Arrays.copyOfRange(codes, from, to);
+
+                List<String> range = codes.subList(from, to);
                 sink.next(Tuples.of(startStr, endStr, range));
                 from = to;
                 to = to + div;
@@ -186,7 +184,7 @@ public class TushareCrawler implements StockCrawler {
 
             // 剩余的 codes
             if (from < len) {
-                String[] range = Arrays.copyOfRange(codes, from, len);
+                List<String> range = codes.subList(from, len);
                 sink.next(Tuples.of(startStr, endStr, range));
             }
 
@@ -219,10 +217,10 @@ public class TushareCrawler implements StockCrawler {
     }
 
     // [000001, 600001] -> 000001.SZ,600001.SH
-    private String formatCodes(String[] codes) {
+    private String formatCodes(List<String> codes) {
         return Optional.ofNullable(codes)
                 .stream()
-                .flatMap(Arrays::stream)
+                .flatMap(List::stream)
                 .map(TushareUtil::appendSuffix)
                 .collect(Collectors.joining(","));
 

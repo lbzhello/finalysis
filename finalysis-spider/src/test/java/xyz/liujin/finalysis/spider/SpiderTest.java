@@ -18,11 +18,11 @@ public class SpiderTest {
 
     @Test
     public void tushareDailyTest() {
-        TushareCrawler tushareCrawler = new TushareCrawler();
-        tushareCrawler.crawlKLine("2021-01-16", null, "000155")
-                .subscribe(it -> {
-                    System.out.println(it);
-                });
+//        TushareCrawler tushareCrawler = new TushareCrawler();
+//        tushareCrawler.crawlKLine("2021-01-16", null, "000155")
+//                .subscribe(it -> {
+//                    System.out.println(it);
+//                });
 
         System.out.println();
     }

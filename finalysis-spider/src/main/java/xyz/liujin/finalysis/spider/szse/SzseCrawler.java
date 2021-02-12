@@ -23,6 +23,7 @@ import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.util.HttpUtils;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -40,7 +41,7 @@ public class SzseCrawler implements StockCrawler {
     }
 
     @Override
-    public Flux<KLineDto> crawlKLine(String startDate, String endDate, String... codes) {
+    public Flux<KLineDto> crawlKLine(String startDate, String endDate, List<String> codes) {
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {
