@@ -68,7 +68,7 @@ public class CrawlManager {
             // yyyy-MM-dd
             String startDate = Optional.ofNullable(start).map(DateUtils::formatDate).orElse(DateUtils.formatDate(OffsetDateTime.now()));
             // 默认当前日期
-            String endDate = Optional.ofNullable(start).map(DateUtils::formatDate).orElse(DateUtils.formatDate(OffsetDateTime.now()));
+            String endDate = Optional.ofNullable(end).map(DateUtils::formatDate).orElse(DateUtils.formatDate(OffsetDateTime.now()));
             // 股票代码，默认所有股票
             List<String> codes = Optional.ofNullable(stockCodes).orElse(stockService.list().stream()
                     .map(Stock::getStockCode)
@@ -78,7 +78,6 @@ public class CrawlManager {
                     .subscribeOn(Schedulers.boundedElastic())
                     .subscribe(kLine -> kLineService.saveOrUpdate(kLine),
                             e -> logger.error("failed to crawlKLine", e));
-
 
             sink.next("job running...\n");
             sink.complete();

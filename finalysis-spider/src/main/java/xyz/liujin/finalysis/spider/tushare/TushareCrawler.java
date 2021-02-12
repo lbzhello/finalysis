@@ -44,7 +44,7 @@ public class TushareCrawler implements StockCrawler {
     private StockService stockService;
 
     public static void main(String[] args) throws Exception {
-        splitCodes("2000-01-20", "2021-01-26", List.of("a", "b", "c", "d", "e"))
+        splitCodes("2021-01-26", "2021-01-26", List.of("a", "b", "c", "d", "e"))
                 .subscribe(it -> {
                     System.out.println(it.getT1() + " " + it.getT2() + " " + it.getT3());
                 });
@@ -150,7 +150,7 @@ public class TushareCrawler implements StockCrawler {
 
             // 最多间隔 5000 天（每天一条数据）
             long diff;
-            while ((diff = start.until(end, ChronoUnit.DAYS)) >= MAX_ITEMS) {
+            while ((diff = start.until(end, ChronoUnit.DAYS) + 1) >= MAX_ITEMS) {
                 // 没个 code 生成 MAX_ITEMS 条数据
                 String from = DateUtils.formatDate(start);
                 String to = DateUtils.formatDate(start.plusDays(MAX_ITEMS - 1));
