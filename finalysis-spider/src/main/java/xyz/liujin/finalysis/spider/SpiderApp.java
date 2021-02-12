@@ -3,38 +3,25 @@ package xyz.liujin.finalysis.spider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.entity.KLine;
-import xyz.liujin.finalysis.common.entity.Stock;
 import xyz.liujin.finalysis.common.service.KLineService;
-import xyz.liujin.finalysis.common.service.StockService;
-import xyz.liujin.finalysis.common.util.DateUtils;
-import xyz.liujin.finalysis.spider.crawler.StockCrawler;
+import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Configuration
 public class SpiderApp {
     private Logger logger = LoggerFactory.getLogger(SpiderApp.class);
 
     @Autowired
-    private StockService stockService;
-
-    @Autowired
     private KLineService kLineService;
 
     @Autowired
-    @Qualifier("tushareCrawler")
-    private StockCrawler stockCrawler;
-
-
+    private CrawlManager crawlManager;
 
     @Bean
     public ApplicationRunner onSpiderStartUp() {
@@ -50,11 +37,7 @@ public class SpiderApp {
     @Scheduled(cron = "0 0 0 * * ?")
     public void refreshStockDaily() {
         logger.debug("start refresh stock daily {}", LocalDate.now());
-        stockCrawler.crawlStock()
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(stock -> {
-                    stockService.saveOrUpdate(stock);
-                }, e -> logger.error("failed to refreshStockDaily", e));
+        crawlManager.refreshStock();
     }
 
     /**
@@ -74,19 +57,10 @@ public class SpiderApp {
         logger.debug("latest date in db k_line is {}", curDate);
 
         // 需要爬取的日期
-        String start = DateUtils.formatDate(curDate.plusDays(1));
-        String end = DateUtils.formatDate(LocalDate.now());
+        LocalDate start = curDate.plusDays(1);
+        LocalDate end = LocalDate.now();
 
-        // 未提供股票代码，爬取所有
-        List<String> codes = stockService.list().stream()
-                .map(Stock::getStockCode)
-                .collect(Collectors.toList());
-
-        // 爬取股票信息
-        stockCrawler.crawlKLine(start, end, codes)
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe(it -> kLineService.saveOrUpdate(it),
-                        e -> logger.error("failed to refresh k line daily", e));
+        crawlManager.refreshKLine(start, end, null);
     }
 
 

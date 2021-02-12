@@ -40,9 +40,10 @@ public class CrawlManager {
      */
     public Flux<String> refreshStock() {
         return Flux.create(sink -> {
+            logger.debug("start crawlStock {}", stockCrawler.getClass());
+
             sink.next("start to crawl stock\n");
 
-            logger.debug("start crawlStock {}", stockCrawler.getClass());
             stockCrawler.crawlStock()
                     .subscribe(stock -> {
                         stockService.saveOrUpdate(stock);
