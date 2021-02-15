@@ -44,6 +44,14 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
+     * 获取数据库最新日期
+     * @return
+     */
+    public LocalDate getLatestDate() {
+        return getBaseMapper().getLatestDate();
+    }
+
+    /**
      * 刷新均线数据
      * 计算均线（5， 10， 20， 30）入库
      */
@@ -133,10 +141,11 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         getQuery().eq(AvgLine::getStockCode, avgLine.getStockCode())
                 .eq(AvgLine::getDate, avgLine.getDate())
                 .oneOpt()
-                .ifPresent(exist -> {
+                .ifPresentOrElse(exist -> {
                     avgLine.setId(exist.getId());
+                }, () -> {
+                    save(avgLine);
                 });
-        saveOrUpdate(avgLine);
     }
 
     // 默认返回 2020-01-01 之后的数据

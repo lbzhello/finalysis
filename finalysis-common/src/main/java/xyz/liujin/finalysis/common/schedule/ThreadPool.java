@@ -8,22 +8,22 @@ public class ThreadPool implements Executor {
     private static final int corePoolSize;
     private static final int maxPoolSize = 100;
     static {
-        corePoolSize = Math.max(Runtime.getRuntime().availableProcessors(), 10);
+        corePoolSize = Math.max(Runtime.getRuntime().availableProcessors(), 100);
     }
 
     private static class Singleton {
-          private static final ExecutorService INSTANCE = new ThreadPoolExecutor(
-                  corePoolSize,
-                  maxPoolSize,
-                  1, TimeUnit.MINUTES,
-                  new ArrayBlockingQueue<>(0),
-                  ThreadFactoryBuilder.create()
-                          .setNamePrefix("finalysis-thread-pool")
-                          .build()
+        private static ExecutorService INSTANCE = new ThreadPoolExecutor(
+                corePoolSize,
+                maxPoolSize,
+                1, TimeUnit.MINUTES,
+                new ArrayBlockingQueue<>(1),
+                ThreadFactoryBuilder.create()
+                        .setNamePrefix("finalysis-pool")
+                        .build()
         );
     }
 
-    public static final ExecutorService getInstance() {
+    public static ExecutorService getInstance() {
         return Singleton.INSTANCE;
     }
 

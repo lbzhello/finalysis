@@ -4,4 +4,8 @@
     <select id="findOne" resultType="xyz.liujin.finalysis.common.entity.KLine">
         SELECT stock_code FROM k_line limit 100;
     </select>
+
+    <select id="getLatestDate" resultType="java.time.LocalDate">
+        select date from k_line_2020_2039 order by date desc limit 1;
+    </select>
 </mapper>

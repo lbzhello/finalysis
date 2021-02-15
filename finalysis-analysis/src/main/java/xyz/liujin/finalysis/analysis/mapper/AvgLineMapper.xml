@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.analysis.mapper.AvgLineMapper">
+    <select id="getLatestDate" resultType="java.time.LocalDate">
+        SELECT date FROM avg_line order by date desc limit 1;
+    </select>
+</mapper>

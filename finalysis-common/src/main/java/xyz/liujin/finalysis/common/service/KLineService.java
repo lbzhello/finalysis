@@ -22,6 +22,14 @@ import java.util.Objects;
 public class KLineService extends ServiceImpl<KLineMapper, KLine> implements IService<KLine> {
 
     /**
+     * 获取数据库最新数据日期
+     * @return
+     */
+    public LocalDate getLatestDate() {
+        return getBaseMapper().getLatestDate();
+    }
+
+    /**
      * 根据股票代码获取股票日 k 数据
      * 默认获取 2021-01-01 以后的数据
      * 根据日期倒叙排列

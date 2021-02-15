@@ -7,6 +7,10 @@ import xyz.liujin.finalysis.common.schedule.ThreadPool;
 
 import java.util.concurrent.Executor;
 
+/**
+ * 配置 {@link org.springframework.scheduling.annotation.Async} 线程池
+ * Async 默认单线程
+ */
 @EnableAsync
 @Configuration
 public class AsyncConfig implements AsyncConfigurer {

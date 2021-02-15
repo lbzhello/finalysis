@@ -5,11 +5,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Configuration
 public class AnalysisApp {
@@ -24,11 +24,7 @@ public class AnalysisApp {
     public void refreshAvgLineDaily() {
         logger.debug("start refresh avg line daily {}", LocalDate.now());
         // 从数据库获取最新的日期
-        LocalDate start = avgLineService.lambdaQuery()
-                .orderByDesc(AvgLine::getDate)
-                .oneOpt()
-                .map(AvgLine::getDate)
-                .orElse(LocalDate.now());
+        LocalDate start = Optional.ofNullable(avgLineService.getLatestDate()).orElse(LocalDate.now());
 
         logger.debug("latest date in db avg_line is {}", start);
 

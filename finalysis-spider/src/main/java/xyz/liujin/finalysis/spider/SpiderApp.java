@@ -7,11 +7,11 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import xyz.liujin.finalysis.common.entity.KLine;
 import xyz.liujin.finalysis.common.service.KLineService;
 import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Configuration
 public class SpiderApp {
@@ -48,11 +48,7 @@ public class SpiderApp {
     public void refreshKLineDaily() {
         logger.debug("refresh k line daily {}", LocalDate.now());
         // 获取 k_line 数据库最新日期，默认当天
-        LocalDate curDate = kLineService.lambdaQuery()
-                .orderByDesc(KLine::getDate)
-                .oneOpt()
-                .map(KLine::getDate)
-                .orElse(LocalDate.now());
+        LocalDate curDate = Optional.ofNullable(kLineService.getLatestDate()).orElse(LocalDate.now());
 
         logger.debug("latest date in db k_line is {}", curDate);
 
