@@ -1,0 +1,16 @@
+package xyz.liujin.finalysis.common.config;
+
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.SchedulingConfigurer;
+import org.springframework.scheduling.config.ScheduledTaskRegistrar;
+import xyz.liujin.finalysis.common.schedule.ThreadPool;
+
+@EnableScheduling
+@Configuration
+public class ScheduleConfig implements SchedulingConfigurer {
+    @Override
+    public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
+        taskRegistrar.setScheduler(ThreadPool.getInstance());
+    }
+}
