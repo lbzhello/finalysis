@@ -15,7 +15,7 @@
         <foreach item="item" index="index" collection="list" separator=",">
             (#{item.stockCode}, #{item.date}, #{item.count}, #{item.current}, #{item.avg})
         </foreach>
-        on conflict do update set
+        on conflict (stock_code, date, count) do update set
         current = excluded.current,
         avg = excluded.avg
     </insert>
