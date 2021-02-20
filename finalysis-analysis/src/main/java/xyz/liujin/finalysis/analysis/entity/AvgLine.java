@@ -31,20 +31,14 @@ public class AvgLine {
      * 当日价格（收盘价）
      */
     private BigDecimal current;
+
     /**
-     * 5 日均线
+     * 需要计算均线的天数
      */
-    private BigDecimal avg5;
+    private Integer count;
+
     /**
-     * 10 日均线
+     * 均线，days 天均值
      */
-    private BigDecimal avg10;
-    /**
-     * 20 日均线
-     */
-    private BigDecimal avg20;
-    /**
-     * 30 日均线
-     */
-    private BigDecimal avg30;
+    private BigDecimal avg;
 }

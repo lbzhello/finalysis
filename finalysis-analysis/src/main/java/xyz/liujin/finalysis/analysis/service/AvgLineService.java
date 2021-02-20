@@ -26,6 +26,7 @@ import xyz.liujin.finalysis.common.util.DateUtils;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,6 +38,9 @@ import java.util.Optional;
 public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implements IService<AvgLine> {
     Object target;
     private static final Logger logger = LoggerFactory.getLogger(AvgLineService.class);
+
+    // 均线天数
+    private List<Integer> DAYS = List.of(5, 10, 20, 30);
 
     @Autowired
     private KLineService kLineService;
@@ -59,16 +63,23 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     public void refreshAvgLine(AvgLineQo avgLineQo) {
         LocalDate start = avgLineQo.getStartDate();
         LocalDate end = avgLineQo.getEndDate();
-        // 30 日均线需要需要知道前 30 天的数据
-        calculateAvgLine(start.minusDays(30L), end, avgLineQo.getStockCodes())
+        // 均线需要需要知道前 n 天的数据；因为有节假日，这里乘以 3 粗略的估算
+        int n = DAYS.stream().max(Comparator.comparingInt(Integer::intValue)).map(it -> it*3).orElse(0);
+        calculateAvgLine(start.minusDays(n), end, avgLineQo.getStockCodes())
                 // 包括 start 天
                 .filter(avgLine -> avgLine.getDate().isAfter(start.minusDays(1)))
+                .window(100)
                 .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance()))
-                .subscribe(this::putByCodeAndDate, e -> logger.error("failed to refreshAvgLine", e));
+                .subscribe(avgFlux -> avgFlux
+                                .collectList()
+                                .subscribe(this::saveBatchByCodeDateCount), e -> logger.error("failed to refreshAvgLine", e));
     }
+
+
 
     /**
      * 计算均线数据
+     *
      * @param startDate 开始日期，默认年初
      * @param endDate  结束日期，默认当天
      * @param codes 需要计算的股票
@@ -102,12 +113,13 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .flatMap(avgLines -> Flux.create(sink -> {
                     int len = avgLines.size();
                     for (int i = 0; i < len; i++) {
-                        AvgLine curAvg = createFrom(avgLines.get(i));
-                        curAvg.setAvg5(avg(avgLines, i, 5));
-                        curAvg.setAvg10(avg(avgLines, i, 10));
-                        curAvg.setAvg20(avg(avgLines, i, 20));
-                        curAvg.setAvg30(avg(avgLines, i, 30));
-                        sink.next(curAvg);
+                        // 计算 day 日均线
+                        for (Integer day : DAYS) {
+                            AvgLine curAvg = createFrom(avgLines.get(i));
+                            curAvg.setCount(day);
+                            curAvg.setAvg(avg(avgLines, i, day));
+                            sink.next(curAvg);
+                        }
                     }
                     sink.complete();
                 }));
@@ -136,18 +148,10 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     }
 
     /**
-     * 根据 stockCode 和 date 保存/更新均线数据
+     * 根据 stockCode, date, days 保存/更新均线数据
      */
-    public void putByCodeAndDate(AvgLine avgLine) {
-        getQuery().eq(AvgLine::getStockCode, avgLine.getStockCode())
-                .eq(AvgLine::getDate, avgLine.getDate())
-                .oneOpt()
-                .ifPresentOrElse(exist -> {
-                    avgLine.setId(exist.getId());
-                    updateById(avgLine);
-                }, () -> {
-                    save(avgLine);
-                });
+    public void saveBatchByCodeDateCount(List<AvgLine> avgLines) {
+        getBaseMapper().saveBatchByCodeDateCount(avgLines);
     }
 
     // 默认返回 2020-01-01 之后的数据

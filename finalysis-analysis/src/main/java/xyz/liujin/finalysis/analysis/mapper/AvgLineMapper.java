@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import xyz.liujin.finalysis.analysis.entity.AvgLine;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface AvgLineMapper extends BaseMapper<AvgLine> {
     /**
@@ -11,4 +12,6 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * @return
      */
     LocalDate getLatestDate();
+
+    void saveBatchByCodeDateCount(List<AvgLine> avgLines);
 }

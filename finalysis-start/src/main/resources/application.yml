@@ -16,6 +16,16 @@ spring:
       hibernate:
         format_sql: true
 
+# mp 打印 sql
+#mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+# 特定类打印日志
+#logging:
+#  level:
+#    xyz.liujin.finalysis.analysis.mapper: debug
+
 ##mybatis的相关配置
 #mybatis:
 #  #mapper配置文件

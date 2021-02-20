@@ -67,27 +67,24 @@ for values from ('2020-01-01') to ('2039-01-01');
 alter table k_line_2020_2039 add constraint pk_k_line_2020_2039 primary key (id);
 create unique index uk_k_line_2020_2039_stock_code_date on k_line_2020_2039(stock_code, date);
 
+-- 股票日均线表
 drop table if exists avg_line;
 create table avg_line (
     id bigserial,
     stock_code varchar(6) not null,
     date date not null default now(),
+    count integer not null default 0,
     current decimal(7, 2) not null default 0,
-    avg5 decimal(7, 2) not null default 0,
-    avg10 decimal(7, 2) not null default 0,
-    avg20 decimal(7, 2) not null default 0,
-    avg30 decimal(7, 2) not null default 0
+    avg decimal(7, 2) not null default 0
 );
 
 comment on table avg_line is '均线数据';
 comment on column avg_line.id is '自增主键';
 comment on column avg_line.stock_code is '股票代码。如 000001';
 comment on column avg_line.date is '日期';
+comment on column avg_line.count is '计算均线天数';
 comment on column avg_line.current is '当日价格';
-comment on column avg_line.avg5 is '5 日均线';
-comment on column avg_line.avg10 is '10 日均线';
-comment on column avg_line.avg20 is '20 日均线';
-comment on column avg_line.avg30 is '30 日均线';
+comment on column avg_line.avg is 'count 均值';
 
 alter table avg_line add constraint pk_avg_line primary key (id);
-create unique index uk_avg_line_stock_code_date on avg_line (stock_code, date);
+create unique index uk_avg_line_stock_code_date_count on avg_line (stock_code, date, count);
