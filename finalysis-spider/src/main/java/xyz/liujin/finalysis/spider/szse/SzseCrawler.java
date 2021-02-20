@@ -15,6 +15,7 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.constant.BoardEnum;
 import xyz.liujin.finalysis.common.dto.KLineDto;
 import xyz.liujin.finalysis.common.entity.Stock;
+import xyz.liujin.finalysis.common.schedule.ThreadPool;
 import xyz.liujin.finalysis.common.service.StockService;
 import xyz.liujin.finalysis.common.util.DateUtils;
 import xyz.liujin.finalysis.spider.constant.HtmlConst;
@@ -58,7 +59,7 @@ public class SzseCrawler implements StockCrawler {
                 .map(Stock::getStockCode)
                 // 异步
                 .flatMap(stockCode -> crawlKLine(stockCode)
-                        .subscribeOn(Schedulers.boundedElastic()))
+                        .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance())))
                 // 开始日期未提供则不过滤
                 .filter(kLineDto -> CharSequenceUtil.compare(startDate, kLineDto.getDate(), true) <= 0
                         // 结束日期未提供则不过滤
@@ -150,7 +151,7 @@ public class SzseCrawler implements StockCrawler {
                 .flatMap(page -> {
                     Flux<Response> responseFlux = HttpUtils.get(SzseConst.GET_REPORT.formatted(day1231, day1231, page))
                             .req()
-                            .subscribeOn(Schedulers.boundedElastic());
+                            .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance()));
                     return retrieveStockFromResponse(responseFlux);
                 });
     }

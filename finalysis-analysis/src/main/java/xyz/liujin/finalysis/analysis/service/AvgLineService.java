@@ -18,6 +18,7 @@ import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.common.entity.Stock;
+import xyz.liujin.finalysis.common.schedule.ThreadPool;
 import xyz.liujin.finalysis.common.service.KLineService;
 import xyz.liujin.finalysis.common.service.StockService;
 import xyz.liujin.finalysis.common.util.DateUtils;
@@ -62,7 +63,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         calculateAvgLine(start.minusDays(30L), end, avgLineQo.getStockCodes())
                 // 包括 start 天
                 .filter(avgLine -> avgLine.getDate().isAfter(start.minusDays(1)))
-                .subscribeOn(Schedulers.boundedElastic())
+                .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance()))
                 .subscribe(this::putByCodeAndDate, e -> logger.error("failed to refreshAvgLine", e));
     }
 
