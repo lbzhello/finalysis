@@ -26,13 +26,20 @@ public class AvgLineController {
     @ApiOperation("获取上升趋势的股票")
     @GetMapping("upwards")
     public Flux<DayAvgLine> upwards(
+            @ApiParam(value = "开始日期；默认最后一个交易日", example = "2021-02-20")
             @RequestParam(name = "start", required = false) LocalDate start,
+
+            @ApiParam(value = "结束日期；默认最后一个交易日", example = "2021-02-20")
             @RequestParam(name = "end", required = false) LocalDate end,
+
+            @ApiParam(value = "股票代码；默认全部", example = "000001,000002")
             @RequestParam(name = "codes", required = false) List<String> codes,
+
+            @ApiParam(value = "数量限制；默认 1000", example = "1000")
             @RequestParam(name = "limit", required = false) Integer limit
     ) {
         AvgLineQo qo = AvgLineQo.builder()
-                .start(Optional.ofNullable(start).orElse(LocalDate.now()))
+                .start(start)
                 .end(end)
                 .stockCodes(codes)
                 .limit(Optional.ofNullable(limit).orElse(1000))

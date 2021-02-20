@@ -29,6 +29,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 /**
@@ -54,6 +55,17 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @return
      */
     public Flux<DayAvgLine> upwards(AvgLineQo avgLineQo) {
+        // 日期默认最后一个交易日
+        if (Objects.isNull(avgLineQo.getStart()) || Objects.isNull(avgLineQo.getEnd())) {
+            LocalDate latest = getLatestDate();
+            if (Objects.isNull(avgLineQo.getStart())) {
+                avgLineQo.setStart(latest);
+            }
+
+            if (Objects.isNull(avgLineQo.getEnd())) {
+                avgLineQo.setEnd(latest);
+            }
+        }
         List<DayAvgLine> dayAvg = getBaseMapper().findDayAvg(avgLineQo);
         return Flux.fromIterable(dayAvg)
                 .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) > 0);
