@@ -19,4 +19,34 @@
         current = excluded.current,
         avg = excluded.avg
     </insert>
+
+    <select id="findDayAvg" resultType="xyz.liujin.finalysis.analysis.dto.DayAvgLine">
+        select stock_code,
+               date,
+               current,
+               sum(case count when 5 then avg else 0 end) as avg5,
+               sum(case count when 10 then avg else 0 end) as avg10,
+               sum(case count when 20 then avg else 0 end) as avg20,
+               sum(case count when 30 then avg else 0 end) as avg30
+        from avg_line
+        <where>
+            <if test="start != null">
+                and date >= #{start}
+            </if>
+            <if test="end != null">
+                and date &lt;= #{end}
+            </if>
+            <if test="stockCodes != null">
+                and stock_code in
+                <foreach collection="stockCodes" item="code"
+                         open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        group by stock_code, date, current
+        <if test="limit != null and limit != 0">
+            limit #{limit}
+        </if>
+    </select>
 </mapper>

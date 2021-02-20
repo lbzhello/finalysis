@@ -1,9 +1,7 @@
 package xyz.liujin.finalysis.analysis.qo;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import xyz.liujin.finalysis.common.qo.PageQo;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -11,12 +9,14 @@ import java.util.List;
 /**
  * 均线查询对象
  */
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AvgLineQo {
-    private LocalDate startDate;
-    private LocalDate endDate;
+public class AvgLineQo extends PageQo {
+    private LocalDate start;
+    private LocalDate end;
     private List<String> stockCodes;
+    private Integer limit;
 }

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
 
@@ -22,6 +23,23 @@ public class AvgLineController {
     @Autowired
     private AvgLineService avgLineService;
 
+    @ApiOperation("获取上升趋势的股票")
+    @GetMapping("upwards")
+    public Flux<DayAvgLine> upwards(
+            @RequestParam(name = "start", required = false) LocalDate start,
+            @RequestParam(name = "end", required = false) LocalDate end,
+            @RequestParam(name = "codes", required = false) List<String> codes,
+            @RequestParam(name = "limit", required = false) Integer limit
+    ) {
+        AvgLineQo qo = AvgLineQo.builder()
+                .start(Optional.ofNullable(start).orElse(LocalDate.now()))
+                .end(end)
+                .stockCodes(codes)
+                .limit(Optional.ofNullable(limit).orElse(1000))
+                .build();
+        return avgLineService.upwards(qo);
+    }
+
     @ApiOperation("更新均线并入库")
     @GetMapping("/refresh")
     public Flux<String> refresh(
@@ -34,8 +52,8 @@ public class AvgLineController {
             @ApiParam(value = "股票代码；默认所有股票", example = "000001,000002")
             @RequestParam(name = "codes", required = false) String codes) {
         AvgLineQo qo = AvgLineQo.builder()
-                .startDate(Optional.ofNullable(start).orElse(LocalDate.now()))
-                .endDate(Optional.ofNullable(end).orElse(LocalDate.now()))
+                .start(Optional.ofNullable(start).orElse(LocalDate.now()))
+                .end(Optional.ofNullable(end).orElse(LocalDate.now()))
                 .stockCodes(Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of()))
                 .build();
         avgLineService.refreshAvgLine(qo);

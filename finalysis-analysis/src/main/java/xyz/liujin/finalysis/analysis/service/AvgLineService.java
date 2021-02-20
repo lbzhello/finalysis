@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
+import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
 import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
@@ -49,6 +50,17 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
+     * 获取上升趋势的均线
+     * @return
+     */
+    public Flux<DayAvgLine> upwards(AvgLineQo avgLineQo) {
+        List<DayAvgLine> dayAvg = getBaseMapper().findDayAvg(avgLineQo);
+        return Flux.fromIterable(dayAvg)
+                .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) > 0);
+
+    }
+
+    /**
      * 获取数据库最新日期
      * @return
      */
@@ -61,8 +73,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * 计算均线（5， 10， 20， 30）入库
      */
     public void refreshAvgLine(AvgLineQo avgLineQo) {
-        LocalDate start = avgLineQo.getStartDate();
-        LocalDate end = avgLineQo.getEndDate();
+        LocalDate start = avgLineQo.getStart();
+        LocalDate end = avgLineQo.getEnd();
         // 均线需要需要知道前 n 天的数据；因为有节假日，这里乘以 3 粗略的估算
         int n = DAYS.stream().max(Comparator.comparingInt(Integer::intValue)).map(it -> it*3).orElse(0);
         calculateAvgLine(start.minusDays(n), end, avgLineQo.getStockCodes())

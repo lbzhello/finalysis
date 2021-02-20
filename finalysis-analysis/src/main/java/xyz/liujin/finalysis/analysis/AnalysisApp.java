@@ -30,8 +30,8 @@ public class AnalysisApp {
 
         // 计算最新均线数据
         avgLineService.refreshAvgLine(AvgLineQo.builder()
-                .startDate(start)
-                .endDate(LocalDate.now())
+                .start(start)
+                .end(LocalDate.now())
                 .build());
     }
 }
