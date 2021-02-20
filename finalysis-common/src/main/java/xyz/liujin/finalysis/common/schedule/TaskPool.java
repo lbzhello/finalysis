@@ -4,7 +4,7 @@ import cn.hutool.core.thread.ThreadFactoryBuilder;
 
 import java.util.concurrent.*;
 
-public class ThreadPool implements Executor {
+public class TaskPool implements Executor {
     private static final int corePoolSize;
     private static final int maxPoolSize = 100;
     static {

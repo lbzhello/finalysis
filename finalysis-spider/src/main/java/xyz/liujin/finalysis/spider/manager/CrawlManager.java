@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.common.entity.Stock;
-import xyz.liujin.finalysis.common.schedule.ThreadPool;
+import xyz.liujin.finalysis.common.schedule.TaskPool;
 import xyz.liujin.finalysis.common.service.KLineService;
 import xyz.liujin.finalysis.common.service.StockService;
 import xyz.liujin.finalysis.common.util.DateUtils;
@@ -46,7 +46,7 @@ public class CrawlManager {
             sink.next("start to crawl stock\n");
 
             stockCrawler.crawlStock()
-                    .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance()))
+                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .subscribe(stock -> {
                         stockService.saveOrUpdate(stock);
                     }, e -> logger.error("failed to crawlStock", e));
@@ -78,7 +78,7 @@ public class CrawlManager {
                     .collect(Collectors.toList()));
 
             stockCrawler.crawlKLine(startDate, endDate, codes)
-                    .subscribeOn(Schedulers.fromExecutor(ThreadPool.getInstance()))
+                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .subscribe(kLine -> kLineService.saveOrUpdate(kLine),
                             e -> logger.error("failed to crawlKLine", e));
 
