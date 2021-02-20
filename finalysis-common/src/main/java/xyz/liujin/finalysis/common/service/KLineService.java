@@ -38,7 +38,7 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
      * @param endDate 结束日期
      * @return
      */
-    public Flux<KLineDto> getByCode(String stockCode, @Nullable LocalDate startDate, @Nullable LocalDate endDate) {
+    public Flux<KLineDto> findByCodeAndOrderByDateDesc(String stockCode, @Nullable LocalDate startDate, @Nullable LocalDate endDate) {
         return Flux.fromIterable(lambdaQuery()
                 .eq(KLine::getStockCode, stockCode)
                 .ge(Objects.nonNull(startDate), KLine::getDate, startDate)
@@ -54,8 +54,11 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
         lambdaQuery().eq(KLine::getStockCode, kLine.getStockCode())
                 .eq(KLine::getDate, kLine.getDate())
                 .oneOpt()
-                .ifPresent(exist -> {
+                .ifPresentOrElse(exist -> {
                     kLine.setId(exist.getId());
+                    updateById(kLine);
+                }, () -> {
+                    save(kLine);
                 });
         saveOrUpdate(kLine);
     }

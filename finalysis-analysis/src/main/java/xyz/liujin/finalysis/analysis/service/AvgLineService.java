@@ -90,7 +90,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         LocalDate end = Optional.ofNullable(endDate).orElse(LocalDate.now());
 
         return stockFlux
-                .flatMap(stock -> kLineService.getByCode(stock.getStockCode(), start, end))
+                .flatMap(stock -> kLineService.findByCodeAndOrderByDateDesc(stock.getStockCode(), start, end))
                 .map(kLineDto -> AvgLine.builder()
                         .stockCode(kLineDto.getStockCode())
                         .date(DateUtils.parseDate(kLineDto.getDate()))
@@ -98,7 +98,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                         .build())
                 .collectList()
                 .flux()
-                // 计算日均线, 入库
+                // 计算日均线
                 .flatMap(avgLines -> Flux.create(sink -> {
                     int len = avgLines.size();
                     for (int i = 0; i < len; i++) {
@@ -126,7 +126,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         return acc.divide(BigDecimal.valueOf(days), 4, RoundingMode.HALF_EVEN);
     }
 
-    // 保持不变性
+    // 复制，保持不变性
     private AvgLine createFrom(AvgLine avgLine) {
         return AvgLine.builder()
                 .stockCode(avgLine.getStockCode())
@@ -144,6 +144,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .oneOpt()
                 .ifPresentOrElse(exist -> {
                     avgLine.setId(exist.getId());
+                    updateById(avgLine);
                 }, () -> {
                     save(avgLine);
                 });

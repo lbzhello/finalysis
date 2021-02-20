@@ -22,7 +22,7 @@ public class KLineController {
     @ApiOperation(value = "获取股票日线数据")
     @GetMapping
     public Flux<KLineDto> query(@ApiParam(name = "code", value = "股票代码") @RequestParam(name = "code", required = false) String code) {
-        return kLineService.getByCode(code, null, null);
+        return kLineService.findByCodeAndOrderByDateDesc(code, null, null);
     }
 
     @ApiOperation(value = "过去股票当日 k 线")
