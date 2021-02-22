@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
 
 import java.time.LocalDate;
@@ -29,9 +28,6 @@ public class AnalysisApp {
         logger.debug("latest date in db avg_line is {}", start);
 
         // 计算最新均线数据
-        avgLineService.refreshAvgLine(AvgLineQo.builder()
-                .start(start)
-                .end(LocalDate.now())
-                .build());
+        avgLineService.refreshAvgLine(start, LocalDate.now(), null);
     }
 }

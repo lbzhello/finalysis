@@ -58,12 +58,11 @@ public class AvgLineController {
 
             @ApiParam(value = "股票代码；默认所有股票", example = "000001,000002")
             @RequestParam(name = "codes", required = false) String codes) {
-        AvgLineQo qo = AvgLineQo.builder()
-                .start(Optional.ofNullable(start).orElse(LocalDate.now()))
-                .end(Optional.ofNullable(end).orElse(LocalDate.now()))
-                .stockCodes(Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of()))
-                .build();
-        avgLineService.refreshAvgLine(qo);
+        LocalDate startDate = Optional.ofNullable(start).orElse(LocalDate.now());
+        LocalDate endDate = Optional.ofNullable(end).orElse(LocalDate.now());
+        List<String> stockCodes = Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of());
+
+        avgLineService.refreshAvgLine(startDate, endDate, stockCodes);
         return Flux.just("start refresh avg");
     }
 }
