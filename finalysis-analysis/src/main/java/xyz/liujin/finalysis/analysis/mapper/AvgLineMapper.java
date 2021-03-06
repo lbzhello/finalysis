@@ -16,7 +16,7 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
     LocalDate getLatestDate();
 
     /**
-     * 批量保存均线数据；如果冲突 code, date, count 则更新
+     * 批量保存均线数据；如果冲突 (code, date, count) 则更新
      * @param avgLines
      */
     void saveBatchByCodeDateCount(List<AvgLine> avgLines);

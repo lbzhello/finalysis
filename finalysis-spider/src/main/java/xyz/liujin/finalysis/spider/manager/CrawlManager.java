@@ -69,7 +69,11 @@ public class CrawlManager {
 
             sink.next("start to crawl k line\n");
             // yyyy-MM-dd
-            String startDate = Optional.ofNullable(start).map(DateUtils::formatDate).orElse(DateUtils.formatDate(OffsetDateTime.now()));
+            String startDate = Optional.ofNullable(start).map(DateUtils::formatDate).orElseGet(() -> {
+                // 获取 k_line 需要爬取的日期，默认当天
+                LocalDate latestDate = Optional.ofNullable(kLineService.getNextDate()).orElse(LocalDate.now());
+                return DateUtils.formatDate(latestDate);
+            });
             // 默认当前日期
             String endDate = Optional.ofNullable(end).map(DateUtils::formatDate).orElse(DateUtils.formatDate(OffsetDateTime.now()));
             // 股票代码，默认所有股票

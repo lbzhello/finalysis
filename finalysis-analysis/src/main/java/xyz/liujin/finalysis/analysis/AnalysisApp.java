@@ -22,8 +22,8 @@ public class AnalysisApp {
     @Scheduled(cron = "0 0 18 * * ?")
     public void refreshAvgLineDaily() {
         logger.debug("start refresh avg line daily {}", LocalDate.now());
-        // 从数据库获取最新的日期
-        LocalDate start = Optional.ofNullable(avgLineService.getLatestDate()).orElse(LocalDate.now());
+        // 从数据库获取需要更新的日期
+        LocalDate start = Optional.ofNullable(avgLineService.getNextDate()).orElse(LocalDate.now());
 
         logger.debug("latest date in db avg_line is {}", start);
 

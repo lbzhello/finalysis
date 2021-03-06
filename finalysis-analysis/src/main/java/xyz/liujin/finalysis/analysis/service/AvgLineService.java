@@ -81,6 +81,14 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     }
 
     /**
+     * 获取最新日期的下一个日期
+     * @return
+     */
+    public @Nullable LocalDate getNextDate() {
+        return Optional.ofNullable(getLatestDate()).map(it -> it.plusDays(1)).orElse(null);
+    }
+
+    /**
      * 刷新均线数据
      * 计算均线（5， 10， 20， 30）入库
      */

@@ -58,7 +58,10 @@ public class AvgLineController {
 
             @ApiParam(value = "股票代码；默认所有股票", example = "000001,000002")
             @RequestParam(name = "codes", required = false) String codes) {
-        LocalDate startDate = Optional.ofNullable(start).orElse(LocalDate.now());
+        LocalDate startDate = Optional.ofNullable(start).orElseGet(() -> {
+            // 从数据库获取最新的日期
+            return Optional.ofNullable(avgLineService.getNextDate()).orElse(LocalDate.now());
+        });
         LocalDate endDate = Optional.ofNullable(end).orElse(LocalDate.now());
         List<String> stockCodes = Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of());
 

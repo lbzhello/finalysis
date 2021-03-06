@@ -16,6 +16,7 @@ import xyz.liujin.finalysis.common.mapper.KLineMapper;
 
 import java.time.LocalDate;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
@@ -27,6 +28,14 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
      */
     public LocalDate getLatestDate() {
         return getBaseMapper().getLatestDate();
+    }
+
+    /**
+     * 获取数据库最新日期的下一个日期
+     * @return
+     */
+    public @Nullable LocalDate getNextDate() {
+        return Optional.ofNullable(getLatestDate()).map(it -> it.plusDays(1)).orElse(null);
     }
 
     /**
