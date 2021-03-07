@@ -1,14 +1,11 @@
 package xyz.liujin.finalysis.start.handler;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import xyz.liujin.finalysis.common.constant.HttpHeaderValues;
 
 @Component
 public class GreetingHandler {

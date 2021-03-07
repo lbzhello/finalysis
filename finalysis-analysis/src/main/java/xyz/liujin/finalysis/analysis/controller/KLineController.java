@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.common.dto.KLineDto;
-import xyz.liujin.finalysis.common.service.KLineService;
+import xyz.liujin.finalysis.base.dto.KLineDto;
+import xyz.liujin.finalysis.base.service.KLineService;
 
 /**
  * 日线数据

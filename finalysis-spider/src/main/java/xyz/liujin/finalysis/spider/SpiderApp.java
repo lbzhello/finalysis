@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
-import xyz.liujin.finalysis.common.service.KLineService;
+import xyz.liujin.finalysis.base.service.KLineService;
 import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
 import java.time.LocalDate;

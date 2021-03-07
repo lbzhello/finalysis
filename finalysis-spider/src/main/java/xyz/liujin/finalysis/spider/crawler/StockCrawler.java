@@ -2,8 +2,8 @@ package xyz.liujin.finalysis.spider.crawler;
 
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.common.dto.KLineDto;
-import xyz.liujin.finalysis.common.entity.Stock;
+import xyz.liujin.finalysis.base.dto.KLineDto;
+import xyz.liujin.finalysis.base.entity.Stock;
 
 import java.util.List;
 

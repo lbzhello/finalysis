@@ -8,11 +8,11 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.common.entity.Stock;
-import xyz.liujin.finalysis.common.schedule.TaskPool;
-import xyz.liujin.finalysis.common.service.KLineService;
-import xyz.liujin.finalysis.common.service.StockService;
-import xyz.liujin.finalysis.common.util.DateUtils;
+import xyz.liujin.finalysis.base.entity.Stock;
+import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.service.KLineService;
+import xyz.liujin.finalysis.base.service.StockService;
+import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 
 import java.time.LocalDate;

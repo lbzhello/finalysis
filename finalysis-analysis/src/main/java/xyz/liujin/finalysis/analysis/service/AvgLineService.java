@@ -18,11 +18,11 @@ import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
 import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
-import xyz.liujin.finalysis.common.entity.Stock;
-import xyz.liujin.finalysis.common.schedule.TaskPool;
-import xyz.liujin.finalysis.common.service.KLineService;
-import xyz.liujin.finalysis.common.service.StockService;
-import xyz.liujin.finalysis.common.util.DateUtils;
+import xyz.liujin.finalysis.base.entity.Stock;
+import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.service.KLineService;
+import xyz.liujin.finalysis.base.service.StockService;
+import xyz.liujin.finalysis.base.util.DateUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;

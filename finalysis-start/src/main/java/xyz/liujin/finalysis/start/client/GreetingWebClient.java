@@ -4,7 +4,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import xyz.liujin.finalysis.common.constant.HttpHeaderValues;
+import xyz.liujin.finalysis.base.constant.HttpHeaderValues;
 
 public class GreetingWebClient {
     private WebClient client = WebClient.create("http://localhost:8080");

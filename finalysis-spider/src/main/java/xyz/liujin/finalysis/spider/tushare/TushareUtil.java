@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.spider.tushare;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import xyz.liujin.finalysis.common.constant.MarketEnum;
+import xyz.liujin.finalysis.base.constant.MarketEnum;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 
 public class TushareUtil {

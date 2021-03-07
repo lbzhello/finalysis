@@ -2,7 +2,7 @@ package xyz.liujin.finalysis.start.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
-import xyz.liujin.finalysis.common.util.DateUtils;
+import xyz.liujin.finalysis.base.util.DateUtils;
 
 import java.time.LocalDate;
 import java.util.Optional;

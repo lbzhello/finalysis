@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.analysis.qo;
 
 import lombok.*;
-import xyz.liujin.finalysis.common.qo.PageQo;
+import xyz.liujin.finalysis.base.qo.PageQo;
 
 import java.time.LocalDate;
 import java.util.List;

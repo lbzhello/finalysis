@@ -8,7 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import xyz.liujin.finalysis.common.constant.HttpHeaderValues;
+import xyz.liujin.finalysis.base.constant.HttpHeaderValues;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
