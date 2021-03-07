@@ -3,35 +3,25 @@ package xyz.liujin.finalysis.spider.handler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
-import xyz.liujin.finalysis.base.service.KLineService;
-import xyz.liujin.finalysis.base.service.StockService;
 import xyz.liujin.finalysis.base.util.DateUtils;
-import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * @deprecated 此类仅用于测试 webflux 函数式编程测试
+ */
+@Deprecated
 @Component
 public class CrawlerHandler {
     public static final Logger logger = LoggerFactory.getLogger(CrawlerHandler.class);
-
-    @Autowired
-    @Qualifier("tushareCrawler")
-    private StockCrawler stockCrawler;
-
-    @Autowired
-    private StockService stockService;
-
-    @Autowired
-    private KLineService kLineService;
 
     @Autowired
     private CrawlManager crawlManager;

@@ -8,10 +8,10 @@ import org.springframework.context.annotation.ComponentScan;
 @MapperScan(basePackages = "xyz.liujin.finalysis.**.mapper")
 @ComponentScan(basePackages = "xyz.liujin.finalysis")
 @SpringBootApplication
-public class FinalysisApplication {
+public class StartApp {
 
 	public static void main(String[] args) {
-		SpringApplication.run(FinalysisApplication.class, args);
+		SpringApplication.run(StartApp.class, args);
 	}
 
 }

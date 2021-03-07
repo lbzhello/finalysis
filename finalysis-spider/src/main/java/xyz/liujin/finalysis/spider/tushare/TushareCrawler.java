@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 /**
  * Tushare K 线数据爬取
  */
-@Component
+@Component(StockCrawler.TUSHARE)
 public class TushareCrawler implements StockCrawler {
     private static Logger logger = LoggerFactory.getLogger(TushareCrawler.class);
 

@@ -12,7 +12,9 @@ import xyz.liujin.finalysis.spider.handler.CrawlerHandler;
 
 /**
  * 此类仅用于测试 webflux 函数式编程测试
+ * @deprecated 功能已经被 {@link xyz.liujin.finalysis.spider.controller.CrawlerController} 取代
  */
+@Deprecated
 @Configuration
 public class CrawlerRouter {
     public static final Logger logger = LoggerFactory.getLogger(CrawlerRouter.class);

@@ -11,6 +11,8 @@ import java.util.List;
  * 股票数据爬虫
  */
 public interface StockCrawler {
+    String TUSHARE = "tushareCrawler";
+
     /**
      * 爬取股票数据，返回异步的股票数据流
      * 子类通过实现此方法，从不同的网站爬取股票数据

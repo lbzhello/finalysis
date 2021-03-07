@@ -12,7 +12,7 @@ import xyz.liujin.finalysis.base.constant.HttpHeaderValues;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-class FinalysisApplicationTests {
+class StartAppTests {
 
 	public static void main(String[] args) {
 		WebClient.create().post().uri("http://www.szse.cn/api/search/secCheck?random=0.8018927628913926")

@@ -11,7 +11,6 @@ import xyz.liujin.finalysis.base.service.KLineService;
 import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Configuration
 public class SpiderApp {
@@ -46,17 +45,11 @@ public class SpiderApp {
      */
     @Scheduled(cron = "0 20 17 * * ?")
     public void refreshKLineDaily() {
-        logger.debug("refresh k line daily {}", LocalDate.now());
-        // 获取 k_line 数据库最新日期，默认当天
-        LocalDate curDate = Optional.ofNullable(kLineService.getNextDate()).orElse(LocalDate.now());
+        LocalDate now = LocalDate.now();
 
-        logger.debug("latest date in db k_line is {}", curDate);
+        logger.debug("refresh k line daily {}", now);
 
-        // 需要爬取的日期
-        LocalDate start = curDate.plusDays(1);
-        LocalDate end = LocalDate.now();
-
-        crawlManager.refreshKLine(start, end, null);
+        crawlManager.refreshKLine(now, now, null);
     }
 
 

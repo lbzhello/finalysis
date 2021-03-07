@@ -92,7 +92,14 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * 刷新均线数据
      * 计算均线（5， 10， 20， 30）入库
      */
-    public void refreshAvgLine(LocalDate start, LocalDate end, List<String> codes) {
+    public void refreshAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable List<String> codes) {
+        // 开始时间，默认数据库获取最新的日期
+        LocalDate start = Optional.ofNullable(startDate).orElseGet(() -> Optional.
+                ofNullable(this.getNextDate()).orElse(LocalDate.now()));
+
+        // 结束时间，默认当日
+        LocalDate end = Optional.ofNullable(endDate).orElse(LocalDate.now());
+
         // 均线需要需要知道前 n 天的数据；因为有节假日，这里乘以 3 粗略的估算
         int n = DAYS.stream().max(Comparator.comparingInt(Integer::intValue)).map(it -> it*3).orElse(0);
         calculateAvgLine(start.minusDays(n), end, codes)
