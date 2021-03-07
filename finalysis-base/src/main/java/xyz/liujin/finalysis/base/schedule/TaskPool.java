@@ -4,9 +4,12 @@ import cn.hutool.core.thread.ThreadFactoryBuilder;
 
 import java.util.concurrent.*;
 
+/**
+ * 项目通用线程池
+ */
 public class TaskPool implements Executor {
     private static final int corePoolSize;
-    private static final int maxPoolSize = 100;
+    private static final int maxPoolSize = 200;
     static {
         corePoolSize = Math.max(Runtime.getRuntime().availableProcessors(), 100);
     }
@@ -18,7 +21,7 @@ public class TaskPool implements Executor {
                 1, TimeUnit.MINUTES,
                 new ArrayBlockingQueue<>(1),
                 ThreadFactoryBuilder.create()
-                        .setNamePrefix("finalysis-pool")
+                        .setNamePrefix("finalysis-pool-")
                         .build()
         );
     }
