@@ -18,5 +18,5 @@ public class StockRefreshEvent {
     /**
      * 新增的股票代码
      */
-    private List<String> newCodes;
+    private List<String> addCodes;
 }

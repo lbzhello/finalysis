@@ -11,7 +11,7 @@ public class TaskPool implements Executor {
     private static final int corePoolSize;
     private static final int maxPoolSize = 200;
     static {
-        corePoolSize = Math.max(Runtime.getRuntime().availableProcessors(), 100);
+        corePoolSize = Math.max(availableProcessors(), 100);
     }
 
     private static class Singleton {
@@ -28,6 +28,14 @@ public class TaskPool implements Executor {
 
     public static ExecutorService getInstance() {
         return Singleton.INSTANCE;
+    }
+
+    /**
+     * 获取 CPU 核心数
+     * @return
+     */
+    public static int availableProcessors() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
     @Override

@@ -1,9 +1,15 @@
 package xyz.liujin.finalysis.spider.constant;
 
+import java.time.LocalDate;
+
 /**
  * 股票中常亮
  */
 public class StockConst {
+
+    // 中国第一支股票交易时间
+    public static final LocalDate CN_FOUND_DATE = LocalDate.of(1984, 11, 18);
+
     // 上交所成立时间
     public static final String SH_FOUND = "1990-11-26";
 

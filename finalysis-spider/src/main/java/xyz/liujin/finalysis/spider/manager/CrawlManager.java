@@ -11,6 +11,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.entity.Stock;
 import xyz.liujin.finalysis.base.event.KLineRefreshEvent;
+import xyz.liujin.finalysis.base.event.StockRefreshEvent;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
 import xyz.liujin.finalysis.base.service.KLineService;
 import xyz.liujin.finalysis.base.service.StockService;
@@ -20,6 +21,7 @@ import xyz.liujin.finalysis.spider.crawler.StockCrawler;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -52,8 +54,24 @@ public class CrawlManager {
 
             stockCrawler.crawlStock()
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .subscribe(stock -> {
-                        stockService.saveOrUpdate(stock);
+                    // 获取新增的股票
+                    .filter(stock -> {
+                        Stock exist = stockService.getById(stock.getStockCode());
+                        // 存在更新
+                        if (Objects.nonNull(exist)) {
+                            stockService.updateById(stock);
+                        } else {
+                            stockService.save(stock);
+                        }
+                        return Objects.isNull(exist);
+                    })
+                    .map(Stock::getStockCode)
+                    .collectList()
+                    .subscribe(codes -> {
+                        logger.debug("refresh stock success, add {}", codes.size());
+                        applicationContext.publishEvent(StockRefreshEvent.builder()
+                                .addCodes(codes)
+                                .build());
                     }, e -> logger.error("failed to crawlStock", e));
 
             sink.next("job running...\n");
@@ -90,11 +108,15 @@ public class CrawlManager {
 
             stockCrawler.crawlKLine(startDate, endDate, codes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .publishOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                    .parallel(TaskPool.availableProcessors())
+                    .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 入库
-                    .doOnNext(kLine -> kLineService.saveOrUpdate(kLine))
+                    .map(kLine -> {
+                        kLineService.saveOrUpdate(kLine);
+                        return 1;
+                    })
                     // 统计更新条目；到这里任务已经执行完毕
-                    .count()
+                    .reduce(Integer::sum)
                     .subscribe(count -> {
                         logger.debug("refresh k line success, refreshed {}", count);
                         applicationContext.publishEvent(KLineRefreshEvent.builder()
