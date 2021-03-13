@@ -51,10 +51,25 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
-     * 获取上升趋势的均线
+     * 获取上升趋势的均线，即从最新的数据开始， 5 日线大于 10 日线的天数
+     * @param days 连续递增天数
      * @return
      */
-    public Flux<DayAvgLine> upwards(AvgLineQo avgLineQo) {
+    public Flux<String> upwards(Integer days) {
+        LocalDate start = Optional
+                .ofNullable(getLatestDate())
+                .map(it -> it.minusDays(days - 1))
+                .orElse(LocalDate.now());
+
+        return Flux.fromIterable(getBaseMapper().upwards(start));
+    }
+
+    /**
+     * 获取日均线数据
+     * @param avgLineQo
+     * @return
+     */
+    public Flux<DayAvgLine> dayAvg(AvgLineQo avgLineQo) {
         // 日期默认最后一个交易日
         if (Objects.isNull(avgLineQo.getStart())) {
             LocalDate latest = getLatestDate();
@@ -82,7 +97,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * 获取最新日期的下一个日期
      * @return
      */
-    public @Nullable LocalDate getNextDate() {
+    @Nullable
+    public LocalDate getNextDate() {
         return Optional.ofNullable(getLatestDate()).map(it -> it.plusDays(1)).orElse(null);
     }
 

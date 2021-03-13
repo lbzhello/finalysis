@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
-import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
 
 import java.time.LocalDate;
@@ -23,28 +23,22 @@ public class AvgLineController {
     @Autowired
     private AvgLineService avgLineService;
 
+    @ApiOperation("统计启动（均线突破)阶段的股票，5 日线刚超过十日线")
+    @GetMapping("start-up")
+    public Flux<DayAvgLine> startUp(
+            @ApiParam(value = "最大启动天数（5 日线超过 10 日线）", example = "3")
+            @RequestParam(name = "days", required = false) Integer days
+    ) {
+        return Flux.just();
+    }
+
     @ApiOperation("获取上升趋势的股票")
     @GetMapping("upwards")
-    public Flux<DayAvgLine> upwards(
-            @ApiParam(value = "开始日期；默认最后一个交易日", example = "2021-02-20")
-            @RequestParam(name = "start", required = false) LocalDate start,
-
-            @ApiParam(value = "结束日期；默认最后一个交易日", example = "2021-02-20")
-            @RequestParam(name = "end", required = false) LocalDate end,
-
-            @ApiParam(value = "股票代码；默认全部", example = "000001,000002")
-            @RequestParam(name = "codes", required = false) List<String> codes,
-
-            @ApiParam(value = "数量限制；默认 1000", example = "1000")
-            @RequestParam(name = "limit", required = false) Integer limit
+    public Mono<List<String>> upwards(
+            @ApiParam(value = "最小持续天数", example = "3")
+            @RequestParam(name = "days", required = false) Integer days
     ) {
-        AvgLineQo qo = AvgLineQo.builder()
-                .start(start)
-                .end(end)
-                .stockCodes(codes)
-                .limit(Optional.ofNullable(limit).orElse(1000))
-                .build();
-        return avgLineService.upwards(qo);
+        return avgLineService.upwards(days).collectList();
     }
 
     @ApiOperation("更新均线并入库")

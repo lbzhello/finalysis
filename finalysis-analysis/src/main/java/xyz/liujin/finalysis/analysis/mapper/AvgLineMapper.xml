@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xyz.liujin.finalysis.analysis.mapper.AvgLineMapper">
+    <!-- 获取上升趋势（5 日线大于 10 日线）的股票 -->
+    <select id="upwards" resultType="java.lang.String">
+        select stock_code from stock
+        where stock_code not in (
+            select distinct t1.stock_code from avg_line as t1, avg_line as t2
+            where t1.date >= #{start}
+            and t1.stock_code = t2.stock_code
+            and t1.date = t2.date
+            and t1.statistic = 5
+            and t2.statistic = 10
+            and t1.avg &lt; t2.avg
+        )
+        order by stock_code;
+    </select>
+
+    <!-- 获取数据库最新日期 -->
     <select id="getLatestDate" resultType="java.time.LocalDate">
-        SELECT date
-        FROM avg_line
+        select date
+        from avg_line
         order by date desc
         limit 1;
     </select>
 
+    <!-- 批量保存，如果冲突（stock_code, date, statistic）则更新 -->
     <insert id="saveBatchByCodeDateStatistic" parameterType="java.util.List">
         insert into avg_line
         (stock_code, date, statistic, current, avg)
@@ -20,6 +37,7 @@
         avg = excluded.avg
     </insert>
 
+    <!-- 获取股票日均线 -->
     <select id="findDayAvg" resultType="xyz.liujin.finalysis.analysis.dto.DayAvgLine">
         select stock_code,
                date,

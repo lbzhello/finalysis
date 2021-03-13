@@ -26,4 +26,11 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * @return
      */
     List<DayAvgLine> findDayAvg(AvgLineQo avgLineQo);
+
+    /**
+     * 获取上升趋势的股票，即 5 日线大于 10 日线
+     * @param start 趋势开始日期
+     * @return
+     */
+    List<String> upwards(LocalDate start);
 }
