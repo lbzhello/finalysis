@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class KLineRefreshEvent {
+public class KLineChangeEvent {
     /**
      * 开始时间
      */

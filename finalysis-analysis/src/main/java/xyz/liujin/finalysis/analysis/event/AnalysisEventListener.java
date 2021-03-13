@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
-import xyz.liujin.finalysis.base.event.KLineRefreshEvent;
+import xyz.liujin.finalysis.base.event.KLineChangeEvent;
 
 @Configuration
 public class AnalysisEventListener {
@@ -18,14 +18,14 @@ public class AnalysisEventListener {
 
     /**
      * 收到 K 线变更事件，更新均线信息
-     * @param kLineRefreshEvent
+     * @param kLineChangeEvent
      */
     @Async
     @EventListener
-    public void kLineRefresh(KLineRefreshEvent kLineRefreshEvent) {
-        logger.debug("found k line refresh {}", kLineRefreshEvent);
-        avgLineService.refreshAvgLine(kLineRefreshEvent.getStart(),
-                kLineRefreshEvent.getEnd(),
-                kLineRefreshEvent.getCodes());
+    public void kLineRefresh(KLineChangeEvent kLineChangeEvent) {
+        logger.debug("found k line refresh {}", kLineChangeEvent);
+        avgLineService.refreshAvgLine(kLineChangeEvent.getStart(),
+                kLineChangeEvent.getEnd(),
+                kLineChangeEvent.getCodes());
     }
 }

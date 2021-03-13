@@ -165,3 +165,10 @@ comment on column avg_line.avg is 'count 均值';
 
 alter table avg_line add constraint pk_avg_line primary key (id);
 create unique index uk_avg_line_stock_code_date_count on avg_line (stock_code, date, count);
+
+-- 2021-03-13
+-- 修改均线表字段名，count -> statistic
+alter table avg_line rename column count to statistic;
+
+drop index uk_avg_line_stock_code_date_count;
+create unique index uk_avg_line_stock_code_date_statistic on avg_line (stock_code, date, statistic);

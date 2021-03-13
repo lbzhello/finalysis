@@ -19,7 +19,7 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * 批量保存均线数据；如果冲突 (code, date, count) 则更新
      * @param avgLines
      */
-    void saveBatchByCodeDateCount(List<AvgLine> avgLines);
+    void saveBatchByCodeDateStatistic(List<AvgLine> avgLines);
 
     /**
      * 查询日均线数据

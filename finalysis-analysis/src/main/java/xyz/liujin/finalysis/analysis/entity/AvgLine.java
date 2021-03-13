@@ -33,9 +33,9 @@ public class AvgLine {
     private BigDecimal current;
 
     /**
-     * 需要计算均线的天数
+     * 统计天数
      */
-    private Integer count;
+    private Integer statistic;
 
     /**
      * 均线，days 天均值

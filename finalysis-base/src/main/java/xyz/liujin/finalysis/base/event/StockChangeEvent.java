@@ -14,7 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class StockRefreshEvent {
+public class StockChangeEvent {
     /**
      * 新增的股票代码
      */

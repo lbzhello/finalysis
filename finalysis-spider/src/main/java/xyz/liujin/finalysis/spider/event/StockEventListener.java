@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import xyz.liujin.finalysis.base.event.StockRefreshEvent;
+import xyz.liujin.finalysis.base.event.StockChangeEvent;
 import xyz.liujin.finalysis.spider.constant.StockConst;
 import xyz.liujin.finalysis.spider.manager.CrawlManager;
 
@@ -23,7 +23,7 @@ public class StockEventListener {
 
     @Async
     @EventListener
-    public void stockRefresh(StockRefreshEvent event) {
+    public void stockRefresh(StockChangeEvent event) {
         logger.debug("found stock refresh: {}", event);
         if (Objects.nonNull(event) && CollectionUtil.isNotEmpty(event.getAddCodes())) {
             crawlManager.refreshKLine(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());

@@ -73,7 +73,7 @@ create table avg_line (
     id bigserial,
     stock_code varchar(6) not null,
     date date not null default now(),
-    count integer not null default 0,
+    statistic integer not null default 0,
     current decimal(7, 2) not null default 0,
     avg decimal(7, 2) not null default 0
 );
@@ -82,9 +82,9 @@ comment on table avg_line is '均线数据';
 comment on column avg_line.id is '自增主键';
 comment on column avg_line.stock_code is '股票代码。如 000001';
 comment on column avg_line.date is '日期';
-comment on column avg_line.count is '计算均线天数';
+comment on column avg_line.statistic is '统计天数';
 comment on column avg_line.current is '当日价格';
 comment on column avg_line.avg is 'count 均值';
 
 alter table avg_line add constraint pk_avg_line primary key (id);
-create unique index uk_avg_line_stock_code_date_count on avg_line (stock_code, date, count);
+create unique index uk_avg_line_stock_code_date_statistic on avg_line (stock_code, date, statistic);

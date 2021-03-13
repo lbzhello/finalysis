@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.entity.Stock;
-import xyz.liujin.finalysis.base.event.KLineRefreshEvent;
-import xyz.liujin.finalysis.base.event.StockRefreshEvent;
+import xyz.liujin.finalysis.base.event.KLineChangeEvent;
+import xyz.liujin.finalysis.base.event.StockChangeEvent;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
 import xyz.liujin.finalysis.base.service.KLineService;
 import xyz.liujin.finalysis.base.service.StockService;
@@ -69,7 +69,7 @@ public class CrawlManager {
                     .collectList()
                     .subscribe(codes -> {
                         logger.debug("refresh stock success, add {}", codes.size());
-                        applicationContext.publishEvent(StockRefreshEvent.builder()
+                        applicationContext.publishEvent(StockChangeEvent.builder()
                                 .addCodes(codes)
                                 .build());
                     }, e -> logger.error("failed to crawlStock", e));
@@ -119,7 +119,7 @@ public class CrawlManager {
                     .reduce(Integer::sum)
                     .subscribe(count -> {
                         logger.debug("refresh k line success, refreshed {}", count);
-                        applicationContext.publishEvent(KLineRefreshEvent.builder()
+                        applicationContext.publishEvent(KLineChangeEvent.builder()
                                 .start(DateUtils.parseDate(startDate))
                                 .end(DateUtils.parseDate(endDate))
                                 .codes(codes)

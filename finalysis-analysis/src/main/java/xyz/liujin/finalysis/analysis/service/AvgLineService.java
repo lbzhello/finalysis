@@ -56,15 +56,13 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      */
     public Flux<DayAvgLine> upwards(AvgLineQo avgLineQo) {
         // 日期默认最后一个交易日
-        if (Objects.isNull(avgLineQo.getStart()) || Objects.isNull(avgLineQo.getEnd())) {
+        if (Objects.isNull(avgLineQo.getStart())) {
             LocalDate latest = getLatestDate();
-            if (Objects.isNull(avgLineQo.getStart())) {
-                avgLineQo.setStart(latest);
-            }
+            avgLineQo.setStart(latest);
+        }
 
-            if (Objects.isNull(avgLineQo.getEnd())) {
-                avgLineQo.setEnd(latest);
-            }
+        if (Objects.isNull(avgLineQo.getEnd())) {
+            avgLineQo.setEnd(LocalDate.now());
         }
         List<DayAvgLine> dayAvg = getBaseMapper().findDayAvg(avgLineQo);
         return Flux.fromIterable(dayAvg)
@@ -109,7 +107,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(avgFlux -> avgFlux
                                 .collectList()
-                                .subscribe(this::saveBatchByCodeDateCount), e -> logger.error("failed to refreshAvgLine", e));
+                                .subscribe(this::saveBatchByCodeDateStatistic), e -> logger.error("failed to refreshAvgLine", e));
     }
 
 
@@ -153,7 +151,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                         // 计算 day 日均线
                         for (Integer day : DAYS) {
                             AvgLine curAvg = createFrom(avgLines.get(i));
-                            curAvg.setCount(day);
+                            curAvg.setStatistic(day);
                             curAvg.setAvg(avg(avgLines, i, day));
                             sink.next(curAvg);
                         }
@@ -187,8 +185,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     /**
      * 根据 stockCode, date, days 保存/更新均线数据
      */
-    public void saveBatchByCodeDateCount(List<AvgLine> avgLines) {
-        getBaseMapper().saveBatchByCodeDateCount(avgLines);
+    public void saveBatchByCodeDateStatistic(List<AvgLine> avgLines) {
+        getBaseMapper().saveBatchByCodeDateStatistic(avgLines);
     }
 
     // 默认返回 2020-01-01 之后的数据
