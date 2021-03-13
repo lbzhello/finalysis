@@ -73,7 +73,7 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
     }
 
     // 数据在不同的分区，默认返回 2020-01-01 之后的数据
-    private LambdaQueryChainWrapper<KLine> getQuery() {
+    public LambdaQueryChainWrapper<KLine> getQuery() {
         return lambdaQuery().ge(KLine::getDate, LocalDate.of(2020, 1, 1));
     }
 }

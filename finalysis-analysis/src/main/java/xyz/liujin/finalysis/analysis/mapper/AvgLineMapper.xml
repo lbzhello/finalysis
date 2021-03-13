@@ -66,5 +66,8 @@
         <if test="limit != null and limit != 0">
             limit #{limit}
         </if>
+        <if test="offset != null and offset >= 0">
+            offset #{offset}
+        </if>
     </select>
 </mapper>

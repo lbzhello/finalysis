@@ -19,4 +19,5 @@ public class AvgLineQo extends PageQo {
     private LocalDate end;
     private List<String> stockCodes;
     private Integer limit;
+    private Integer offset;
 }

@@ -29,8 +29,9 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 计算均线形态 5 日线， 10 日线， 30 日线
@@ -51,6 +52,42 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
+     * 获取启动趋势的股票，即 5 日线刚大于 10 日线
+     * @param days 启动天数，不超过此值，最多十天
+     * @return
+     */
+    public Flux<DayAvgLine> startUp(Integer days) {
+        int _days = Math.min(days, 10);
+        // 当前天数 5 日线大于等于 10 日线
+        LocalDate end = Optional.ofNullable(getLatestDate())
+                .orElse(LocalDate.now());
+        Flux<DayAvgLine> endDayAvg = Flux.fromIterable(
+                getBaseMapper().findDayAvg(AvgLineQo.builder()
+                        .start(end)
+                        .end(end)
+                        .build()))
+                .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) >= 0);
+
+        // 起始天数 5 日线小于等于 10 日线
+        LocalDate start = end.minusDays(_days);
+        Flux<DayAvgLine> startDayAvg = Flux.fromIterable(
+                getBaseMapper().findDayAvg(AvgLineQo.builder()
+                        .start(start)
+                        .end(start)
+                        .build()))
+                .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) <= 0);
+
+        // 取交集
+        return Flux.zip(startDayAvg.collectList(), endDayAvg.collectList())
+                .flatMap(tuple -> {
+                    Set<String> existSet = tuple.getT1().stream()
+                            .map(DayAvgLine::getStockCode).collect(Collectors.toSet());
+                    return Flux.fromIterable(tuple.getT2())
+                            .filter(it -> existSet.contains(it.getStockCode()));
+                });
+    }
+
+    /**
      * 获取上升趋势的均线，即从最新的数据开始， 5 日线大于 10 日线的天数
      * @param days 连续递增天数
      * @return
@@ -62,27 +99,6 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .orElse(LocalDate.now());
 
         return Flux.fromIterable(getBaseMapper().upwards(start));
-    }
-
-    /**
-     * 获取日均线数据
-     * @param avgLineQo
-     * @return
-     */
-    public Flux<DayAvgLine> dayAvg(AvgLineQo avgLineQo) {
-        // 日期默认最后一个交易日
-        if (Objects.isNull(avgLineQo.getStart())) {
-            LocalDate latest = getLatestDate();
-            avgLineQo.setStart(latest);
-        }
-
-        if (Objects.isNull(avgLineQo.getEnd())) {
-            avgLineQo.setEnd(LocalDate.now());
-        }
-        List<DayAvgLine> dayAvg = getBaseMapper().findDayAvg(avgLineQo);
-        return Flux.fromIterable(dayAvg)
-                .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) > 0);
-
     }
 
     /**

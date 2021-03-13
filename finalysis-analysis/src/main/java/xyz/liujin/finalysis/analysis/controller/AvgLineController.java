@@ -23,13 +23,13 @@ public class AvgLineController {
     @Autowired
     private AvgLineService avgLineService;
 
-    @ApiOperation("统计启动（均线突破)阶段的股票，5 日线刚超过十日线")
+    @ApiOperation("获取启动阶段的股票")
     @GetMapping("start-up")
     public Flux<DayAvgLine> startUp(
-            @ApiParam(value = "最大启动天数（5 日线超过 10 日线）", example = "3")
+            @ApiParam(value = "最大启动天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return Flux.just();
+        return avgLineService.startUp(days);
     }
 
     @ApiOperation("获取上升趋势的股票")
