@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.base.util.DateUtils;
-import xyz.liujin.finalysis.extractor.manager.ExtractorManager;
+import xyz.liujin.finalysis.extractor.manager.ExtractManager;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -20,19 +20,19 @@ import java.util.List;
  */
 @Deprecated
 @Component
-public class CrawlerHandler {
-    public static final Logger logger = LoggerFactory.getLogger(CrawlerHandler.class);
+public class ExtractHandler {
+    public static final Logger logger = LoggerFactory.getLogger(ExtractHandler.class);
 
     @Autowired
-    private ExtractorManager extractorManager;
+    private ExtractManager extractManager;
 
     /**
      * 爬取股票数据并入库
      * @return
      */
-    public Mono<ServerResponse> crawlStock(ServerRequest serverRequest) {
+    public Mono<ServerResponse> extractStock(ServerRequest serverRequest) {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(extractorManager.refreshStock(), String.class);
+                .body(extractManager.refreshStock(), String.class);
 
     }
 
@@ -41,7 +41,7 @@ public class CrawlerHandler {
      * 爬取 k 线数据并入库
      * @return
      */
-    public Mono<ServerResponse> crawlKLine(ServerRequest serverRequest) {
+    public Mono<ServerResponse> extractKLine(ServerRequest serverRequest) {
         // yyyy-MM-dd
         LocalDate startDate = serverRequest.queryParam("startDate").map(DateUtils::parseDate).orElse(LocalDate.now());
         // 默认当前日期
@@ -49,7 +49,7 @@ public class CrawlerHandler {
         // 股票列表
         List<String> codes = serverRequest.queryParam("codes").map(codeStr -> Arrays.asList(codeStr.split(","))).orElse(null);
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(extractorManager.refreshKLine(startDate, endDate, codes), String.class);
+                .body(extractManager.refreshKLine(startDate, endDate, codes), String.class);
 
     }
 }

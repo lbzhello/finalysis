@@ -8,21 +8,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.extractor.manager.ExtractorManager;
+import xyz.liujin.finalysis.extractor.manager.ExtractManager;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("extract")
-public class ExtractorController {
+public class ExtractController {
     @Autowired
-    private ExtractorManager extractorManager;
+    private ExtractManager extractManager;
 
     @ApiOperation("更新股票数据")
     @GetMapping("stock")
     public Flux<String> refreshStock() {
-        return extractorManager.refreshStock();
+        return extractManager.refreshStock();
     }
 
 
@@ -37,6 +37,6 @@ public class ExtractorController {
 
             @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
             @RequestParam(name = "codes", required = false) List<String> codes) {
-        return extractorManager.refreshKLine(start, end, codes);
+        return extractManager.refreshKLine(start, end, codes);
     }
 }

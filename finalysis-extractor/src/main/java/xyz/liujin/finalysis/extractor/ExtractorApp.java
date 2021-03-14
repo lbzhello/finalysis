@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import xyz.liujin.finalysis.base.service.KLineService;
-import xyz.liujin.finalysis.extractor.manager.ExtractorManager;
+import xyz.liujin.finalysis.extractor.manager.ExtractManager;
 
 import java.time.LocalDate;
 
@@ -20,7 +20,7 @@ public class ExtractorApp {
     private KLineService kLineService;
 
     @Autowired
-    private ExtractorManager extractorManager;
+    private ExtractManager extractManager;
 
     @Bean
     public ApplicationRunner onSpiderStartUp() {
@@ -36,7 +36,7 @@ public class ExtractorApp {
     @Scheduled(cron = "0 0 0 * * ?")
     public void refreshStockDaily() {
         logger.debug("start refresh stock daily {}", LocalDate.now());
-        extractorManager.refreshStock();
+        extractManager.refreshStock();
     }
 
     /**
@@ -49,7 +49,7 @@ public class ExtractorApp {
 
         logger.debug("refresh k line daily {}", now);
 
-        extractorManager.refreshKLine(now, now, null);
+        extractManager.refreshKLine(now, now, null);
     }
 
 

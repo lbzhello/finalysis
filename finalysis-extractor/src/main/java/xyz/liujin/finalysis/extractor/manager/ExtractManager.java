@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
  * 股票数据提取控制器
  */
 @Service
-public class ExtractorManager {
-    private static Logger logger = LoggerFactory.getLogger(ExtractorManager.class);
+public class ExtractManager {
+    private static Logger logger = LoggerFactory.getLogger(ExtractManager.class);
 
     @Autowired
     @Qualifier(StockExtractor.TUSHARE)
@@ -51,11 +51,11 @@ public class ExtractorManager {
      */
     public Flux<String> refreshStock() {
         return Flux.create(sink -> {
-            logger.debug("start crawlStock {}", stockExtractor.getClass());
+            logger.debug("start extract stock {}", stockExtractor.getClass());
 
-            sink.next("start to crawl stock\n");
+            sink.next("start to extract stock\n");
 
-            stockExtractor.crawlStock()
+            stockExtractor.extractStock()
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 获取新增的股票
                     .filter(stock -> {
@@ -75,7 +75,7 @@ public class ExtractorManager {
                         applicationContext.publishEvent(StockChangeEvent.builder()
                                 .addCodes(codes)
                                 .build());
-                    }, e -> logger.error("failed to crawlStock", e));
+                    }, e -> logger.error("failed to extract stock", e));
 
             sink.next("job running...\n");
             sink.complete();
@@ -106,10 +106,10 @@ public class ExtractorManager {
                     .map(Stock::getStockCode)
                     .collect(Collectors.toList()));
 
-            sink.next("start to crawl k line\n");
-            logger.debug("start to crawl k line [startDate:{}, endDate:{}]", startDate, endDate);
+            sink.next("start to extract k line\n");
+            logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
-            stockExtractor.crawlKLine(startDate, endDate, codes)
+            stockExtractor.extractKLine(startDate, endDate, codes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
@@ -127,7 +127,7 @@ public class ExtractorManager {
                                 .end(DateUtils.parseDate(endDate))
                                 .codes(codes)
                                 .build());
-                        }, e -> logger.error("failed to crawlKLine", e));
+                        }, e -> logger.error("failed to extract k line", e));
 
             sink.next("job running...\n");
             sink.complete();

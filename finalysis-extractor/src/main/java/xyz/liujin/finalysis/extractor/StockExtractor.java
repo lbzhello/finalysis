@@ -11,14 +11,14 @@ import java.util.List;
  * 股票数据爬虫
  */
 public interface StockExtractor {
-    String TUSHARE = "tushareCrawler";
+    String TUSHARE = "tushareExtractor";
 
     /**
      * 爬取股票数据，返回异步的股票数据流
      * 子类通过实现此方法，从不同的网站爬取股票数据
      * @return 异步流
      */
-    Flux<Stock> crawlStock();
+    Flux<Stock> extractStock();
 
     /**
      * 爬取日 K 线数据
@@ -27,6 +27,6 @@ public interface StockExtractor {
      * @param endDate   yyyy-MM-dd 结束时间，包含，为空则不过滤; 例如 2021-01-02
      * @return
      */
-    Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, @Nullable List<String> codes);
+    Flux<KLineDto> extractKLine(@Nullable String startDate, @Nullable String endDate, @Nullable List<String> codes);
 
 }

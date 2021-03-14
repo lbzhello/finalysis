@@ -42,7 +42,7 @@ public class SzseExtractor implements StockExtractor {
     }
 
     @Override
-    public Flux<KLineDto> crawlKLine(String startDate, String endDate, List<String> codes) {
+    public Flux<KLineDto> extractKLine(String startDate, String endDate, List<String> codes) {
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {
@@ -58,7 +58,7 @@ public class SzseExtractor implements StockExtractor {
         })
                 .map(Stock::getStockCode)
                 // 异步
-                .flatMap(stockCode -> crawlKLine(stockCode)
+                .flatMap(stockCode -> extractKLine(stockCode)
                         .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance())))
                 // 开始日期未提供则不过滤
                 .filter(kLineDto -> CharSequenceUtil.compare(startDate, kLineDto.getDate(), true) <= 0
@@ -71,8 +71,8 @@ public class SzseExtractor implements StockExtractor {
      * @param stockCode
      * @return
      */
-    private Flux<KLineDto> crawlKLine(String stockCode) {
-        logger.debug("crawlKLine {}", stockCode);
+    private Flux<KLineDto> extractKLine(String stockCode) {
+        logger.debug("extract k line {}", stockCode);
         return HttpUtils.get(SzseConst.GET_HISTORY_DATA_OF_DAY.formatted(stockCode)).req()
                 .map(response -> {
                     try {
@@ -119,7 +119,7 @@ public class SzseExtractor implements StockExtractor {
      * @return
      */
     @Override
-    public Flux<Stock> crawlStock() {
+    public Flux<Stock> extractStock() {
         String today = DateUtils.formatDate(OffsetDateTime.now());
         String day1231 = "2020-12-31";
         return HttpUtils.get(SzseConst.GET_REPORT.formatted(day1231, day1231, 1))

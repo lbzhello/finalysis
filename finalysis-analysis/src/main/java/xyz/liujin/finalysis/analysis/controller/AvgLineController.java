@@ -28,7 +28,7 @@ public class AvgLineController {
             @ApiParam(value = "最大突破天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return avgLineService.fiveCrossTen(days).collectList();
+        return avgLineService.fiveCrossTen(Optional.ofNullable(days).orElse(3)).collectList();
     }
 
     @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
@@ -37,7 +37,7 @@ public class AvgLineController {
             @ApiParam(value = "最小持续天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return avgLineService.fiveAboveTen(days).collectList();
+        return avgLineService.fiveAboveTen(Optional.ofNullable(days).orElse(3)).collectList();
     }
 
     @ApiOperation("更新均线并入库")

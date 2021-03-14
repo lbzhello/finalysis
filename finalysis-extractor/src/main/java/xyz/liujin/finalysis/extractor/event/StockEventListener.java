@@ -9,7 +9,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
 import xyz.liujin.finalysis.base.event.StockChangeEvent;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
-import xyz.liujin.finalysis.extractor.manager.ExtractorManager;
+import xyz.liujin.finalysis.extractor.manager.ExtractManager;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -19,14 +19,14 @@ public class StockEventListener {
     private static Logger logger = LoggerFactory.getLogger(StockEventListener.class);
 
     @Autowired
-    private ExtractorManager extractorManager;
+    private ExtractManager extractManager;
 
     @Async
     @EventListener
     public void stockRefresh(StockChangeEvent event) {
         logger.debug("found stock refresh: {}", event);
         if (Objects.nonNull(event) && CollectionUtil.isNotEmpty(event.getAddCodes())) {
-            extractorManager.refreshKLine(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());
+            extractManager.refreshKLine(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());
         }
     }
 }

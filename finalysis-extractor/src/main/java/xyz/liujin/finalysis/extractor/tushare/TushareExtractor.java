@@ -51,7 +51,7 @@ public class TushareExtractor implements StockExtractor {
     }
 
     @Override
-    public Flux<Stock> crawlStock() {
+    public Flux<Stock> extractStock() {
         return Tushare.StockBasic.builder()
                 .build()
                 .req("symbol,name,list_status,list_date")
@@ -64,7 +64,7 @@ public class TushareExtractor implements StockExtractor {
                                 .eval(bodyStr, StockDto.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
-                        logger.error("crawlStock failed", e);
+                        logger.error("extract stock failed", e);
                     }
                     return Flux.just();
                 });
@@ -103,7 +103,7 @@ public class TushareExtractor implements StockExtractor {
      * @return
      */
     @Override
-    public Flux<KLineDto> crawlKLine(@Nullable String startDate, @Nullable String endDate, List<String> codes) {
+    public Flux<KLineDto> extractKLine(@Nullable String startDate, @Nullable String endDate, List<String> codes) {
         // 爬取所有股票 K 线
         return splitCodes(startDate, endDate, codes)
                 .flatMap(tuple -> {
