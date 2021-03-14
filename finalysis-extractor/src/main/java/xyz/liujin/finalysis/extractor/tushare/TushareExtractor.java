@@ -18,7 +18,7 @@ import xyz.liujin.finalysis.base.entity.Stock;
 import xyz.liujin.finalysis.base.json.CsvMapper;
 import xyz.liujin.finalysis.base.service.StockService;
 import xyz.liujin.finalysis.base.util.DateUtils;
-import xyz.liujin.finalysis.base.util.SyncUtils;
+import xyz.liujin.finalysis.base.util.SyncUnit;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
 
@@ -93,6 +93,8 @@ public class TushareExtractor implements StockExtractor {
                 .build();
     }
 
+    // 用于控制方法执行速率
+    private SyncUnit syncUnit = SyncUnit.create();
     /**
      * 每分钟最多调用 500 次（每秒最多调用 8 次）
      * @param startDate yyyy-MM-dd 开始时间，包含，为空则不过滤; 例如 2021-01-01
@@ -106,7 +108,7 @@ public class TushareExtractor implements StockExtractor {
         return splitCodes(startDate, endDate, codes)
                 .flatMap(tuple -> {
                     // 每分钟最多调用 500 次（每秒最多调用 8 次）
-                    SyncUtils.waitMillis(1000/8);
+                    syncUnit.waitMillis(1000/8);
 
                     return Tushare.Daily.builder()
                             .ts_code(formatCodes(tuple.getT3()))
