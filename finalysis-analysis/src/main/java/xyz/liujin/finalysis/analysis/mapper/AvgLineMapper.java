@@ -1,6 +1,8 @@
 package xyz.liujin.finalysis.analysis.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.lang.NonNull;
 import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
 import xyz.liujin.finalysis.analysis.entity.AvgLine;
 import xyz.liujin.finalysis.analysis.qo.AvgLineQo;
@@ -28,9 +30,15 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
     List<DayAvgLine> findDayAvg(AvgLineQo avgLineQo);
 
     /**
-     * 获取上升趋势的股票，即 5 日线大于 10 日线
+     * 获取股票趋势
      * @param start 趋势开始日期
+     * @param end 结束日期
+     * @param highStats 较高的统计类型
+     * @param lowStats 较低的统计类型
      * @return
      */
-    List<String> upwards(LocalDate start);
+    List<String> trend(@NonNull @Param("start") LocalDate start,
+                       @NonNull @Param("end") LocalDate end,
+                       @Param("highStats") int highStats,
+                       @Param("lowStats") int lowStats);
 }

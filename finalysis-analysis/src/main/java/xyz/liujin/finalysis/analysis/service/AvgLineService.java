@@ -52,8 +52,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
-     * 获取 5 日线突破十日线的股票
-     * @param days 突破天数，最多十天
+     * 获取 5 日线突破 10 日线的股票
+     * @param days 最大突破天数，最多十天
      * @return
      */
     public Flux<String> fiveCrossTen(Integer days) {
@@ -93,17 +93,21 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     }
 
     /**
-     * 获取上升趋势的均线，即从最新的数据开始， 5 日线大于 10 日线的天数
-     * @param days 连续递增天数
+     * 获取 5 日线大于 10 日线的股票
+     * @param days 最小持续天数
      * @return
      */
-    public Flux<String> upwards(Integer days) {
-        LocalDate start = Optional
+    public Flux<String> fiveAboveTen(Integer days) {
+        // 结束日期当前最新数据
+        LocalDate end = Optional
                 .ofNullable(getLatestDate())
-                .map(it -> it.minusDays(days - 1))
                 .orElse(LocalDate.now());
 
-        return Flux.fromIterable(getBaseMapper().upwards(start));
+        // 计算开始时间，闭合区间
+        LocalDate start = end.minusDays(days - 1);
+
+        // 5 日均线大于 10 日均线为升势
+        return Flux.fromIterable(getBaseMapper().trend(start, end, 5, 10));
     }
 
     /**

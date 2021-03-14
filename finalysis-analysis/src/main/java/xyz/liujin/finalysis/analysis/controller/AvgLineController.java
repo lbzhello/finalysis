@@ -24,20 +24,20 @@ public class AvgLineController {
 
     @ApiOperation("获取 5 日线突破十日线的股票")
     @GetMapping("5-cross-10")
-    public Flux<String> fiveCrossTen(
+    public Mono<List<String>> fiveCrossTen(
             @ApiParam(value = "最大突破天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return avgLineService.fiveCrossTen(days);
+        return avgLineService.fiveCrossTen(days).collectList();
     }
 
-    @ApiOperation("获取上升趋势的股票")
-    @GetMapping("upwards")
-    public Mono<List<String>> upwards(
+    @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
+    @GetMapping("5-above-10")
+    public Mono<List<String>> fiveAboveTen(
             @ApiParam(value = "最小持续天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return avgLineService.upwards(days).collectList();
+        return avgLineService.fiveAboveTen(days).collectList();
     }
 
     @ApiOperation("更新均线并入库")
