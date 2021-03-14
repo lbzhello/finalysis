@@ -13,7 +13,7 @@ pluginManagement {
     }
 }
 rootProject.name = 'finalysis'
-include 'finalysis-spider'
+include 'finalysis-extractor'
 include 'finalysis-start'
 include 'finalysis-base'
 include 'finalysis-test'
