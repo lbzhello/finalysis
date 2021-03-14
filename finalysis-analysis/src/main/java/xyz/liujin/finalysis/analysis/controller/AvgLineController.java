@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import xyz.liujin.finalysis.analysis.dto.DayAvgLine;
 import xyz.liujin.finalysis.analysis.service.AvgLineService;
 
 import java.time.LocalDate;
@@ -23,13 +22,13 @@ public class AvgLineController {
     @Autowired
     private AvgLineService avgLineService;
 
-    @ApiOperation("获取启动阶段的股票")
-    @GetMapping("start-up")
-    public Flux<DayAvgLine> startUp(
-            @ApiParam(value = "最大启动天数", example = "3")
+    @ApiOperation("获取 5 日线突破十日线的股票")
+    @GetMapping("5-cross-10")
+    public Flux<String> fiveCrossTen(
+            @ApiParam(value = "最大突破天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
-        return avgLineService.startUp(days);
+        return avgLineService.fiveCrossTen(days);
     }
 
     @ApiOperation("获取上升趋势的股票")

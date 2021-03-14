@@ -52,11 +52,11 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     private StockService stockService;
 
     /**
-     * 获取启动趋势的股票，即 5 日线刚大于 10 日线
-     * @param days 启动天数，不超过此值，最多十天
+     * 获取 5 日线突破十日线的股票
+     * @param days 突破天数，最多十天
      * @return
      */
-    public Flux<DayAvgLine> startUp(Integer days) {
+    public Flux<String> fiveCrossTen(Integer days) {
         int _days = Math.min(days, 10);
         // 当前天数 5 日线大于等于 10 日线
         LocalDate end = Optional.ofNullable(getLatestDate())
@@ -80,10 +80,15 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         // 取交集
         return Flux.zip(startDayAvg.collectList(), endDayAvg.collectList())
                 .flatMap(tuple -> {
-                    Set<String> existSet = tuple.getT1().stream()
+                    Set<String> t1Set = tuple.getT1().stream()
                             .map(DayAvgLine::getStockCode).collect(Collectors.toSet());
-                    return Flux.fromIterable(tuple.getT2())
-                            .filter(it -> existSet.contains(it.getStockCode()));
+
+                    Set<String> t2Set = tuple.getT2().stream()
+                            .map(DayAvgLine::getStockCode).collect(Collectors.toSet());
+
+                    t2Set.retainAll(t1Set);
+
+                    return Flux.fromIterable(t2Set);
                 });
     }
 
