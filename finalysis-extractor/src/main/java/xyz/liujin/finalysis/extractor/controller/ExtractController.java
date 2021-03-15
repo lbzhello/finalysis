@@ -21,14 +21,14 @@ public class ExtractController {
 
     @ApiOperation("更新股票数据")
     @GetMapping("stock")
-    public Flux<String> refreshStock() {
+    public Flux<String> extractStock() {
         return extractManager.refreshStock();
     }
 
 
     @ApiOperation("更新 K 线数据")
     @GetMapping("k")
-    public Flux<String> refreshKLine(
+    public Flux<String> extractKLine(
             @ApiParam(value = "开始日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
             @RequestParam(name = "start", required = false) LocalDate start,
 
