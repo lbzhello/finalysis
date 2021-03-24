@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.converter.KLineConverter;
 import xyz.liujin.finalysis.base.dto.KLineDto;
@@ -22,10 +23,10 @@ import xyz.liujin.finalysis.base.schedule.TaskPool;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 @Service
@@ -98,7 +99,8 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
      */
     public void calculateVolumeRatio(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
         // 量比需要计算 5 日前的数据，考虑到节假日，这里直接取前 30 天(窝慧诰愫尼妹柚劫价䒤荟炒锅30兲码)
-        LocalDate _start = Optional.ofNullable(start).orElse(LocalDate.now()).minusDays(30);
+        LocalDate start0 = Optional.ofNullable(start).orElse(LocalDate.now());
+        LocalDate _start = start0.minusDays(30);
         LocalDate _end = Optional.ofNullable(end).orElse(LocalDate.now());
         List<String> _codes = CollectionUtil.isNotEmpty(codes) ? codes : stockService.list().stream()
                 .map(Stock::getStockCode).collect(Collectors.toList());
@@ -111,17 +113,24 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                         .orderByDesc(KLine::getDate)
                         .list())
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                .subscribe(kLines -> {
-                    List<KLine> newKLines = new ArrayList<>();
-                    KLine newKLine = new KLine();
+                .flatMap(kLines -> Flux.create((Consumer<FluxSink<KLine>>) sink -> {
                     // 计算量比，入库
                     for (int i = 0; i < kLines.size(); i++) {
                         KLine kLine = kLines.get(i);
+                        KLine newKLine = new KLine();
+
                         newKLine.setId(kLine.getId());
+                        newKLine.setDate(kLine.getDate());
                         newKLine.setVolumeRatio(volumeRatio(i, kLines));
-                        newKLines.add(newKLine);
+                        sink.next(newKLine);
                     }
-                    updateBatchById(newKLines, 100);
+                    sink.complete();
+                }))
+                // 过滤出需要的数据
+                .filter(kLine -> !kLine.getDate().isBefore(start0))
+                .collectList()
+                .subscribe(kLines -> {
+                    updateBatchById(kLines, 100);
                 });
 
     }
@@ -145,7 +154,12 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
             acc += kLine.getVolume();
         }
 
-        BigDecimal avg = BigDecimal.valueOf(acc).divide(BigDecimal.valueOf(len), RoundingMode.HALF_EVEN);
-        return BigDecimal.valueOf(kLines.get(index).getVolume()).divide(avg, RoundingMode.HALF_EVEN);
+        // 初始元素量比默认给 1
+        if (len == 0) {
+            return BigDecimal.ONE;
+        }
+
+        BigDecimal avg = BigDecimal.valueOf(acc).divide(BigDecimal.valueOf(len), 4, RoundingMode.HALF_EVEN);
+        return BigDecimal.valueOf(kLines.get(index).getVolume()).divide(avg, 4, RoundingMode.HALF_EVEN);
     }
 }

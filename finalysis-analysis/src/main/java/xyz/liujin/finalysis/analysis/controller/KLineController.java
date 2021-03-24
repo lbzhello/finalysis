@@ -35,7 +35,7 @@ public class KLineController {
             @RequestParam(name = "codes", required = false) List<String> codes
             ) {
         kLineService.calculateVolumeRatio(start, end, codes);
-        return Flux.just("start");
+        return Flux.just("start to calculate volume ratio...");
     }
 
     @ApiOperation(value = "过去股票当日 k 线")
