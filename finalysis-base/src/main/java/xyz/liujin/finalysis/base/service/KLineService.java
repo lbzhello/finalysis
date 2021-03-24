@@ -117,17 +117,17 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                     // 计算量比，入库
                     for (int i = 0; i < kLines.size(); i++) {
                         KLine kLine = kLines.get(i);
-                        KLine newKLine = new KLine();
+                        // 只计算需要的天数
+                        if (!kLine.getDate().isBefore(start0)) {
+                            KLine newKLine = new KLine();
+                            newKLine.setId(kLine.getId());
+                            newKLine.setVolumeRatio(volumeRatio(i, kLines));
+                            sink.next(newKLine);
+                        }
 
-                        newKLine.setId(kLine.getId());
-                        newKLine.setDate(kLine.getDate());
-                        newKLine.setVolumeRatio(volumeRatio(i, kLines));
-                        sink.next(newKLine);
                     }
                     sink.complete();
                 }))
-                // 过滤出需要的数据
-                .filter(kLine -> !kLine.getDate().isBefore(start0))
                 .collectList()
                 .subscribe(kLines -> {
                     updateBatchById(kLines, 100);
