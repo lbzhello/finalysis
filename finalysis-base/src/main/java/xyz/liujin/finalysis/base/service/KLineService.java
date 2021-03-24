@@ -1,22 +1,32 @@
 package xyz.liujin.finalysis.base.service;
 
+import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.converter.KLineConverter;
 import xyz.liujin.finalysis.base.dto.KLineDto;
 import xyz.liujin.finalysis.base.entity.KLine;
+import xyz.liujin.finalysis.base.entity.Stock;
 import xyz.liujin.finalysis.base.mapper.KLineMapper;
+import xyz.liujin.finalysis.base.schedule.TaskPool;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
@@ -75,5 +85,67 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
     // 数据在不同的分区，默认返回 2020-01-01 之后的数据
     public LambdaQueryChainWrapper<KLine> getQuery() {
         return lambdaQuery().ge(KLine::getDate, LocalDate.of(2020, 1, 1));
+    }
+
+    @Autowired
+    private StockService stockService;
+
+    /**
+     * 计算股票量比
+     * @param start 开始日期，默认当天
+     * @param end 结束日期，默认当天
+     * @param codes 股票列表，默认所有
+     */
+    public void calculateVolumeRatio(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
+        // 量比需要计算 5 日前的数据，考虑到节假日，这里直接取前 30 天(窝慧诰愫尼妹柚劫价䒤荟炒锅30兲码)
+        LocalDate _start = Optional.ofNullable(start).orElse(LocalDate.now()).minusDays(30);
+        LocalDate _end = Optional.ofNullable(end).orElse(LocalDate.now());
+        List<String> _codes = CollectionUtil.isNotEmpty(codes) ? codes : stockService.list().stream()
+                .map(Stock::getStockCode).collect(Collectors.toList());
+
+        Flux.fromIterable(_codes)
+                .map(code -> getQuery()
+                        .eq(KLine::getStockCode, code)
+                        .ge(KLine::getDate, _start)
+                        .le(KLine::getDate, _end)
+                        .orderByDesc(KLine::getDate)
+                        .list())
+                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                .subscribe(kLines -> {
+                    List<KLine> newKLines = new ArrayList<>();
+                    KLine newKLine = new KLine();
+                    // 计算量比，入库
+                    for (int i = 0; i < kLines.size(); i++) {
+                        KLine kLine = kLines.get(i);
+                        newKLine.setId(kLine.getId());
+                        newKLine.setVolumeRatio(volumeRatio(i, kLines));
+                        newKLines.add(newKLine);
+                    }
+                    updateBatchById(newKLines, 100);
+                });
+
+    }
+
+    /**
+     * 计算第 index 个元素的量比。第 index 个元素与前 5 个元素的均值的比值
+     * @param index
+     * @param kLines
+     */
+    private BigDecimal volumeRatio(int index, List<KLine> kLines) {
+        if (index < 0 || index > kLines.size() - 1) {
+            throw new IllegalArgumentException("failed calculate volume ratio: index out of range");
+        }
+
+        // 需要计算的元素个数，最多 5 个
+        int len = Math.min(5, kLines.size() - 1 - index);
+
+        Long acc = 0L;
+        for (int i = 1; i <= len; i++) {
+            KLine kLine = kLines.get(index + i);
+            acc += kLine.getVolume();
+        }
+
+        BigDecimal avg = BigDecimal.valueOf(acc).divide(BigDecimal.valueOf(len), RoundingMode.HALF_EVEN);
+        return BigDecimal.valueOf(kLines.get(index).getVolume()).divide(avg, RoundingMode.HALF_EVEN);
     }
 }
