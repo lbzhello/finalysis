@@ -84,7 +84,7 @@ public class ExtractManager {
 
     /**
      * 爬取 K 线入库，更新股票信息
-     * @param start 爬取开始日期，默认当天
+     * @param start 爬取开始日期，默认数据库最新数据
      * @param end 爬取结束日期，默认当天
      * @param stockCodes 需要爬取的股票列表，默认所有
      * @return

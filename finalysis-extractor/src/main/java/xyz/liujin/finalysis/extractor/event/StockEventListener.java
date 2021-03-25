@@ -24,8 +24,8 @@ public class StockEventListener {
     @Async
     @EventListener
     public void stockRefresh(StockChangeEvent event) {
-        logger.debug("found stock refresh: {}", event);
         if (Objects.nonNull(event) && CollectionUtil.isNotEmpty(event.getAddCodes())) {
+            logger.debug("found stock added: {}", event);
             extractManager.refreshKLine(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());
         }
     }
