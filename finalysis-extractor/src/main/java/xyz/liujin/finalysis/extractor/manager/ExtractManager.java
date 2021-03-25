@@ -53,7 +53,7 @@ public class ExtractManager {
         return Flux.create(sink -> {
             logger.debug("start extract stock {}", stockExtractor.getClass());
 
-            sink.next("start to extract stock");
+            sink.next("start to extract stock. ");
 
             stockExtractor.extractStock()
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
@@ -77,7 +77,7 @@ public class ExtractManager {
                                 .build());
                     }, e -> logger.error("failed to extract stock", e));
 
-            sink.next("job running...");
+            sink.next("job running... ");
             sink.complete();
         });
     }
@@ -106,7 +106,7 @@ public class ExtractManager {
                     .map(Stock::getStockCode)
                     .collect(Collectors.toList()));
 
-            sink.next("start to extract k line");
+            sink.next("start to extract k line. ");
             logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
             stockExtractor.extractKLine(startDate, endDate, codes)
@@ -129,7 +129,7 @@ public class ExtractManager {
                                 .build());
                         }, e -> logger.error("failed to extract k line", e));
 
-            sink.next("job running...");
+            sink.next("job running... ");
             sink.complete();
         });
     }
