@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.tushare.controller;
+package xyz.liujin.finalysis.extractor.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("extract")
-public class TushareController {
+public class ExtractorController {
     @Autowired
     private TushareManager tushareManager;
 

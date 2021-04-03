@@ -8,12 +8,12 @@ import org.springframework.web.reactive.function.server.RequestPredicates;
 import org.springframework.web.reactive.function.server.RouterFunction;
 import org.springframework.web.reactive.function.server.RouterFunctions;
 import org.springframework.web.reactive.function.server.ServerResponse;
-import xyz.liujin.finalysis.extractor.tushare.controller.TushareController;
+import xyz.liujin.finalysis.extractor.controller.ExtractorController;
 import xyz.liujin.finalysis.extractor.tushare.handler.TushareHandler;
 
 /**
  * 此类仅用于测试 webflux 函数式编程测试
- * @deprecated 功能已经被 {@link TushareController} 取代
+ * @deprecated 功能已经被 {@link ExtractorController} 取代
  */
 @Deprecated
 @Configuration
