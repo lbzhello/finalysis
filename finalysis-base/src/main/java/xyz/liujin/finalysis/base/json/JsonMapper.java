@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
  *     "code": 0,
  *     "time": "20210112",
  *     "name": "hello kitty",
- *     "info": "empty
+ *     "info": "empty"
  * }
  */
 public interface JsonMapper {
