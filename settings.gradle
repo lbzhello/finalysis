@@ -18,4 +18,6 @@ include 'finalysis-start'
 include 'finalysis-base'
 include 'finalysis-test'
 include 'finalysis-analysis'
+include 'finalysis-daily'
+include 'finalysis-stock'
 

@@ -2,8 +2,8 @@ package xyz.liujin.finalysis.extractor;
 
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.base.dto.KLineDto;
-import xyz.liujin.finalysis.base.entity.Stock;
+import xyz.liujin.finalysis.daily.dto.KLineDto;
+import xyz.liujin.finalysis.stock.entity.Stock;
 
 import java.util.List;
 

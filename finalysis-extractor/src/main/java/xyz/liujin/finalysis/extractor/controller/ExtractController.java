@@ -22,7 +22,7 @@ public class ExtractController {
     @ApiOperation(value = "启动所有任务", notes = "1. 更新股票数据；2. 更新 k 线数据；")
     @GetMapping("all")
     public Flux<String> all() {
-        return Flux.merge(extractStock(), extractKLine(null, null, null));
+        return extractManager.refreshAll();
     }
 
     @ApiOperation("更新股票数据")

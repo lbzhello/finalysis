@@ -3,6 +3,10 @@ apply plugin: 'java'
 dependencies {
     compile project(":finalysis-base")
 
+    compile project(":finalysis-daily")
+
+    compile project(":finalysis-stock")
+
     compile group: 'com.squareup.okhttp3', name: 'okhttp'
 
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'

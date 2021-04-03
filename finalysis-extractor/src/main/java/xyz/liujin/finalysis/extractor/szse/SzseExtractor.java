@@ -13,15 +13,15 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.constant.BoardEnum;
-import xyz.liujin.finalysis.base.dto.KLineDto;
-import xyz.liujin.finalysis.base.entity.Stock;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
-import xyz.liujin.finalysis.base.service.StockService;
 import xyz.liujin.finalysis.base.util.DateUtils;
+import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.constant.HtmlConst;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
 import xyz.liujin.finalysis.extractor.util.HttpUtils;
+import xyz.liujin.finalysis.stock.entity.Stock;
+import xyz.liujin.finalysis.stock.service.StockService;
 
 import java.time.OffsetDateTime;
 import java.util.List;

@@ -5,8 +5,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import xyz.liujin.finalysis.analysis.mapper.AvgLineMapper;
-import xyz.liujin.finalysis.analysis.service.AvgLineService;
+import xyz.liujin.finalysis.daily.mapper.AvgLineMapper;
+import xyz.liujin.finalysis.daily.service.AvgLineService;
 
 import java.time.LocalDate;
 

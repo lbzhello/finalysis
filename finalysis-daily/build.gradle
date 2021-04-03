@@ -1,11 +1,6 @@
-plugins {
-    id 'java'
-}
+apply plugin: 'java'
 
 dependencies {
     compile project(":finalysis-base")
-
-    compile project(":finalysis-daily")
-
     compile project(":finalysis-stock")
 }

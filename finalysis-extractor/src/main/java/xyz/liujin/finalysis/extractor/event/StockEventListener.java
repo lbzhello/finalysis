@@ -7,9 +7,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Async;
-import xyz.liujin.finalysis.base.event.StockChangeEvent;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
 import xyz.liujin.finalysis.extractor.manager.ExtractManager;
+import xyz.liujin.finalysis.stock.event.StockChangeEvent;
 
 import java.time.LocalDate;
 import java.util.Objects;

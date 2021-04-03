@@ -9,14 +9,14 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.base.entity.Stock;
-import xyz.liujin.finalysis.base.event.KLineChangeEvent;
-import xyz.liujin.finalysis.base.event.StockChangeEvent;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
-import xyz.liujin.finalysis.base.service.KLineService;
-import xyz.liujin.finalysis.base.service.StockService;
 import xyz.liujin.finalysis.base.util.DateUtils;
+import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
+import xyz.liujin.finalysis.daily.service.KLineService;
 import xyz.liujin.finalysis.extractor.StockExtractor;
+import xyz.liujin.finalysis.stock.entity.Stock;
+import xyz.liujin.finalysis.stock.event.StockChangeEvent;
+import xyz.liujin.finalysis.stock.service.StockService;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -44,6 +44,16 @@ public class ExtractManager {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    /**
+     * 自动更新股票数据
+     * 1. 更新股票数据
+     * 2. 更新 K 线数据
+     * @return
+     */
+    public Flux<String> refreshAll() {
+        return Flux.merge(refreshStock(), refreshKLine(null, null, null));
+    }
 
     /**
      * 更新股票信息
