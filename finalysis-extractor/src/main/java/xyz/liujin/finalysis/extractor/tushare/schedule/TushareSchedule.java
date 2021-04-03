@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.tushare;
+package xyz.liujin.finalysis.extractor.tushare.schedule;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,8 +13,8 @@ import xyz.liujin.finalysis.extractor.tushare.manager.TushareManager;
 import java.time.LocalDateTime;
 
 @Configuration
-public class TushareApp {
-    private Logger logger = LoggerFactory.getLogger(TushareApp.class);
+public class TushareSchedule {
+    private Logger logger = LoggerFactory.getLogger(TushareSchedule.class);
 
     @Autowired
     private KLineService kLineService;

@@ -15,7 +15,7 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.constant.HtmlConst;
 import xyz.liujin.finalysis.base.constant.StockBoardEnum;
 import xyz.liujin.finalysis.base.constant.StockConst;
-import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.HttpUtils;
 import xyz.liujin.finalysis.daily.dto.KLineDto;

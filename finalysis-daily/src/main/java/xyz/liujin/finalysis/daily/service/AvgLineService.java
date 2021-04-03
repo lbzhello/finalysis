@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.dto.DayAvgLine;
 import xyz.liujin.finalysis.daily.entity.AvgLine;

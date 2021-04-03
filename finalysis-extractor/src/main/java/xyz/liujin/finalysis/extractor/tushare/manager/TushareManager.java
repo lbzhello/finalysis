@@ -3,17 +3,15 @@ package xyz.liujin.finalysis.extractor.tushare.manager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
 import xyz.liujin.finalysis.daily.service.KLineService;
-import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.tushare.TushareExtractor;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.event.StockChangeEvent;
@@ -34,7 +32,6 @@ public class TushareManager {
     private static Logger logger = LoggerFactory.getLogger(TushareManager.class);
 
     @Autowired
-    @Qualifier(StockExtractor.TUSHARE)
     private TushareExtractor tushareExtractor;
 
     @Autowired

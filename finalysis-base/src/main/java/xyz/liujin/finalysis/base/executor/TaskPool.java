@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.base.schedule;
+package xyz.liujin.finalysis.base.executor;
 
 import cn.hutool.core.thread.ThreadFactoryBuilder;
 

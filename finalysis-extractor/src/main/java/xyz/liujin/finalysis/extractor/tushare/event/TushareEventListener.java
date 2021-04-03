@@ -15,8 +15,8 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Configuration
-public class StockEventListener {
-    private static Logger logger = LoggerFactory.getLogger(StockEventListener.class);
+public class TushareEventListener {
+    private static Logger logger = LoggerFactory.getLogger(TushareEventListener.class);
 
     @Autowired
     private TushareManager tushareManager;

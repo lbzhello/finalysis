@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.base.schedule.TaskPool;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.daily.entity.KLine;

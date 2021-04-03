@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.tushare.constant;
+package xyz.liujin.finalysis.extractor.constant;
 
 /**
  * 常用证券数据获取网站
