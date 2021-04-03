@@ -7,7 +7,7 @@ dependencies {
 
     compile project(":finalysis-stock")
 
-    compile group: 'com.squareup.okhttp3', name: 'okhttp'
+
 
     compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 }

@@ -2,14 +2,14 @@ package xyz.liujin.finalysis.base.constant;
 
 import cn.hutool.core.text.CharSequenceUtil;
 
-public enum  MarketEnum {
+public enum StockMarketEnum {
     SH("SH"), // 伤害证券交易所
     SZ("SZ"), // 深圳证券交易所
     UNKNOWN("UNKNOWN"),
     ;
     private String name;
 
-    MarketEnum(String name) {
+    StockMarketEnum(String name) {
         this.name = name;
     }
 

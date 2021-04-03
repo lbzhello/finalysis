@@ -1,8 +1,8 @@
-package xyz.liujin.finalysis.extractor.tushare;
+package xyz.liujin.finalysis.extractor.tushare.util;
 
 import cn.hutool.core.text.CharSequenceUtil;
-import xyz.liujin.finalysis.base.constant.MarketEnum;
-import xyz.liujin.finalysis.extractor.constant.StockConst;
+import xyz.liujin.finalysis.base.constant.StockConst;
+import xyz.liujin.finalysis.base.constant.StockMarketEnum;
 
 public class TushareUtil {
     /**
@@ -19,6 +19,6 @@ public class TushareUtil {
      * @return
      */
     public static String appendSuffix(String stockCode) {
-        return CharSequenceUtil.isBlank(stockCode) ? "" : stockCode + "." + MarketEnum.getMarket(stockCode);
+        return CharSequenceUtil.isBlank(stockCode) ? "" : stockCode + "." + StockMarketEnum.getMarket(stockCode);
     }
 }

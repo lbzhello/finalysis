@@ -5,7 +5,7 @@ import java.util.Arrays;
 /**
  * 交易板块常亮
  */
-public enum BoardEnum {
+public enum StockBoardEnum {
     SH_A(1, "沪A", "60"),
     SZ_A(2, "深A", "00"),
     CYB(3, "创业板", "300"),
@@ -21,7 +21,7 @@ public enum BoardEnum {
     // 股票代码前缀
     private String pre;
 
-    BoardEnum(int board, String boardName, String pre) {
+    StockBoardEnum(int board, String boardName, String pre) {
         this.board = board;
         this.boardName = boardName;
         this.pre = pre;

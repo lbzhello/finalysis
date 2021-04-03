@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.controller;
+package xyz.liujin.finalysis.extractor.tushare.controller;
 
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -8,27 +8,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.extractor.manager.ExtractManager;
+import xyz.liujin.finalysis.extractor.tushare.manager.TushareManager;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
 @RequestMapping("extract")
-public class ExtractController {
+public class TushareController {
     @Autowired
-    private ExtractManager extractManager;
+    private TushareManager tushareManager;
 
     @ApiOperation(value = "启动所有任务", notes = "1. 更新股票数据；2. 更新 k 线数据；")
     @GetMapping("all")
     public Flux<String> all() {
-        return extractManager.refreshAll();
+        return tushareManager.refreshAll();
     }
 
     @ApiOperation("更新股票数据")
     @GetMapping("stock")
     public Flux<String> extractStock() {
-        return extractManager.refreshStock();
+        return tushareManager.refreshStock();
     }
 
 
@@ -43,6 +43,6 @@ public class ExtractController {
 
             @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
             @RequestParam(name = "codes", required = false) List<String> codes) {
-        return extractManager.refreshKLine(start, end, codes);
+        return tushareManager.refreshKLine(start, end, codes);
     }
 }

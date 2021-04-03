@@ -11,14 +11,17 @@ import org.springframework.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
-import xyz.liujin.finalysis.base.constant.BoardEnum;
+import xyz.liujin.finalysis.base.constant.StockBoardEnum;
+import xyz.liujin.finalysis.base.constant.StockConst;
 import xyz.liujin.finalysis.base.json.CsvMapper;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.SyncUnit;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
-import xyz.liujin.finalysis.extractor.constant.StockConst;
+import xyz.liujin.finalysis.extractor.tushare.api.Tushare;
+import xyz.liujin.finalysis.extractor.tushare.dto.TushareResp;
+import xyz.liujin.finalysis.extractor.tushare.util.TushareUtil;
 import xyz.liujin.finalysis.stock.dto.StockDto;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
@@ -88,7 +91,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
         return Stock.builder()
                 .stockCode(parseCode(stockDto.getStockCode()))
                 .stockName(stockDto.getStockName())
-                .board(BoardEnum.getBoardByCode(stockDto.getStockCode()))
+                .board(StockBoardEnum.getBoardByCode(stockDto.getStockCode()))
                 .stat(stat)
                 .listingDate(offsetDate)
                 .build();

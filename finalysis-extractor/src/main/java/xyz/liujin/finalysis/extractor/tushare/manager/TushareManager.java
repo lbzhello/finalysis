@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.manager;
+package xyz.liujin.finalysis.extractor.tushare.manager;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +30,8 @@ import java.util.stream.Collectors;
  * 股票数据提取控制器
  */
 @Service
-public class ExtractManager {
-    private static Logger logger = LoggerFactory.getLogger(ExtractManager.class);
+public class TushareManager {
+    private static Logger logger = LoggerFactory.getLogger(TushareManager.class);
 
     @Autowired
     @Qualifier(StockExtractor.TUSHARE)

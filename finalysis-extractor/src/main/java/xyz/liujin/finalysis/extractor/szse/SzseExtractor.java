@@ -12,15 +12,15 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.base.constant.BoardEnum;
+import xyz.liujin.finalysis.base.constant.HtmlConst;
+import xyz.liujin.finalysis.base.constant.StockBoardEnum;
+import xyz.liujin.finalysis.base.constant.StockConst;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
+import xyz.liujin.finalysis.base.util.HttpUtils;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
-import xyz.liujin.finalysis.extractor.constant.HtmlConst;
-import xyz.liujin.finalysis.extractor.constant.StockConst;
-import xyz.liujin.finalysis.extractor.util.HttpUtils;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
 
@@ -188,7 +188,7 @@ public class SzseExtractor implements StockExtractor, KLineExtractor {
                             // 去除 ST *ST &nbsp; 等字符
                             StockConst.ST, StockConst.STAR_ST, StockConst.STAR, HtmlConst.SPACE);
                     // 交易板块
-                    Integer board = BoardEnum.getBoardByCode(zqdm);
+                    Integer board = StockBoardEnum.getBoardByCode(zqdm);
                     return Stock.builder().stockCode(zqdm).stockName(zqjc).board(board).build();
                 });
     }

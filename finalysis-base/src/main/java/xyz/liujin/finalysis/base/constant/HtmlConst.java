@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.constant;
+package xyz.liujin.finalysis.base.constant;
 
 /**
  * HTML 常亮

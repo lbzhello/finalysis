@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.tushare;
+package xyz.liujin.finalysis.extractor.tushare.api;
 
 import cn.hutool.json.JSONUtil;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import okhttp3.Response;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.extractor.util.HttpUtils;
+import xyz.liujin.finalysis.base.util.HttpUtils;
 
 import java.util.Map;
 

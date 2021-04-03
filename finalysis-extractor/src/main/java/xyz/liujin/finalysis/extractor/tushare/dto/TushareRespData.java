@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.tushare;
+package xyz.liujin.finalysis.extractor.tushare.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

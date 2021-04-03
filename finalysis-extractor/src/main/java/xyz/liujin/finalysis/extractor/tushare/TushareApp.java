@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor;
+package xyz.liujin.finalysis.extractor.tushare;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -8,19 +8,19 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.Scheduled;
 import xyz.liujin.finalysis.daily.service.KLineService;
-import xyz.liujin.finalysis.extractor.manager.ExtractManager;
+import xyz.liujin.finalysis.extractor.tushare.manager.TushareManager;
 
 import java.time.LocalDateTime;
 
 @Configuration
-public class ExtractorApp {
-    private Logger logger = LoggerFactory.getLogger(ExtractorApp.class);
+public class TushareApp {
+    private Logger logger = LoggerFactory.getLogger(TushareApp.class);
 
     @Autowired
     private KLineService kLineService;
 
     @Autowired
-    private ExtractManager extractManager;
+    private TushareManager tushareManager;
 
     @Bean
     public ApplicationRunner onSpiderStartUp() {
@@ -37,7 +37,7 @@ public class ExtractorApp {
     public void refreshDaily() {
         logger.debug("auto refresh data daily {}", LocalDateTime.now());
 
-        extractManager.refreshAll();
+        tushareManager.refreshAll();
     }
 
 

@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.handler;
+package xyz.liujin.finalysis.extractor.tushare.handler;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,7 +9,7 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.base.util.DateUtils;
-import xyz.liujin.finalysis.extractor.manager.ExtractManager;
+import xyz.liujin.finalysis.extractor.tushare.manager.TushareManager;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -20,11 +20,11 @@ import java.util.List;
  */
 @Deprecated
 @Component
-public class ExtractHandler {
-    public static final Logger logger = LoggerFactory.getLogger(ExtractHandler.class);
+public class TushareHandler {
+    public static final Logger logger = LoggerFactory.getLogger(TushareHandler.class);
 
     @Autowired
-    private ExtractManager extractManager;
+    private TushareManager tushareManager;
 
     /**
      * 爬取股票数据并入库
@@ -32,7 +32,7 @@ public class ExtractHandler {
      */
     public Mono<ServerResponse> extractStock(ServerRequest serverRequest) {
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(extractManager.refreshStock(), String.class);
+                .body(tushareManager.refreshStock(), String.class);
 
     }
 
@@ -49,7 +49,7 @@ public class ExtractHandler {
         // 股票列表
         List<String> codes = serverRequest.queryParam("codes").map(codeStr -> Arrays.asList(codeStr.split(","))).orElse(null);
         return ServerResponse.ok().contentType(MediaType.APPLICATION_JSON)
-                .body(extractManager.refreshKLine(startDate, endDate, codes), String.class);
+                .body(tushareManager.refreshKLine(startDate, endDate, codes), String.class);
 
     }
 }

@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.extractor.util;
+package xyz.liujin.finalysis.base.util;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.core.text.CharSequenceUtil;
