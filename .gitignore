@@ -1,3 +1,9 @@
+### custom ###
+finalysis-start/src/test/java/xyz/liujin/finalysis/start/LocalTest.java
+
+### custom end ###
+
+### gradle ###
 HELP.md
 .gradle
 build/
