@@ -14,6 +14,7 @@ import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
 import xyz.liujin.finalysis.daily.service.KLineService;
 import xyz.liujin.finalysis.extractor.StockExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareExtractor;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.event.StockChangeEvent;
 import xyz.liujin.finalysis.stock.service.StockService;
@@ -34,7 +35,7 @@ public class ExtractManager {
 
     @Autowired
     @Qualifier(StockExtractor.TUSHARE)
-    private StockExtractor stockExtractor;
+    private TushareExtractor tushareExtractor;
 
     @Autowired
     private StockService stockService;
@@ -61,11 +62,11 @@ public class ExtractManager {
      */
     public Flux<String> refreshStock() {
         return Flux.create(sink -> {
-            logger.debug("start extract stock {}", stockExtractor.getClass());
+            logger.debug("start extract stock {}", tushareExtractor.getClass());
 
             sink.next("start to extract stock. ");
 
-            stockExtractor.extractStock()
+            tushareExtractor.extractStock()
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 获取新增的股票
                     .filter(stock -> {
@@ -101,7 +102,7 @@ public class ExtractManager {
      */
     public Flux<String> refreshKLine(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> stockCodes) {
         return Flux.create(sink -> {
-            logger.debug("start refreshKLine. class: {}", stockExtractor.getClass());
+            logger.debug("start refreshKLine. class: {}", tushareExtractor.getClass());
 
             // yyyy-MM-dd
             String startDate = Optional.ofNullable(start).map(DateUtils::formatDate).orElseGet(() -> {
@@ -119,7 +120,7 @@ public class ExtractManager {
             sink.next("start to extract k line. ");
             logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
-            stockExtractor.extractKLine(startDate, endDate, codes)
+            tushareExtractor.extractKLine(startDate, endDate, codes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))

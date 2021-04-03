@@ -16,6 +16,7 @@ import xyz.liujin.finalysis.base.json.CsvMapper;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.SyncUnit;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
+import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
 import xyz.liujin.finalysis.stock.dto.StockDto;
@@ -37,7 +38,7 @@ import java.util.stream.Collectors;
  * Tushare K 线数据爬取
  */
 @Component(StockExtractor.TUSHARE)
-public class TushareExtractor implements StockExtractor {
+public class TushareExtractor implements StockExtractor, KLineExtractor {
     private static Logger logger = LoggerFactory.getLogger(TushareExtractor.class);
 
     @Autowired

@@ -34,7 +34,7 @@ public class ExtractorApp {
      * 每天 17:20 爬取 k 线信息
      */
     @Scheduled(cron = "0 20 17 * * ?")
-    public void refreshKLineDaily() {
+    public void refreshDaily() {
         logger.debug("auto refresh data daily {}", LocalDateTime.now());
 
         extractManager.refreshAll();

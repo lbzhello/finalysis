@@ -16,6 +16,7 @@ import xyz.liujin.finalysis.base.constant.BoardEnum;
 import xyz.liujin.finalysis.base.schedule.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
+import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.constant.HtmlConst;
 import xyz.liujin.finalysis.extractor.constant.StockConst;
@@ -31,7 +32,7 @@ import java.util.function.Consumer;
  * 深圳证券交易所数据爬取
  */
 @Component
-public class SzseExtractor implements StockExtractor {
+public class SzseExtractor implements StockExtractor, KLineExtractor {
     private static Logger logger = LoggerFactory.getLogger(SzseExtractor.class);
 
     @Autowired
