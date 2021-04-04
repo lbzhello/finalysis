@@ -55,7 +55,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param days 最大突破天数，最多十天
      * @return
      */
-    public Flux<Stock> fiveCrossTen(Integer days) {
+    public Flux<String> fiveCrossTen(Integer days) {
         int _days = Math.min(days, 10);
         // 当前天数 5 日线大于等于 10 日线
         LocalDate end = Optional.ofNullable(getLatestDate())
@@ -87,16 +87,26 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
                     t2Set.retainAll(t1Set);
 
-                    return stockService.queryByCodes(t2Set);
+                    return Flux.fromIterable(t2Set);
                 });
     }
+
+//    public Flux<DailyData> fiveAboveTenData(Integer days) {
+//        fiveAboveTen(days)
+//                .collectList()
+//                .flux()
+//                .flatMap(codes -> {
+//                    return stockService.queryByCodes(codes)
+//                })
+//                .map
+//    }
 
     /**
      * 获取 5 日线大于 10 日线的股票
      * @param days 最小持续天数
      * @return
      */
-    public Flux<Stock> fiveAboveTen(Integer days) {
+    public Flux<String> fiveAboveTen(Integer days) {
         // 结束日期当前最新数据
         LocalDate end = Optional
                 .ofNullable(getLatestDate())
@@ -106,7 +116,22 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         LocalDate start = end.minusDays(days - 1);
 
         // 5 日均线大于 10 日均线为升势
-        return stockService.queryByCodes(getBaseMapper().trend(start, end, 5, 10));
+        return trend(start, end, 5, 10);
+    }
+
+    /**
+     * 计算均线走势；
+     * 查找 start 至 end 期间，均线 highAvg 在 lowAvg 上方的股票
+     * @param start
+     * @param end
+     * @param highAvg
+     * @param lowAvg
+     * @return
+     */
+    public Flux<String> trend(LocalDate start, LocalDate end,
+                              Integer highAvg, Integer lowAvg) {
+        // highAvg 日均线大于 lowAvg 日均线为升势
+        return Flux.fromIterable(getBaseMapper().trend(start, end, highAvg, lowAvg));
     }
 
     /**

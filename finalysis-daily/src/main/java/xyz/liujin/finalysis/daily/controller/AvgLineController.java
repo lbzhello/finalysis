@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
-import xyz.liujin.finalysis.stock.entity.Stock;
 
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -25,7 +24,7 @@ public class AvgLineController {
 
     @ApiOperation("获取 5 日线突破十日线的股票")
     @GetMapping("5-cross-10")
-    public Mono<List<Stock>> fiveCrossTen(
+    public Mono<List<String>> fiveCrossTen(
             @ApiParam(value = "最大突破天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
@@ -34,7 +33,7 @@ public class AvgLineController {
 
     @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
     @GetMapping("5-above-10")
-    public Mono<List<Stock>> fiveAboveTen(
+    public Mono<List<String>> fiveAboveTen(
             @ApiParam(value = "最小持续天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days
     ) {
