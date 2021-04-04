@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TushareStock {
     /**
-     * 股票代码
+     * 股票代码; 格式如下
+     * 000001.SZ
+     * 600001.SH
      */
     private String stockCode;
     /**
@@ -19,13 +21,11 @@ public class TushareStock {
      */
     private String stockName;
     /**
-     * 交易板块。0 未知；1 沪 A；2 深 A；3 创业板；4 科创板
-     */
-    private String board;
-    /**
-     * 股票状态。-1 退市；0 正常；1 暂停上市；2 ST；3 融资融券；
+     * 股票状态; L 上市， D 退市， P 暂停，
      */
     private String stat;
-
+    /**
+     * 上市日期；yyyyMMdd
+     */
     private String listingDate;
 }

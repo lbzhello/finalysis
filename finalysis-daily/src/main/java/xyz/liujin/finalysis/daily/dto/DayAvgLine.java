@@ -5,6 +5,9 @@ import lombok.Data;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * 股票日均线数据
+ */
 @Data
 public class DayAvgLine {
     // 股票代码 000001
