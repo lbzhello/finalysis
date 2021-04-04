@@ -55,7 +55,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param days 最大突破天数，最多十天
      * @return
      */
-    public Flux<String> fiveCrossTen(Integer days) {
+    public Flux<Stock> fiveCrossTen(Integer days) {
         int _days = Math.min(days, 10);
         // 当前天数 5 日线大于等于 10 日线
         LocalDate end = Optional.ofNullable(getLatestDate())
@@ -76,8 +76,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                         .build()))
                 .filter(avg -> avg.getAvg5().compareTo(avg.getAvg10()) <= 0);
 
-        // 取交集
         return Flux.zip(startDayAvg.collectList(), endDayAvg.collectList())
+                // 取交集
                 .flatMap(tuple -> {
                     Set<String> t1Set = tuple.getT1().stream()
                             .map(DayAvgLine::getStockCode).collect(Collectors.toSet());
@@ -87,7 +87,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
                     t2Set.retainAll(t1Set);
 
-                    return Flux.fromIterable(t2Set);
+                    return stockService.queryByCodes(t2Set);
                 });
     }
 
@@ -96,7 +96,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param days 最小持续天数
      * @return
      */
-    public Flux<String> fiveAboveTen(Integer days) {
+    public Flux<Stock> fiveAboveTen(Integer days) {
         // 结束日期当前最新数据
         LocalDate end = Optional
                 .ofNullable(getLatestDate())
@@ -106,7 +106,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         LocalDate start = end.minusDays(days - 1);
 
         // 5 日均线大于 10 日均线为升势
-        return Flux.fromIterable(getBaseMapper().trend(start, end, 5, 10));
+        return stockService.queryByCodes(getBaseMapper().trend(start, end, 5, 10));
     }
 
     /**

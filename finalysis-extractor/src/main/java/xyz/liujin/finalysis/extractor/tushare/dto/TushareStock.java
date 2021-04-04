@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.stock.dto;
+package xyz.liujin.finalysis.extractor.tushare.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class StockDto {
+public class TushareStock {
     /**
      * 股票代码
      */

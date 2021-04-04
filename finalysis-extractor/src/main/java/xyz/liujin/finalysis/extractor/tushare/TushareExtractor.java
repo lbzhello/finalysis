@@ -21,8 +21,8 @@ import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.tushare.api.Tushare;
 import xyz.liujin.finalysis.extractor.tushare.dto.TushareResp;
+import xyz.liujin.finalysis.extractor.tushare.dto.TushareStock;
 import xyz.liujin.finalysis.extractor.tushare.util.TushareUtil;
-import xyz.liujin.finalysis.stock.dto.StockDto;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
 
@@ -65,7 +65,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
                         // 获取映射文件
                         File file = ResourceUtils.getFile("classpath:tushare/stock_basic_2_stock.yml");
                         return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
-                                .eval(bodyStr, StockDto.class)
+                                .eval(bodyStr, TushareStock.class)
                                 .map(this::toStock);
                     } catch (Exception e) {
                         logger.error("extract stock failed", e);
@@ -74,9 +74,9 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
                 });
     }
 
-    private Stock toStock(StockDto stockDto) {
+    private Stock toStock(TushareStock tushareStock) {
         // 股票状态
-        String statStr = stockDto.getStat();
+        String statStr = tushareStock.getStat();
         int stat = 0;
         if (Objects.equals(statStr, "L")) {
             stat = StockConst.NORMAL;
@@ -85,13 +85,13 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
         } else if (Objects.equals(statStr, "P")) {
             stat = StockConst.PAUSE_LISTING;
         }
-        String dateStr = stockDto.getListingDate();
+        String dateStr = tushareStock.getListingDate();
         LocalDate offsetDate = DateUtils.parseDate(dateStr, "yyyyMMdd");
 
         return Stock.builder()
-                .stockCode(parseCode(stockDto.getStockCode()))
-                .stockName(stockDto.getStockName())
-                .board(StockBoardEnum.getBoardByCode(stockDto.getStockCode()))
+                .stockCode(parseCode(tushareStock.getStockCode()))
+                .stockName(tushareStock.getStockName())
+                .board(StockBoardEnum.getBoardByCode(tushareStock.getStockCode()))
                 .stat(stat)
                 .listingDate(offsetDate)
                 .build();
