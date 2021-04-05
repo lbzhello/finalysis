@@ -86,6 +86,9 @@ allprojects {
 
 subprojects {
 	dependencies {
+		// https://mvnrepository.com/artifact/com.github.ben-manes.caffeine/caffeine
+		implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.1'
+
 		compile 'cn.hutool:hutool-all:5.5.4'
 
 		compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'

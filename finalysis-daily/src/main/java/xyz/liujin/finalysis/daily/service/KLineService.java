@@ -18,6 +18,7 @@ import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.daily.entity.KLine;
 import xyz.liujin.finalysis.daily.mapper.KLineMapper;
+import xyz.liujin.finalysis.daily.qo.KLineQo;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
 
@@ -33,6 +34,17 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
 public class KLineService extends ServiceImpl<KLineMapper, KLine> implements IService<KLine> {
+    /**
+     * 分页查询
+     * @return
+     */
+    public Flux<KLine> pageQuery(KLineQo kLineQo) {
+        List<KLine> kLines = getBaseMapper().pageQuery(kLineQo);
+        if (CollectionUtil.isEmpty(kLines)) {
+            return Flux.just();
+        }
+        return Flux.fromIterable(kLines);
+    }
 
     /**
      * 获取数据库最新数据日期

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
 
 import java.time.LocalDate;
@@ -33,11 +34,14 @@ public class AvgLineController {
 
     @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
     @GetMapping("5-above-10")
-    public Mono<List<String>> fiveAboveTen(
+    public Mono<List<DailyData>> fiveAboveTen(
             @ApiParam(value = "最小持续天数", example = "3")
-            @RequestParam(name = "days", required = false) Integer days
+            @RequestParam(name = "days", required = false) Integer days,
+            @ApiParam(value = "当前日期，默认数据库最新")
+            @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        return avgLineService.fiveAboveTen(Optional.ofNullable(days).orElse(3)).collectList();
+        return avgLineService.fiveAboveTenDetail(Optional.ofNullable(days).orElse(3),
+                date).collectList();
     }
 
     @ApiOperation("更新均线并入库")

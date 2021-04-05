@@ -5,6 +5,31 @@
         SELECT stock_code FROM k_line limit 100;
     </select>
 
+    <select id="pageQuery" resultType="xyz.liujin.finalysis.daily.entity.KLine">
+        select * from k_line_2020_2039
+        <where>
+            <if test="code != null and code != ''">
+                and stock_code = #{code}
+            </if>
+            <if test="code == null and codes != null and codes.size() > 0">
+                and stock_code in
+                <foreach collection="codes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
+            </if>
+            <if test="date != null">
+                and date = #{date}
+            </if>
+            <if test="date == null and startDate != null">
+                and date >= #{startDate}
+            </if>
+            <if test="date == null and endDate != null">
+                and date &lt;= #{endDate}
+            </if>
+        </where>
+        limit 1000;
+    </select>
+
     <select id="getLatestDate" resultType="java.time.LocalDate">
         select date from k_line_2020_2039 order by date desc limit 1;
     </select>
