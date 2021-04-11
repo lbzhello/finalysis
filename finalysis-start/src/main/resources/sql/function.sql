@@ -1,4 +1,6 @@
 -- 计算股票某天（day）量比
+-- code 股票代码，例如 000001
+-- date 计算日期，例如 2021-03-04
 drop function if exists calculate_volume_ratio(text, date);
 create or replace function calculate_volume_ratio(code text, day date) returns decimal as
 $$
@@ -35,3 +37,32 @@ end;
 $$ language plpgsql;
 
 -- select calculate_volume_ratio('000063', '2021-03-19');
+
+
+-- 获取日成交额排行
+-- day 计算日期
+drop function if exists amount_rank(day date);
+create or replace function amount_rank(day date)
+    returns table
+            (
+                stock_code varchar(6),
+                stock_name varchar(32),
+                price      decimal(7, 2),
+                pct_change decimal(5, 2),
+                amount     decimal(14, 2),
+                vol_ratio  decimal(5, 2)
+            )
+as
+$$
+begin
+    return query select s.stock_code, s.stock_name, k.close, k.pct_change, k.amount, k.volume_ratio
+                 from k_line_2020_2039 k
+                          inner join stock s
+                                     on k.stock_code = s.stock_code
+                 where date = day
+                 order by amount desc
+                 limit 100;
+end;
+$$ language plpgsql;
+
+select * from amount_rank('2021-04-09');
