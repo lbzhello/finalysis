@@ -38,20 +38,22 @@ $$ language plpgsql;
 
 -- select calculate_volume_ratio('000063', '2021-03-19');
 
+-- 用于函数返回股票日数据信息
+drop type if exists stock_daily cascade;
+create type stock_daily as (
+   stock_code varchar(6),
+   stock_name varchar(32),
+   price      decimal(7, 2),
+   pct_change decimal(6, 2),
+   amount     decimal(14, 2),
+   vol_ratio  decimal(6, 2)
+);
 
 -- 获取日成交额排行
 -- day 计算日期
 drop function if exists amount_rank(day date);
 create or replace function amount_rank(day date)
-    returns table
-            (
-                stock_code varchar(6),
-                stock_name varchar(32),
-                price      decimal(7, 2),
-                pct_change decimal(5, 2),
-                amount     decimal(14, 2),
-                vol_ratio  decimal(5, 2)
-            )
+    returns setof stock_daily
 as
 $$
 begin
@@ -65,4 +67,17 @@ begin
 end;
 $$ language plpgsql;
 
-select * from amount_rank('2021-04-09');
+-- select * from amount_rank('2021-04-16');
+
+drop function if exists amount_rank();
+create or replace function amount_rank() returns setof stock_daily as
+$$
+declare
+    cur_date date := now();
+begin
+    select into cur_date date from k_line_2020_2039 order by date desc limit 1;
+    return query select * from amount_rank(cur_date);
+end;
+$$ language plpgsql;
+
+-- select * from amount_rank();
