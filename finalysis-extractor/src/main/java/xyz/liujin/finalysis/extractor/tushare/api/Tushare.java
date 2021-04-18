@@ -99,6 +99,7 @@ public class Tushare {
 
     /**
      * 获取基础信息数据，包括股票代码、名称、上市日期、退市日期等
+     * https://tushare.pro/document/2?doc_id=25
      */
     @Data
     @Builder
