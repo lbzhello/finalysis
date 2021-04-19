@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * 日均线数据
+ */
 @Data
 @Builder
 @NoArgsConstructor

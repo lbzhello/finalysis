@@ -1,10 +1,8 @@
 package xyz.liujin.finalysis.extractor.tushare.api;
 
 import cn.hutool.json.JSONUtil;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import okhttp3.Response;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.base.util.HttpUtils;
@@ -97,6 +95,45 @@ public class Tushare {
         }
     }
 
+    @Data
+    @SuperBuilder(toBuilder = true)
+    public static abstract class BaseApi implements Params {
+        /**
+         * 股票代码（支持多个股票同时提取，逗号分隔）
+         * 示例：000001.SZ
+         * N: 默认全部股票
+         */
+        private String ts_code;
+
+        /**
+         * 交易日期（YYYYMMDD）
+         */
+        private String trade_date;
+
+        /**
+         * 开始日期(YYYYMMDD)
+         */
+        private String start_date;
+
+        /**
+         * 结束日期(YYYYMMDD)
+         */
+        private String end_date;
+
+    }
+
+    @Data
+    @SuperBuilder(toBuilder = true)
+    @EqualsAndHashCode(callSuper = true)
+    public static final class DailyBasic extends BaseApi {
+        @Override
+        public String getApiName() {
+            return "daily_basic";
+        }
+
+
+    }
+
     /**
      * 获取基础信息数据，包括股票代码、名称、上市日期、退市日期等
      * https://tushare.pro/document/2?doc_id=25
@@ -142,6 +179,12 @@ public class Tushare {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class Daily implements Params {
+
+        @Override
+        public String getApiName() {
+            return "daily";
+        }
+
         /**
          * 股票代码（支持多个股票同时提取，逗号分隔）
          * 示例：000001.SZ
@@ -163,11 +206,6 @@ public class Tushare {
          * 结束日期(YYYYMMDD)
          */
         private String end_date;
-
-        @Override
-        public String getApiName() {
-            return "daily";
-        }
     }
 
     /**
@@ -185,6 +223,11 @@ public class Tushare {
     @NoArgsConstructor
     @AllArgsConstructor
     public static final class AdjFactor implements Params {
+
+        @Override
+        public String getApiName() {
+            return "adj_factor";
+        }
 
         /**
          * 股票代码
@@ -208,10 +251,6 @@ public class Tushare {
          */
         private String end_date;
 
-        @Override
-        public String getApiName() {
-            return "adj_factor";
-        }
     }
 
 }

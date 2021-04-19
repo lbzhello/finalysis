@@ -1,10 +1,7 @@
 package xyz.liujin.finalysis.daily.qo;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import xyz.liujin.finalysis.base.page.Page;
 
 import java.time.LocalDate;
@@ -14,6 +11,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class KLineQo extends Page {
     @ApiModelProperty("股票代码；可空")
     private String code;
