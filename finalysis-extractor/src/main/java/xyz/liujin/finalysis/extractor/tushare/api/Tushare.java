@@ -81,7 +81,7 @@ public class Tushare {
 
         /**
          * 根据接口名字发送请求
-         * @param fields 请求字段
+         * @param fields 请求字段；示例 "name,list_status,list_date"
          * @return
          */
         default Flux<Response> req(String fields) {
@@ -122,6 +122,12 @@ public class Tushare {
 
     }
 
+    /**
+     * 每日指标
+     * 更新时间：交易日每日15点～17点之间
+     * 描述：获取全部股票每日重要的基本面指标，可用于选股分析、报表展示等。
+     * https://tushare.pro/document/2?doc_id=32
+     */
     @Data
     @SuperBuilder(toBuilder = true)
     @EqualsAndHashCode(callSuper = true)
@@ -130,7 +136,6 @@ public class Tushare {
         public String getApiName() {
             return "daily_basic";
         }
-
 
     }
 

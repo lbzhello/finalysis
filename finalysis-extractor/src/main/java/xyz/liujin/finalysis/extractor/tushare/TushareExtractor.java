@@ -20,7 +20,7 @@ import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.extractor.KLineExtractor;
 import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.extractor.tushare.api.Tushare;
-import xyz.liujin.finalysis.extractor.tushare.dto.TushareResp;
+import xyz.liujin.finalysis.extractor.tushare.api.TushareResp;
 import xyz.liujin.finalysis.extractor.tushare.dto.TushareStock;
 import xyz.liujin.finalysis.extractor.tushare.util.TushareUtil;
 import xyz.liujin.finalysis.stock.entity.Stock;
