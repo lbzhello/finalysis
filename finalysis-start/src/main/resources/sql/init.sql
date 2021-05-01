@@ -186,3 +186,34 @@ alter table avg_line_30
     add constraint pk_avg_line_30 primary key (id);
 
 create unique index uk_avg_line_30_stock_code_date on avg_line_30 (stock_code, date);
+
+-- 2021-05-01
+-- 均线视图，大区分查询应该基于此视图而不是具体的表
+drop view if exists v_avg_line;
+create view v_avg_line as
+select a5.stock_code,
+       a5.date,
+       a5.current,
+       a5.avg  avg5,
+       a10.avg avg10,
+       a20.avg avg20,
+       a30.avg avg30
+from avg_line_5 as a5
+join avg_line_10 as a10
+    on a5.stock_code = a10.stock_code
+    and a5.date = a10.date
+join avg_line_20 as a20
+    on a5.stock_code = a20.stock_code
+    and a5.date = a20.date
+join avg_line_30 as a30
+    on a5.stock_code = a30.stock_code
+    and a5.date = a30.date;
+
+comment on view v_avg_line is '均线视图';
+comment on column v_avg_line.stock_code is '股票代码';
+comment on column v_avg_line.date is '日期';
+comment on column v_avg_line.current is '当日加个，当日收盘价';
+comment on column v_avg_line.avg5 is '5 日均线';
+comment on column v_avg_line.avg10 is '10 日均线';
+comment on column v_avg_line.avg20 is '20 日均线';
+comment on column v_avg_line.avg30 is '30 日均线';

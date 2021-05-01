@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -138,7 +139,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         LocalDate start = end.minusDays(days - 1);
 
         // 5 日均线大于 10 日均线为升势
-        return trend(start, end, 5, 10);
+        return trend5Up10(start, end);
     }
 
     /**
@@ -154,6 +155,17 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                               Integer highAvg, Integer lowAvg) {
         // highAvg 日均线大于 lowAvg 日均线为升势
         return Flux.fromIterable(getBaseMapper().trend(start, end, highAvg, lowAvg));
+    }
+
+    /**
+     * 查找 start 至 end 期间，5 日均线大于 10 日均线的股票
+     * @param start
+     * @param end
+     * @return
+     */
+    public Flux<String> trend5Up10(@NonNull LocalDate start, @NonNull LocalDate end) {
+        // highAvg 日均线大于 lowAvg 日均线为升势
+        return Flux.fromIterable(getBaseMapper().trend5Up10(start, end));
     }
 
     /**

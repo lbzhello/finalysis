@@ -36,9 +36,15 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * @param highStats 较高的统计类型
      * @param lowStats 较低的统计类型
      * @return
+     * @deprecated 使用 {@link #trend5Up10(LocalDate, LocalDate)} 替换
+     *             数据结构改变，不在从 avg_line 表获取数据
+     *             改从 v_avg_line 获取数据
      */
     List<String> trend(@NonNull @Param("start") LocalDate start,
                        @NonNull @Param("end") LocalDate end,
                        @Param("highStats") int highStats,
                        @Param("lowStats") int lowStats);
+
+    List<String> trend5Up10(@NonNull @Param("start") LocalDate start,
+                       @NonNull @Param("end") LocalDate end);
 }
