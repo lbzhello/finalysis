@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.daily.mapper.HelloWorldMapper">
+    <select id="select" resultType="xyz.liujin.finalysis.daily.entity.HelloWorld">
+        select * from hello_world order by date desc, code limit 100;
+    </select>
+
+    <!-- 批量保存，如果冲突（code, date）则更新 -->
+    <insert id="insert" parameterType="java.util.List">
+        insert into hello_world
+        (code, date, message)
+        values
+        <foreach item="item" index="i" collection="helloWorlds" separator=",">
+            (#{item.code}, #{item.date}, #{item.message})
+        </foreach>
+        on conflict (code, date) do update set
+        message = excluded.message,
+    </insert>
+</mapper>

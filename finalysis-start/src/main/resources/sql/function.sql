@@ -92,3 +92,38 @@ $$ language plpgsql;
 select create_amount_rank();
 
 -- select * from amount_rank();
+
+-- 获取均线最新日期，5 10 20 30 最新日期中最小的
+drop function if exists avg_latest_date();
+create or replace function avg_latest_date() returns date as $$
+declare
+    latest_date date := now();
+    latest_date_5 date := now();
+    latest_date_10 date := now();
+    latest_date_20 date := now();
+    latest_date_30 date := now();
+begin
+    select into latest_date_5 date from avg_line_5 order by date desc limit 1;
+    select into latest_date_10 date from avg_line_10 order by date desc limit 1;
+    select into latest_date_20 date from avg_line_20 order by date desc limit 1;
+    select into latest_date_30 date from avg_line_30 order by date desc limit 1;
+
+    if latest_date > latest_date_5 then
+        latest_date := latest_date_5;
+    end if;
+
+    if latest_date > latest_date_10 then
+        latest_date := latest_date_10;
+    end if;
+
+    if latest_date > latest_date_20 then
+        latest_date := latest_date_20;
+    end if;
+
+    if latest_date > latest_date_30 then
+        latest_date := latest_date_30;
+    end if;
+
+    return latest_date;
+end
+$$ language plpgsql;

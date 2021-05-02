@@ -1,3 +1,13 @@
+-- 测试表 ignore
+drop table if exists hello_world;
+create table if not exists hello_world
+(
+    id      bigserial primary key,
+    code    integer      not null default 0,
+    date    date         not null default now(),
+    message varchar(256) not null default ''
+);
+
 create table if not exists stock
 (
     stock_code   varchar(6)  not null,

@@ -30,10 +30,7 @@
 
     <!-- 获取数据库最新日期 -->
     <select id="getLatestDate" resultType="java.time.LocalDate">
-        select date
-        from v_avg_line
-        order by date desc
-        limit 1;
+        select avg_latest_date()
     </select>
 
     <!-- 批量保存，如果冲突（stock_code, date, statistic）则更新 -->
@@ -51,14 +48,7 @@
 
     <!-- 获取股票日均线 -->
     <select id="findDayAvg" resultType="xyz.liujin.finalysis.daily.dto.DayAvgLine">
-        select stock_code,
-               date,
-               current,
-               sum(case statistic when 5 then avg else 0 end) as avg5,
-               sum(case statistic when 10 then avg else 0 end) as avg10,
-               sum(case statistic when 20 then avg else 0 end) as avg20,
-               sum(case statistic when 30 then avg else 0 end) as avg30
-        from avg_line
+        select * from v_avg_line
         <where>
             <if test="start != null">
                 and date >= #{start}
@@ -74,7 +64,6 @@
                 </foreach>
             </if>
         </where>
-        group by stock_code, date, current
         <if test="limit != null and limit != 0">
             limit #{limit}
         </if>
@@ -82,4 +71,51 @@
             offset #{offset}
         </if>
     </select>
+
+    <!-- 批量保存均线数据，如果冲突（code, date）则更新 -->
+    <insert id="saveBatchByCodeDate" parameterType="java.util.List">
+        <!-- 保存 5 日均线 -->
+        insert into avg_line_5
+        (stock_code, date, current, avg)
+        values
+        <foreach item="item" index="i" collection="avgLines" separator=",">
+            (#{item.stockCode}, #{item.date}, #{item.current}, #{item.avg5})
+        </foreach>
+        on conflict (stock_code, date) do update set
+        current = excluded.current,
+        avg = excluded.avg;
+
+        <!-- 保存 10 日均线 -->
+        insert into avg_line_10
+        (stock_code, date, current, avg)
+        values
+        <foreach item="item" index="i" collection="avgLines" separator=",">
+            (#{item.stockCode}, #{item.date}, #{item.current}, #{item.avg10})
+        </foreach>
+        on conflict (stock_code, date) do update set
+        current = excluded.current,
+        avg = excluded.avg;
+
+        <!-- 保存 20 日均线 -->
+        insert into avg_line_20
+        (stock_code, date, current, avg)
+        values
+        <foreach item="item" index="i" collection="avgLines" separator=",">
+            (#{item.stockCode}, #{item.date}, #{item.current}, #{item.avg20})
+        </foreach>
+        on conflict (stock_code, date) do update set
+        current = excluded.current,
+        avg = excluded.avg;
+
+        <!-- 保存 30 日均线 -->
+        insert into avg_line_30
+        (stock_code, date, current, avg)
+        values
+        <foreach item="item" index="i" collection="avgLines" separator=",">
+            (#{item.stockCode}, #{item.date}, #{item.current}, #{item.avg30})
+        </foreach>
+        on conflict (stock_code, date) do update set
+        current = excluded.current,
+        avg = excluded.avg;
+    </insert>
 </mapper>
