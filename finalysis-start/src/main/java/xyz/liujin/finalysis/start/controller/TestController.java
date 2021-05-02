@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.daily.entity.VAvgLine;
+import xyz.liujin.finalysis.daily.entity.DayAvgLine;
 import xyz.liujin.finalysis.daily.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
 
@@ -37,7 +37,7 @@ public class TestController {
 
     @GetMapping("save-avg-line")
     public void saveAvgLine() {
-        avgLineService.saveBatchByCodeDate(Flux.just(VAvgLine.builder()
+        avgLineService.saveBatchByCodeDate(Flux.just(DayAvgLine.builder()
                 .stockCode("8577")
                 .date(LocalDate.now())
                 .current(BigDecimal.valueOf(88))

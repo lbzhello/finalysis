@@ -16,11 +16,11 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@TableName(autoResultMap = true) // 查询时 typeHandler 不生效问题
-public class VAvgLine {
+@TableName(value = "v_avg_line", autoResultMap = true) // 查询时 typeHandler 不生效问题
+public class DayAvgLine {
     // 股票代码 000001
     private String stockCode;
-    // 当前日期 2021-01-13
+    // 当前日期
     private LocalDate date;
     // 当前价格
     private BigDecimal current;

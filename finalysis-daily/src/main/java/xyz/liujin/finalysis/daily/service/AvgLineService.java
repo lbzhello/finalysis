@@ -21,9 +21,8 @@ import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.converter.AvgLineConverter;
 import xyz.liujin.finalysis.daily.converter.DailyDateConverter;
 import xyz.liujin.finalysis.daily.dto.DailyData;
-import xyz.liujin.finalysis.daily.dto.DayAvgLine;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
-import xyz.liujin.finalysis.daily.entity.VAvgLine;
+import xyz.liujin.finalysis.daily.entity.DayAvgLine;
 import xyz.liujin.finalysis.daily.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.daily.qo.AvgLineQo;
 import xyz.liujin.finalysis.daily.qo.KLineQo;
@@ -226,7 +225,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param codes 需要计算的股票
      * @return
      */
-    public Flux<VAvgLine> calculateAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable List<String> codes) {
+    public Flux<DayAvgLine> calculateAvgLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, @Nullable List<String> codes) {
         // 股票
         Flux<Stock> stockFlux;
         if (CollectionUtil.isNotEmpty(codes)) {
@@ -243,7 +242,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
         return stockFlux
                 .flatMap(stock -> kLineService.findByCodeAndOrderByDateDesc(stock.getStockCode(), start, end))
-                .map(kLineDto -> VAvgLine.builder()
+                .map(kLineDto -> DayAvgLine.builder()
                         .stockCode(kLineDto.getStockCode())
                         .date(DateUtils.parseDate(kLineDto.getDate()))
                         .current(new BigDecimal(kLineDto.getClose()))
@@ -255,7 +254,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                     int len = avgLines.size();
                     for (int i = 0; i < len; i++) {
                         // 计算 day 日均线
-                        VAvgLine curAvg = copy(avgLines.get(i));
+                        DayAvgLine curAvg = copy(avgLines.get(i));
                         curAvg.setAvg5(avg(avgLines, i, 5));
                         curAvg.setAvg10(avg(avgLines, i, 10));
                         curAvg.setAvg20(avg(avgLines, i, 20));
@@ -269,7 +268,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
 
     // 计算 avgLines 中 从 start 开始的连续 days 个均值
-    private BigDecimal avg(List<VAvgLine> avgLines, int start, int days) {
+    private BigDecimal avg(List<DayAvgLine> avgLines, int start, int days) {
         int len = Math.min(start + days, avgLines.size());
 
         BigDecimal acc = BigDecimal.ZERO;
@@ -281,8 +280,8 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     }
 
     // 复制，保持不变性
-    private VAvgLine copy(VAvgLine avgLine) {
-        return VAvgLine.builder()
+    private DayAvgLine copy(DayAvgLine avgLine) {
+        return DayAvgLine.builder()
                 .stockCode(avgLine.getStockCode())
                 .date(avgLine.getDate())
                 .current(avgLine.getCurrent())
@@ -301,7 +300,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * 如果冲突 code, date 则更新
      * @param avgLineFlux
      */
-    public void saveBatchByCodeDate(Flux<VAvgLine> avgLineFlux) {
+    public void saveBatchByCodeDate(Flux<DayAvgLine> avgLineFlux) {
         avgLineFlux.collectList()
                 .subscribe(avgLines -> getBaseMapper().saveBatchByCodeDate(avgLines));
 

@@ -47,7 +47,7 @@
     </insert>
 
     <!-- 获取股票日均线 -->
-    <select id="findDayAvg" resultType="xyz.liujin.finalysis.daily.dto.DayAvgLine">
+    <select id="findDayAvg" resultType="xyz.liujin.finalysis.daily.entity.DayAvgLine">
         select * from v_avg_line
         <where>
             <if test="start != null">

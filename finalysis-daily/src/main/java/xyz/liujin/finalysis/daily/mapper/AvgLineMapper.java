@@ -3,9 +3,8 @@ package xyz.liujin.finalysis.daily.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.lang.NonNull;
-import xyz.liujin.finalysis.daily.dto.DayAvgLine;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
-import xyz.liujin.finalysis.daily.entity.VAvgLine;
+import xyz.liujin.finalysis.daily.entity.DayAvgLine;
 import xyz.liujin.finalysis.daily.qo.AvgLineQo;
 
 import java.time.LocalDate;
@@ -29,7 +28,7 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * 批量保存均线数据；如果冲突 (code, date) 则更新
      * @param avgLines
      */
-    void saveBatchByCodeDate(@Param("avgLines") List<VAvgLine> avgLines);
+    void saveBatchByCodeDate(@Param("avgLines") List<DayAvgLine> avgLines);
 
     /**
      * 查询日均线数据
