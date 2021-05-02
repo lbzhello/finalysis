@@ -143,21 +143,6 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
     }
 
     /**
-     * 计算均线走势；
-     * 查找 start 至 end 期间，均线 highAvg 在 lowAvg 上方的股票
-     * @param start
-     * @param end
-     * @param highAvg
-     * @param lowAvg
-     * @return
-     */
-    public Flux<String> trend(LocalDate start, LocalDate end,
-                              Integer highAvg, Integer lowAvg) {
-        // highAvg 日均线大于 lowAvg 日均线为升势
-        return Flux.fromIterable(getBaseMapper().trend(start, end, highAvg, lowAvg));
-    }
-
-    /**
      * 查找 start 至 end 期间，5 日均线大于 10 日均线的股票
      * @param start
      * @param end
@@ -286,13 +271,6 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .date(avgLine.getDate())
                 .current(avgLine.getCurrent())
                 .build();
-    }
-
-    /**
-     * 根据 stockCode, date, days 保存/更新均线数据
-     */
-    public void saveBatchByCodeDateStatistic(List<AvgLine> avgLines) {
-        getBaseMapper().saveBatchByCodeDateStatistic(avgLines);
     }
 
     /**
