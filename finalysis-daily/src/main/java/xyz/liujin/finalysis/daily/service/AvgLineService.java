@@ -18,7 +18,6 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
-import xyz.liujin.finalysis.daily.converter.AvgLineConverter;
 import xyz.liujin.finalysis.daily.converter.DailyDateConverter;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
@@ -200,6 +199,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
 
         // 均线需要需要知道前 n 天的数据；因为有节假日，这里乘以 3 粗略的估算
         int n = DAYS.stream().max(Comparator.comparingInt(Integer::intValue)).map(it -> it*3).orElse(0);
+        // 保存到各个均线表
         calculateAvgLine(start.minusDays(n), end, codes)
                 // 包括 start 天
                 .filter(avgLine -> avgLine.getDate().isAfter(start.minusDays(1)))
@@ -208,10 +208,10 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .subscribe(avgFlux -> {
                     // 保存到各个均线表
                     saveBatchByCodeDate(avgFlux);
-                    // 保存到 avg_line 表 todo 不在需要
-                    avgFlux.flatMap(AvgLineConverter::toAvgLine)
-                            .collectList()
-                            .subscribe(this::saveBatchByCodeDateStatistic);
+//                    // 保存到 avg_line 表
+//                    avgFlux.flatMap(AvgLineConverter::toAvgLine)
+//                            .collectList()
+//                            .subscribe(this::saveBatchByCodeDateStatistic);
                 }, e -> logger.error("failed to refreshAvgLine", e));
     }
 
