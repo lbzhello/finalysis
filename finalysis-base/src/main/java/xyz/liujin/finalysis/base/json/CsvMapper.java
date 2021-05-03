@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * 用于从 csv 格式的 json 中提取数据
@@ -116,11 +117,15 @@ public class CsvMapper {
         return create(fieldPath, itemsPath, JSONUtil.parseObj(jsonMapper));
     }
 
+    public static CsvMapper create(@Nullable String fieldPath, @Nullable String itemsPath) {
+        return create(fieldPath, itemsPath, null);
+    }
+
     /**
      * 创建一个 Mapper 用于从 CSV 格式 JSON 提取数据
      * @param fieldPath
      * @param itemsPath
-     * @param mapper
+     * @param mapper 若为 null 则使用 fieldPath 作为 mapper
      *      {
      *          "bookName": "/name",
      *          "price": "/price",
@@ -131,8 +136,16 @@ public class CsvMapper {
         CsvMapper csvMapper = new CsvMapper();
         csvMapper.setFieldPath(JsonMapper.pathExpr(fieldPath));
         csvMapper.setItemsPath(JsonMapper.pathExpr(itemsPath));
-        csvMapper.parseMap(mapper);
+        if (Objects.nonNull(mapper)) {
+            csvMapper.parseMap(mapper);
+        }
         return csvMapper;
+    }
+
+    public static void main(String[] args) {
+        CsvMapper csvMapper = new CsvMapper();
+        csvMapper.parseMap(null);
+        System.out.println(csvMapper);
     }
 
     /**
@@ -164,13 +177,19 @@ public class CsvMapper {
     public <T> Flux<T> eval(Map<String, ?> json, Class<T> clazz) {
         // fieldIndex 可以直接提供，若为 null 则从 fieldPath 获取
         // fieldPath 可空，可以直接通过索引获取值
-        if (Objects.nonNull(this.fieldPath) && Objects.nonNull(this.fieldPath)) {
+        if (Objects.nonNull(this.fieldPath) && Objects.isNull(this.fieldIndex)) {
             List<String> fields = (List<String>) this.fieldPath.eval(json);
             if (Objects.nonNull(fields)) {
                 this.fieldIndex = Flux.fromIterable(fields)
                         .index()
                         .collectMap(Tuple2::getT2, Tuple2::getT1)
                         .block();
+            }
+
+            // 如果 mapper 为空，则使用 fieldPath 中的字段作为映射
+            if (Objects.isNull(this.mapper) && Objects.nonNull(fields)) {
+                Map<String, String> map = fields.stream().collect(Collectors.toMap(field -> field, field -> "/" + field));
+                parseMap(map);
             }
         }
 
@@ -190,7 +209,7 @@ public class CsvMapper {
 
 
 
-    private void parseMap(Map<String, ?> map) {
+    private void parseMap(@Nullable Map<String, ?> map) {
         this.mapper = Mono.justOrEmpty(map)
                 .flatMapIterable(Map::entrySet)
                 .map(entry -> Pair.of(entry.getKey(), this.parseExpr((String) entry.getValue())))
