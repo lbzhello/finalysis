@@ -12,6 +12,8 @@ import xyz.liujin.finalysis.extractor.tushare.dto.TushareDailyIndicator;
 import xyz.liujin.finalysis.extractor.tushare.util.TushareUtil;
 
 import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * 获取股票每日指标
@@ -20,7 +22,7 @@ import java.io.IOException;
 public class DailyIndicatorExtractor {
     private static Logger logger = LoggerFactory.getLogger(DailyIndicatorExtractor.class);
 
-    public Flux<DailyIndicator> extractDailyIndicator() {
+    public Flux<DailyIndicator> extractDailyIndicator(LocalDate start, LocalDate end, List<String> codes) {
         return Tushare.DailyBasic.builder()
                 .ts_code("")
                 .trade_date("20210430")
