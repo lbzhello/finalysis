@@ -17,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TushareUtil {
     public static final String YYYYMMDD = "yyyyMMdd";
@@ -82,6 +83,21 @@ public class TushareUtil {
      */
     public static BigDecimal parseBigDecimal(@Nullable String moneyStr) {
         return parseBigDecimal(moneyStr, 1);
+    }
+
+    /**
+     * 股票转 tushare 格式列表字符串
+     * [000001, 600001] -> 000001.SZ,600001.SH
+     * @param codes
+     * @return
+     */
+    public static String formatCodes(List<String> codes) {
+        return Optional.ofNullable(codes)
+                .stream()
+                .flatMap(List::stream)
+                .map(TushareUtil::formatCode)
+                .collect(Collectors.joining(","));
+
     }
 
     // 返回最大记录数，日线每日 1 条，最多 5000 条

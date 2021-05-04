@@ -28,8 +28,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 /**
  * Tushare K 线数据爬取
@@ -99,7 +97,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
                     syncUnit.waitMillis(1000/8);
 
                     return Tushare.Daily.builder()
-                            .ts_code(formatCodes(tuple.getT3()))
+                            .ts_code(TushareUtil.formatCodes(tuple.getT3()))
                             .start_date(TushareUtil.formatDate(tuple.getT1()))
                             .end_date(TushareUtil.formatDate(tuple.getT2()))
                             .build()
@@ -137,16 +135,6 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
         // 成交额 tushare 单位：千元，改为 元
         kLineDto.setAmount(getAmountYuan(kLineDto.getAmount()));
         return kLineDto;
-    }
-
-    // [000001, 600001] -> 000001.SZ,600001.SH
-    private String formatCodes(List<String> codes) {
-        return Optional.ofNullable(codes)
-                .stream()
-                .flatMap(List::stream)
-                .map(TushareUtil::formatCode)
-                .collect(Collectors.joining(","));
-
     }
 
     // yyyy-MM-dd -> yyyyMMdd

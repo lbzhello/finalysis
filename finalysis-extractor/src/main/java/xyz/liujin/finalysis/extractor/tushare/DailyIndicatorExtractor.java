@@ -23,25 +23,28 @@ public class DailyIndicatorExtractor {
     private static Logger logger = LoggerFactory.getLogger(DailyIndicatorExtractor.class);
 
     public Flux<DailyIndicator> extractDailyIndicator(LocalDate start, LocalDate end, List<String> codes) {
-        return Tushare.DailyBasic.builder()
-                .ts_code("")
-                .trade_date("20210430")
-                .build()
-                .req("")
-                .flatMap(response -> {
-                    try {
-                        String bodyStr = response.body().string();
-                        // 字段映射
-                        return CsvMapper.create(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH)
-                                .eval(bodyStr, TushareDailyIndicator.class)
-                                .map(this::toDailyIndicator);
+        return TushareUtil.splitCodes(start, end, codes)
+                .flatMap(tuple -> Tushare.DailyBasic.builder()
+                        .ts_code(TushareUtil.formatCodes(tuple.getT3()))
+                        .start_date(TushareUtil.formatDate(tuple.getT1()))
+                        .end_date(TushareUtil.formatDate(tuple.getT2()))
+                        .build()
+                        .req("")
+                        .flatMap(response -> {
+                            try {
+                                String bodyStr = response.body().string();
+                                // 字段映射
+                                return CsvMapper.create(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH)
+                                        .eval(bodyStr, TushareDailyIndicator.class)
+                                        .map(this::toDailyIndicator);
 
-                    } catch (IOException e) {
-                        logger.error("failed to extract daily indicator", e);
-                    }
+                            } catch (IOException e) {
+                                logger.error("failed to extract daily indicator", e);
+                            }
 
-                    return Flux.just();
-                });
+                            return Flux.just();
+                        }));
+
     }
 
     // 转成数据库对象

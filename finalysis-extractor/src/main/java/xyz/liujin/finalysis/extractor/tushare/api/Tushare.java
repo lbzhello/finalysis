@@ -123,7 +123,7 @@ public class Tushare {
     }
 
     /**
-     * 每日指标
+     * 每日指标 ts_code 和 trade_date 二选一
      * 更新时间：交易日每日15点～17点之间
      * 描述：获取全部股票每日重要的基本面指标，可用于选股分析、报表展示等。
      * https://tushare.pro/document/2?doc_id=32

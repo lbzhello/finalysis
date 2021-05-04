@@ -18,7 +18,9 @@ public class DailyIndicatorExtractorTest {
 
     @Test
     public void extractDailyIndicator() {
-        dailyIndicatorExtractor.extractDailyIndicator(LocalDate.now(), LocalDate.now(), List.of())
+        dailyIndicatorExtractor.extractDailyIndicator(LocalDate.of(2021, 4, 20),
+                LocalDate.of(2021, 4, 30),
+                List.of("000001"))
                 .subscribe(it -> {
                     System.out.println(it);
                 });
