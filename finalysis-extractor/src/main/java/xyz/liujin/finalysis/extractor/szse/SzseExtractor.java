@@ -24,6 +24,7 @@ import xyz.liujin.finalysis.extractor.StockExtractor;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.function.Consumer;
@@ -43,7 +44,9 @@ public class SzseExtractor implements StockExtractor, KLineExtractor {
     }
 
     @Override
-    public Flux<KLineDto> extractKLine(String startDate, String endDate, List<String> codes) {
+    public Flux<KLineDto> extractKLine(LocalDate start, LocalDate end, List<String> codes) {
+        String startDate = DateUtils.formatDate(start);
+        String endDate = DateUtils.formatDate(end);
 //        String stockCode = "002594";
         // 爬取所有股票 K 线
         return Flux.create((Consumer<FluxSink<Stock>>) fluxSink -> {

@@ -7,6 +7,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import xyz.liujin.finalysis.base.util.DebugUtils;
 
+import java.time.LocalDate;
+import java.util.List;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = DailyIndicatorExtractor.class)
 public class DailyIndicatorExtractorTest {
@@ -15,7 +18,7 @@ public class DailyIndicatorExtractorTest {
 
     @Test
     public void extractDailyIndicator() {
-        dailyIndicatorExtractor.extractDailyIndicator()
+        dailyIndicatorExtractor.extractDailyIndicator(LocalDate.now(), LocalDate.now(), List.of())
                 .subscribe(it -> {
                     System.out.println(it);
                 });

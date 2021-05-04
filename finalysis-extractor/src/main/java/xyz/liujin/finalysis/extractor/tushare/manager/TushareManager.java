@@ -117,7 +117,7 @@ public class TushareManager {
             sink.next("start to extract k line. ");
             logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
-            tushareExtractor.extractKLine(startDate, endDate, codes)
+            tushareExtractor.extractKLine(DateUtils.parseDate(startDate), DateUtils.parseDate(endDate), codes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))

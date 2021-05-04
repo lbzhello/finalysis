@@ -91,7 +91,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
      * @return
      */
     @Override
-    public Flux<KLineDto> extractKLine(@Nullable String startDate, @Nullable String endDate, List<String> codes) {
+    public Flux<KLineDto> extractKLine(@Nullable LocalDate startDate, @Nullable LocalDate endDate, List<String> codes) {
         // 爬取所有股票 K 线
         return TushareUtil.splitCodes(startDate, endDate, codes)
                 .flatMap(tuple -> {
@@ -100,8 +100,8 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
 
                     return Tushare.Daily.builder()
                             .ts_code(formatCodes(tuple.getT3()))
-                            .start_date(yyyyMMdd(tuple.getT1()))
-                            .end_date(yyyyMMdd(tuple.getT2()))
+                            .start_date(TushareUtil.formatDate(tuple.getT1()))
+                            .end_date(TushareUtil.formatDate(tuple.getT2()))
                             .build()
                             .req()
                             .flatMap(response -> {

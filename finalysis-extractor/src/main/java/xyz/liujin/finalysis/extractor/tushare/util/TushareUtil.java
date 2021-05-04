@@ -8,7 +8,6 @@ import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.base.constant.StockConst;
 import xyz.liujin.finalysis.base.constant.StockMarketEnum;
-import xyz.liujin.finalysis.base.util.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -53,6 +52,7 @@ public class TushareUtil {
 
     /**
      * 日期转 tushare 格式
+     * LocalDate -> yyyyMMdd
      * @param localDate
      * @return
      */
@@ -91,21 +91,21 @@ public class TushareUtil {
     private static final long MAX_ITEMS = 5000L;
     // 每次请求 codes 最大值
     private static final int MAX_CODES = 100;
-    public static Flux<Tuple3<String, String, List<String>>> splitCodes(String startDate, String endDate, List<String> codes) {
+    public static Flux<Tuple3<LocalDate, LocalDate, List<String>>> splitCodes(LocalDate startDate, LocalDate endDate, List<String> codes) {
         if (ArrayUtil.isEmpty(codes)) {
             return Flux.just(Tuples.of(startDate, endDate, List.of()));
         }
 
         return Flux.create(sink -> {
-            LocalDate start = DateUtils.parseDate(startDate);
-            LocalDate end = DateUtils.parseDate(endDate);
+            LocalDate start = startDate;
+            LocalDate end = endDate;
 
             // 最多间隔 5000 天（每天一条数据）
             long diff;
             while ((diff = start.until(end, ChronoUnit.DAYS) + 1) >= MAX_ITEMS) {
                 // 没个 code 生成 MAX_ITEMS 条数据
-                String from = DateUtils.formatDate(start);
-                String to = DateUtils.formatDate(start.plusDays(MAX_ITEMS - 1));
+                LocalDate from = start;
+                LocalDate to = start.plusDays(MAX_ITEMS - 1);
                 Flux.fromIterable(codes)
                         .subscribe(code -> {
                             sink.next(Tuples.of(from, to, List.of(code)));
@@ -115,9 +115,9 @@ public class TushareUtil {
                 start = start.plusDays(MAX_ITEMS);
             }
 
-            // 获取日期区间
-            String startStr = DateUtils.formatDate(start);
-            String endStr = DateUtils.formatDate(end);
+//            // 获取日期区间
+//            String startStr = DateUtils.formatDate(start);
+//            String endStr = DateUtils.formatDate(end);
 
             // 计算每次循环的 codes 数
             // codes
@@ -129,7 +129,7 @@ public class TushareUtil {
             while (to <= len) {
 
                 List<String> range = codes.subList(from, to);
-                sink.next(Tuples.of(startStr, endStr, range));
+                sink.next(Tuples.of(start, end, range));
                 from = to;
                 to = to + div;
             }
@@ -137,7 +137,7 @@ public class TushareUtil {
             // 剩余的 codes
             if (from < len) {
                 List<String> range = codes.subList(from, len);
-                sink.next(Tuples.of(startStr, endStr, range));
+                sink.next(Tuples.of(start, end, range));
             }
 
             sink.complete();
@@ -146,7 +146,8 @@ public class TushareUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        splitCodes("2021-01-26", "2021-01-26", List.of("a", "b", "c", "d", "e"))
+        splitCodes(LocalDate.of(2001, 1, 26),
+                LocalDate.of(2021, 1, 26), List.of("a", "b", "c", "d", "e"))
                 .subscribe(it -> {
                     System.out.println(it.getT1() + " " + it.getT2() + " " + it.getT3());
                 });
