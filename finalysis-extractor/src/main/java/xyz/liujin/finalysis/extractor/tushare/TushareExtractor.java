@@ -89,7 +89,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
         LocalDate offsetDate = DateUtils.parseDate(dateStr, "yyyyMMdd");
 
         return Stock.builder()
-                .stockCode(parseCode(tushareStock.getStockCode()))
+                .stockCode(TushareUtil.parseCode(tushareStock.getStockCode()))
                 .stockName(tushareStock.getStockName())
                 .board(StockBoardEnum.getBoardByCode(tushareStock.getStockCode()))
                 .stat(stat)
@@ -207,7 +207,7 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
      */
     private KLineDto format(KLineDto kLineDto) {
         // 000001.SZ -> 000001
-        kLineDto.setStockCode(TushareUtil.removeSuffix(kLineDto.getStockCode()));
+        kLineDto.setStockCode(TushareUtil.parseCode(kLineDto.getStockCode()));
         // yyyyMMdd -> yyyy-MM-dd
         kLineDto.setDate(formatDate(kLineDto.getDate()));
         // 成交量 tushare 单位是手, 改为股
@@ -217,17 +217,12 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
         return kLineDto;
     }
 
-    // 000001.SZ -> 000001
-    private String parseCode(String code) {
-        return CharSequenceUtil.removeAny(code, StockConst.POINT, StockConst.SH, StockConst.SZ);
-    }
-
     // [000001, 600001] -> 000001.SZ,600001.SH
     private String formatCodes(List<String> codes) {
         return Optional.ofNullable(codes)
                 .stream()
                 .flatMap(List::stream)
-                .map(TushareUtil::appendSuffix)
+                .map(TushareUtil::formatCode)
                 .collect(Collectors.joining(","));
 
     }

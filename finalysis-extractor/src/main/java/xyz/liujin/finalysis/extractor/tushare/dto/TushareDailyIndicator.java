@@ -24,7 +24,7 @@ public class TushareDailyIndicator {
     private String dv_ttm; // 股息率（TTM）（%）
     private String total_share; // 总股本 （万股）
     private String float_share; // 流通股本 （万股）
-    private String free_share; // 自由流通股本 （万）
+    private String free_share; // 自由流通股本 （万股）
     private String total_mv; // 总市值 （万元）
     private String circ_mv; // 流通市值（万元）
 }

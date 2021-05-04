@@ -50,20 +50,20 @@ create unique index uk_k_line_stock_code_date_time on k_line(stock_code, date_ti
 comment on table k_line is '日 K 线';
 comment on column k_line.id is '自增主键';
 comment on column k_line.stock_code is '股票代码';
-comment on column k_line.date_time is '日期';
-comment on column k_line.open is '开盘价';
-comment on column k_line.close is '收盘价';
-comment on column k_line.high is '最高价';
-comment on column k_line.low is '最低价';
-comment on column k_line.inc is '增量';
-comment on column k_line.inc_rate is '增幅';
-comment on column k_line.volume is '成交量';
-comment on column k_line.amount is '成交额';
+comment on column k_line.date is '日期';
+comment on column k_line.open is '开盘价（元）';
+comment on column k_line.close is '收盘价（元）';
+comment on column k_line.high is '最高价（元）';
+comment on column k_line.low is '最低价（元）';
+comment on column k_line.change is '增量（元）';
+comment on column k_line.pct_change is '增幅（%）';
+comment on column k_line.volume is '成交量（股）';
+comment on column k_line.amount is '成交额（元）';
 comment on column k_line.volume_ratio is '量比';
-comment on column k_line.turn is '换手率';
-comment on column k_line.committee is '委比';
-comment on column k_line.buying is '买盘/内盘';
-comment on column k_line.selling is '卖盘/外盘';
+comment on column k_line.turn is '换手率（%）';
+comment on column k_line.committee is '委比（%）';
+comment on column k_line.buying is '买盘/内盘（股）';
+comment on column k_line.selling is '卖盘/外盘（股）';
 
 -- 2021-01-06
 -- 修改列名符合常规
@@ -287,3 +287,54 @@ comment on column v_avg_line.avg10 is '10 日均线';
 comment on column v_avg_line.avg20 is '20 日均线';
 comment on column v_avg_line.avg30 is '30 日均线';
 
+-- 2021-05-04
+-- 股票日指标数据
+drop table if exists daily_indicator;
+create table if not exists daily_indicator
+(
+    id              bigserial,
+    stock_code      varchar(6)     not null default '',
+    date            date           not null default now(),
+    close           decimal(7, 2)  not null default 0.00,
+    turnover_rate   decimal(5, 2)  not null default 0.00,
+    turnover_rate_f decimal(5, 2)  not null default 0.00,
+    volume_ratio    decimal(6, 2)  not null default 0.00,
+    pe              decimal(7, 2)  not null default 0.00,
+    pe_ttm          decimal(7, 2)  not null default 0.00,
+    pb              decimal(7, 2)  not null default 0.00,
+    ps              decimal(7, 2)  not null default 0.00,
+    ps_ttm          decimal(7, 2)  not null default 0.00,
+    dv_ratio        decimal(5, 2)  not null default 0.00,
+    dv_ttm          decimal(5, 2)  not null default 0.00,
+    total_share     decimal(16, 2) not null default 0.00,
+    float_share     decimal(16, 2) not null default 0.00,
+    free_share      decimal(16, 2) not null default 0.00,
+    total_mv        decimal(16, 2) not null default 0.00,
+    circ_mv         decimal(16, 2) not null default 0.00
+);
+
+comment on table daily_indicator is '股票日指标';
+comment on column daily_indicator.id is '自增主键';
+comment on column daily_indicator.stock_code is 'TS股票代码';
+comment on column daily_indicator.date is '交易日期';
+comment on column daily_indicator.close is '当日收盘价';
+comment on column daily_indicator.turnover_rate is '换手率（%）';
+comment on column daily_indicator.turnover_rate_f is '换手率（自由流通股）';
+comment on column daily_indicator.volume_ratio is '量比';
+comment on column daily_indicator.pe is '市盈率（总市值/净利润， 亏损的PE为空）';
+comment on column daily_indicator.pe_ttm is '市盈率（TTM，亏损的PE为空）';
+comment on column daily_indicator.pb is '市净率（总市值/净资产）';
+comment on column daily_indicator.ps is '市销率';
+comment on column daily_indicator.ps_ttm is '市销率（TTM）';
+comment on column daily_indicator.dv_ratio is '股息率 （%）';
+comment on column daily_indicator.dv_ttm is '股息率（TTM）（%）';
+comment on column daily_indicator.total_share is '总股本 （股）';
+comment on column daily_indicator.float_share is '流通股本 （股）';
+comment on column daily_indicator.free_share is '自由流通股本 （股）';
+comment on column daily_indicator.total_mv is '总市值 （元）';
+comment on column daily_indicator.circ_mv is '流通市值（元）';
+
+alter table daily_indicator
+    add constraint pk_daily_indicator primary key (id);
+
+create unique index uk_daily_indicator_date_stock_code on daily_indicator (date, stock_code);
