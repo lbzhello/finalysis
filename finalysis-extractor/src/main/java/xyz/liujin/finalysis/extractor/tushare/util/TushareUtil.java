@@ -1,19 +1,21 @@
 package xyz.liujin.finalysis.extractor.tushare.util;
 
+import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import cn.hutool.core.util.ArrayUtil;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.base.constant.StockConst;
 import xyz.liujin.finalysis.base.constant.StockMarketEnum;
+import xyz.liujin.finalysis.base.util.DateUtils;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class TushareUtil {
@@ -82,23 +84,56 @@ public class TushareUtil {
         return parseBigDecimal(moneyStr, 1);
     }
 
-    /**
-     * tushare 最多返回 5000 条记录, 为了不使请求数据丢失，
-     * 这里将 codes 分割，使其在 规定的日期内最多返回 5000 条数据
-     * @return startDate, endDate, codes
-     */
     // 返回最大记录数，日线每日 1 条，最多 5000 条
     private static final long MAX_ITEMS = 5000L;
     // 每次请求 codes 最大值
     private static final int MAX_CODES = 100;
-    public static Flux<Tuple3<LocalDate, LocalDate, List<String>>> splitCodes(LocalDate startDate, LocalDate endDate, List<String> codes) {
-        if (ArrayUtil.isEmpty(codes)) {
-            return Flux.just(Tuples.of(startDate, endDate, List.of()));
+    /**
+     * tushare 最多返回 5000 条记录, 为了不使请求数据丢失，
+     * 这里将 codes 分割，使其在 规定的日期内最多返回 5000 条数据
+     * @param startDate 开始日期，默认年初
+     * @param endDate   结束日期，默认当日
+     * @param codes     股票代码，默认所有股票（此时每天生成一次请求）
+     * @return startDate, endDate, codes
+     */
+    public static Flux<Tuple3<LocalDate, LocalDate, List<String>>> splitCodes(@Nullable LocalDate startDate,
+                                                                              @Nullable LocalDate endDate,
+                                                                              @Nullable List<String> codes) {
+        if (Objects.isNull(startDate)) {
+            startDate = DateUtils.beginOfYear();
         }
 
-        return Flux.create(sink -> {
-            LocalDate start = startDate;
+        if (Objects.isNull(endDate)) {
+            endDate = LocalDate.now();
+        }
+
+        // 开始日期不能在结束日期之后
+        if (startDate.isAfter(endDate)) {
+            return Flux.just();
+        }
+
+        /**
+         * 为空表示所有股票，这里按天分割，每天一次请求
+         */
+        if (CollectionUtil.isEmpty(codes)) {
+            LocalDate from = startDate;
             LocalDate end = endDate;
+            return Flux.create(fluxSink -> {
+                LocalDate day = from;
+                while (day.isBefore(end) || day.isEqual(end)) {
+                    fluxSink.next(Tuples.of(day, day, List.of()));
+                    day = day.plusDays(1);
+                }
+                fluxSink.complete();
+            });
+        }
+
+        // lambda 必须是 final
+        LocalDate _start = startDate;
+        LocalDate _end = endDate;
+        return Flux.create(sink -> {
+            LocalDate start = _start;
+            LocalDate end = _end;
 
             // 最多间隔 5000 天（每天一条数据）
             long diff;
@@ -146,8 +181,8 @@ public class TushareUtil {
     }
 
     public static void main(String[] args) throws Exception {
-        splitCodes(LocalDate.of(2001, 1, 26),
-                LocalDate.of(2021, 1, 26), List.of("a", "b", "c", "d", "e"))
+        splitCodes(LocalDate.of(2021, 1, 23),
+                LocalDate.of(2021, 1, 26), List.of("a", "b", "c"))
                 .subscribe(it -> {
                     System.out.println(it.getT1() + " " + it.getT2() + " " + it.getT3());
                 });
