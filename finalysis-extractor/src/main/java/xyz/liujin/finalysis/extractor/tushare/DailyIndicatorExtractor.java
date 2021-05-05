@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.base.util.JsonUtils;
+import xyz.liujin.finalysis.base.util.SyncUnit;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.extractor.tushare.api.Tushare;
 import xyz.liujin.finalysis.extractor.tushare.api.TushareResp;
@@ -22,35 +23,49 @@ import java.util.List;
 public class DailyIndicatorExtractor {
     private static Logger logger = LoggerFactory.getLogger(DailyIndicatorExtractor.class);
 
+    // 用于控制方法执行速率 每分钟最多访问该接口200次
+    private SyncUnit syncUnit = SyncUnit.create();
+    /**
+     * 获取股票每日指标数据
+     * 每分钟最多访问该接口200次
+     * @param start 开始日期
+     * @param end 结束日期
+     * @param codes 股票列表；如 ["000001", "600001"...]
+     * @return
+     */
     public Flux<DailyIndicator> extractDailyIndicator(LocalDate start, LocalDate end, List<String> codes) {
         return TushareUtil.splitCodes(start, end, codes)
-                .flatMap(tuple -> Tushare.DailyBasic.builder()
-                        .ts_code(TushareUtil.formatCodes(tuple.getT3()))
-                        .start_date(TushareUtil.formatDate(tuple.getT1()))
-                        .end_date(TushareUtil.formatDate(tuple.getT2()))
-                        .build()
-                        .req("")
-                        .flatMap(response -> {
-                            try {
-                                String bodyStr = response.body().string();
-                                TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
+                .flatMap(tuple -> {
+                    // 每分钟最多调用 200 次
+                    syncUnit.waitMillis(300);
+                    return Tushare.DailyBasic.builder()
+                            .ts_code(TushareUtil.formatCodes(tuple.getT3()))
+                            .start_date(TushareUtil.formatDate(tuple.getT1()))
+                            .end_date(TushareUtil.formatDate(tuple.getT2()))
+                            .build()
+                            .req("")
+                            .flatMap(response -> {
+                                try {
+                                    String bodyStr = response.body().string();
+                                    TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
 
-                                if (TushareUtil.hasError(tushareResp)) {
-                                    IllegalStateException illegalStateException = new IllegalStateException(tushareResp.getMsg());
-                                    logger.error("failed to extract tushare daily indicator", illegalStateException);
-                                    return Flux.error(illegalStateException);
+                                    if (TushareUtil.hasError(tushareResp)) {
+                                        IllegalStateException illegalStateException = new IllegalStateException(tushareResp.getMsg());
+                                        logger.error("failed to extract tushare daily indicator", illegalStateException);
+                                        return Flux.error(illegalStateException);
+                                    }
+
+                                    return JsonUtils.parseCsv(tushareResp.getData().getFields(), tushareResp.getData().getItems())
+                                            .map(map -> JSONUtil.toBean(JSONUtil.parseObj(map), TushareDailyIndicator.class))
+                                            .map(this::toDailyIndicator);
+
+                                } catch (Exception e) {
+                                    logger.error("failed to extract daily indicator", e);
                                 }
 
-                                return JsonUtils.parseCsv(tushareResp.getData().getFields(), tushareResp.getData().getItems())
-                                        .map(map -> JSONUtil.toBean(JSONUtil.parseObj(map), TushareDailyIndicator.class))
-                                        .map(this::toDailyIndicator);
-
-                            } catch (Exception e) {
-                                logger.error("failed to extract daily indicator", e);
-                            }
-
-                            return Flux.just();
-                        }));
+                                return Flux.just();
+                            });
+                });
 
     }
 
