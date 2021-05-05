@@ -23,7 +23,7 @@ public class DailyIndicatorExtractorTest {
                 List.of("000001"))
                 .subscribe(it -> {
                     System.out.println(it);
-                });
+                }, e -> System.out.println(e));
         DebugUtils.waitMillis(2000);
     }
 }

@@ -1,17 +1,17 @@
 package xyz.liujin.finalysis.extractor.tushare;
 
+import cn.hutool.json.JSONUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.base.json.CsvMapper;
+import xyz.liujin.finalysis.base.util.JsonUtils;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.extractor.tushare.api.Tushare;
 import xyz.liujin.finalysis.extractor.tushare.api.TushareResp;
 import xyz.liujin.finalysis.extractor.tushare.dto.TushareDailyIndicator;
 import xyz.liujin.finalysis.extractor.tushare.util.TushareUtil;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -33,12 +33,19 @@ public class DailyIndicatorExtractor {
                         .flatMap(response -> {
                             try {
                                 String bodyStr = response.body().string();
-                                // 字段映射
-                                return CsvMapper.create(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH)
-                                        .eval(bodyStr, TushareDailyIndicator.class)
+                                TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
+
+                                if (TushareUtil.hasError(tushareResp)) {
+                                    IllegalStateException illegalStateException = new IllegalStateException(tushareResp.getMsg());
+                                    logger.error("failed to extract tushare daily indicator", illegalStateException);
+                                    return Flux.error(illegalStateException);
+                                }
+
+                                return JsonUtils.parseCsv(tushareResp.getData().getFields(), tushareResp.getData().getItems())
+                                        .map(map -> JSONUtil.toBean(JSONUtil.parseObj(map), TushareDailyIndicator.class))
                                         .map(this::toDailyIndicator);
 
-                            } catch (IOException e) {
+                            } catch (Exception e) {
                                 logger.error("failed to extract daily indicator", e);
                             }
 

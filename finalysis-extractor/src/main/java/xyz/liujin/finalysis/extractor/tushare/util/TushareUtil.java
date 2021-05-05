@@ -2,6 +2,8 @@ package xyz.liujin.finalysis.extractor.tushare.util;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.util.function.Tuple3;
@@ -9,6 +11,7 @@ import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.base.constant.StockConst;
 import xyz.liujin.finalysis.base.constant.StockMarketEnum;
 import xyz.liujin.finalysis.base.util.DateUtils;
+import xyz.liujin.finalysis.extractor.tushare.api.TushareResp;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -20,7 +23,49 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class TushareUtil {
+    private static Logger logger = LoggerFactory.getLogger(TushareUtil.class);
+
     public static final String YYYYMMDD = "yyyyMMdd";
+
+    public static final Integer SUCCESS_CODE = 0;
+
+    /**
+     * 判断 tushare 相应是否成功
+     * @param resp
+     * @return
+     */
+    public static boolean isSuccess(@Nullable TushareResp resp) {
+        return Objects.nonNull(resp) && Objects.equals(resp.getCode(), SUCCESS_CODE);
+    }
+
+    /**
+     * 判断 tushare 相应成功，并且结果非 null
+     * @param resp
+     * @return
+     */
+    public static boolean nonNullSuccess(@Nullable TushareResp resp) {
+        return isSuccess(resp) && Objects.nonNull(resp.getData());
+    }
+
+    /**
+     * 相应异常
+     * @param resp
+     * @return
+     */
+    public static boolean hasError(TushareResp resp) {
+        return !isSuccess(resp);
+    }
+
+    /**
+     * 判断失败并且打印日志
+     */
+    public static boolean hasErrorAndLog(TushareResp resp, String message, Exception e) {
+        if (hasError(resp)) {
+            logger.error(message, e);
+        }
+
+        return hasError(resp);
+    }
 
     /**
      * tushare 格式股票代码转换
