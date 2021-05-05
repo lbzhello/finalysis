@@ -26,7 +26,10 @@ public class TushareEventListener {
     public void stockRefresh(StockChangeEvent event) {
         if (Objects.nonNull(event) && CollectionUtil.isNotEmpty(event.getAddCodes())) {
             logger.debug("found stock added: {}", event);
+            // 更新 K 线数据
             tushareManager.refreshKLine(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());
+            // 更新股票日指标数据
+            tushareManager.refreshDailyIndicator(StockConst.CN_FOUND_DATE, LocalDate.now(), event.getAddCodes());
         }
     }
 }

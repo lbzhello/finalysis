@@ -45,4 +45,19 @@ public class ExtractorController {
             @RequestParam(name = "codes", required = false) List<String> codes) {
         return tushareManager.refreshKLine(start, end, codes);
     }
+
+    @ApiOperation("更新股票每日指标")
+    @GetMapping("indicator")
+    public Flux<String> extractDailyIndicator(
+            @ApiParam(value = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2021-02-12")
+            @RequestParam(name = "start", required = false) LocalDate start,
+
+            @ApiParam(value = "结束日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
+            @RequestParam(name = "end", required = false) LocalDate end,
+
+            @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
+            @RequestParam(name = "codes", required = false) List<String> codes) {
+        return tushareManager.refreshDailyIndicator(start, end, codes);
+    }
+
 }

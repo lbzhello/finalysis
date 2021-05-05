@@ -270,6 +270,10 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 .stockCode(avgLine.getStockCode())
                 .date(avgLine.getDate())
                 .current(avgLine.getCurrent())
+                .avg5(avgLine.getAvg5())
+                .avg10(avgLine.getAvg10())
+                .avg20(avgLine.getAvg20())
+                .avg30(avgLine.getAvg30())
                 .build();
     }
 
