@@ -44,8 +44,8 @@ public class DailyIndicatorService extends ServiceImpl<DailyIndicatorMapper, Dai
                 .eq(DailyIndicator::getStockCode, dailyIndicator.getStockCode())
                 .oneOpt()
                 .ifPresentOrElse(exist -> {
-                    dailyIndicator.setId(exist.getId());
-                    updateById(dailyIndicator);
+//                    dailyIndicator.setId(exist.getId());
+//                    updateById(dailyIndicator);
                 }, () -> {
                     save(dailyIndicator);
                 });

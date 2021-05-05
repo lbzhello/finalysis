@@ -340,8 +340,12 @@ alter table daily_indicator
 create unique index uk_daily_indicator_date_stock_code on daily_indicator (date, stock_code);
 
 -- 2021-05-05
+-- 数据范围不够，增大
 alter table daily_indicator alter column pe type decimal(8, 2);
 alter table daily_indicator alter column pe_ttm type decimal(8, 2);
 alter table daily_indicator alter column pb type decimal(9, 2);
 alter table daily_indicator alter column ps type decimal(9, 2);
 alter table daily_indicator alter column ps_ttm type decimal(9, 2);
+
+alter table daily_indicator alter column dv_ratio type decimal(7, 2);
+alter table daily_indicator alter column dv_ttm type decimal(7, 2);
