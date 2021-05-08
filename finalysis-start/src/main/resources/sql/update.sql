@@ -349,3 +349,6 @@ alter table daily_indicator alter column ps_ttm type decimal(9, 2);
 
 alter table daily_indicator alter column dv_ratio type decimal(7, 2);
 alter table daily_indicator alter column dv_ttm type decimal(7, 2);
+
+alter table daily_indicator alter column turnover_rate type decimal(7, 2);
+alter table daily_indicator alter column turnover_rate_f type decimal(7, 2);
