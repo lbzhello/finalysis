@@ -4,4 +4,138 @@
     <select id="getLatestDate" resultType="java.time.LocalDate">
         select date from daily_indicator order by date desc limit 1;
     </select>
+
+    <insert id="saveByCodeDate" parameterType="java.util.List">
+        insert into daily_indicator
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stockCode != null">
+                stock_code,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+            <if test="close != null">
+                close,
+            </if>
+            <if test="turnoverRate != null">
+                turnover_rate,
+            </if>
+            <if test="turnoverRateF != null">
+                turnover_rate_f,
+            </if>
+            <if test="volumeRatio != null">
+                volume_ratio,
+            </if>
+            <if test="pe != null">
+                pe,
+            </if>
+            <if test="peTtm != null">
+                pe_ttm,
+            </if>
+            <if test="pb != null">
+                pb,
+            </if>
+            <if test="ps != null">
+                ps,
+            </if>
+            <if test="psTtm != null">
+                ps_ttm,
+            </if>
+            <if test="dvRatio != null">
+                dv_ratio,
+            </if>
+            <if test="dvTtm != null">
+                dv_ttm,
+            </if>
+            <if test="totalShare != null">
+                total_share,
+            </if>
+            <if test="floatShare != null">
+                float_share,
+            </if>
+            <if test="freeShare != null">
+                free_share,
+            </if>
+            <if test="totalMv != null">
+                total_mv,
+            </if>
+            <if test="circMv != null">
+                circ_mv,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stockCode != null">
+                #{stockCode},
+            </if>
+            <if test="date != null">
+                #{date},
+            </if>
+            <if test="close != null">
+                #{close},
+            </if>
+            <if test="turnoverRate != null">
+                #{turnoverRate},
+            </if>
+            <if test="turnoverRateF != null">
+                #{turnoverRateF},
+            </if>
+            <if test="volumeRatio != null">
+                #{volumeRatio},
+            </if>
+            <if test="pe != null">
+                #{pe},
+            </if>
+            <if test="peTtm != null">
+                #{peTtm},
+            </if>
+            <if test="pb != null">
+                #{pb},
+            </if>
+            <if test="ps != null">
+                #{ps},
+            </if>
+            <if test="psTtm != null">
+                #{psTtm},
+            </if>
+            <if test="dvRatio != null">
+                #{dvRatio},
+            </if>
+            <if test="dvTtm != null">
+                #{dvTtm},
+            </if>
+            <if test="totalShare != null">
+                #{totalShare},
+            </if>
+            <if test="floatShare != null">
+                #{floatShare},
+            </if>
+            <if test="freeShare != null">
+                #{freeShare},
+            </if>
+            <if test="totalMv != null">
+                #{totalMv},
+            </if>
+            <if test="circMv != null">
+                #{circMv},
+            </if>
+        </trim>
+        on conflict (date, stock_code) do update set
+        close = excluded.close,
+        turnover_rate = excluded.turnover_rate,
+        turnover_rate_f = excluded.turnover_rate_f,
+        volume_ratio = excluded.volume_ratio,
+        pe = excluded.pe,
+        pe_ttm = excluded.pe_ttm,
+        pb = excluded.pb,
+        ps = excluded.ps,
+        ps_ttm = excluded.ps_ttm,
+        dv_ratio = excluded.dv_ratio,
+        dv_ttm = excluded.dv_ttm,
+        total_share = excluded.total_share,
+        float_share = excluded.float_share,
+        free_share = excluded.free_share,
+        total_mv = excluded.total_mv,
+        circ_mv = excluded.circ_mv
+    </insert>
 </mapper>

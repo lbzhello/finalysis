@@ -40,14 +40,6 @@ public class DailyIndicatorService extends ServiceImpl<DailyIndicatorMapper, Dai
      * @param dailyIndicator
      */
     public void saveByCodeDate(DailyIndicator dailyIndicator) {
-        lambdaQuery().eq(DailyIndicator::getDate, dailyIndicator.getDate())
-                .eq(DailyIndicator::getStockCode, dailyIndicator.getStockCode())
-                .oneOpt()
-                .ifPresentOrElse(exist -> {
-//                    dailyIndicator.setId(exist.getId());
-//                    updateById(dailyIndicator);
-                }, () -> {
-                    save(dailyIndicator);
-                });
+        getBaseMapper().saveByCodeDate(dailyIndicator);
     }
 }

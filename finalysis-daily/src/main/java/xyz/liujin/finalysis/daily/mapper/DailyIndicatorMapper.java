@@ -12,10 +12,10 @@ public interface DailyIndicatorMapper extends BaseMapper<DailyIndicator> {
      */
     LocalDate getLatestDate();
 
-//    /**
-//     * 批量保存均线数据；如果冲突 (code, date) 则更新
-//     * @param dailyIndicators
-//     */
-//    void saveBatchByCodeDate(@Param("dailyIndicators") List<DailyIndicator> dailyIndicators);
+    /**
+     * 批量保存均线数据；如果冲突 (code, date) 则更新
+     * @param dailyIndicator
+     */
+    void saveByCodeDate(DailyIndicator dailyIndicator);
 
 }
