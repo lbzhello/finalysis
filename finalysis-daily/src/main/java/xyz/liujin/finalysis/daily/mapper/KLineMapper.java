@@ -21,4 +21,10 @@ public interface KLineMapper extends BaseMapper<KLine> {
      * @return
      */
     LocalDate getLatestDate();
+
+    /**
+     * 保存或更新
+     * @param kLine
+     */
+    void insertOrUpdate(KLine kLine);
 }

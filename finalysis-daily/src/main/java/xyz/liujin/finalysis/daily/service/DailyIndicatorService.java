@@ -40,6 +40,6 @@ public class DailyIndicatorService extends ServiceImpl<DailyIndicatorMapper, Dai
      * @param dailyIndicator
      */
     public void saveByCodeDate(DailyIndicator dailyIndicator) {
-        getBaseMapper().saveByCodeDate(dailyIndicator);
+        getBaseMapper().insertOrUpdate(dailyIndicator);
     }
 }

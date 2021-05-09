@@ -81,6 +81,12 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                 .map(KLineConverter::toKLineDto);
     }
 
+    /**
+     * 保存或更新
+     * @param kLineDto
+     * @deprecated 被 {@link #insertOrUpdate(KLine)} 方法取代
+     */
+    @Deprecated
     public void saveOrUpdate(KLineDto kLineDto) {
         KLine kLine = KLineConverter.toKLine(kLineDto);
         // 同一股票，同一时间不重复
@@ -94,6 +100,14 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                     save(kLine);
                 });
         saveOrUpdate(kLine);
+    }
+
+    /**
+     * 新增或更新
+     * @param kLine
+     */
+    public void insertOrUpdate(KLine kLine) {
+        getBaseMapper().insertOrUpdate(kLine);
     }
 
     // 数据在不同的分区，默认返回 2020-01-01 之后的数据

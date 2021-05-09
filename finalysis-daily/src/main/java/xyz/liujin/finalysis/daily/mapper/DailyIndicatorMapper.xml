@@ -5,7 +5,7 @@
         select date from daily_indicator order by date desc limit 1;
     </select>
 
-    <insert id="saveByCodeDate" parameterType="java.util.List">
+    <insert id="insertOrUpdate">
         insert into daily_indicator
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="stockCode != null">

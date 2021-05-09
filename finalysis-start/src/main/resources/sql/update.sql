@@ -352,3 +352,10 @@ alter table daily_indicator alter column dv_ttm type decimal(7, 2);
 
 alter table daily_indicator alter column turnover_rate type decimal(7, 2);
 alter table daily_indicator alter column turnover_rate_f type decimal(7, 2);
+
+-- 2021-05-09
+-- 获取自增序列
+select currval('k_line_id_seq');
+
+-- 重置自增序列
+select setval('k_line_id_seq', max(id)) from k_line_2020_2039;

@@ -16,6 +16,6 @@ public interface DailyIndicatorMapper extends BaseMapper<DailyIndicator> {
      * 批量保存均线数据；如果冲突 (code, date) 则更新
      * @param dailyIndicator
      */
-    void saveByCodeDate(DailyIndicator dailyIndicator);
+    void insertOrUpdate(DailyIndicator dailyIndicator);
 
 }

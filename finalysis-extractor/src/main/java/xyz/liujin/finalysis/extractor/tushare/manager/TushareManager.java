@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.executor.TaskPool;
+import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.event.DailyIndicatorChangeEvent;
 import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
 import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
@@ -131,8 +132,9 @@ public class TushareManager {
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 入库
+                    .map(KLineConverter::toKLine)
                     .map(kLine -> {
-                        kLineService.saveOrUpdate(kLine);
+                        kLineService.insertOrUpdate(kLine);
                         return 1;
                     })
                     // 统计更新条目；到这里任务已经执行完毕

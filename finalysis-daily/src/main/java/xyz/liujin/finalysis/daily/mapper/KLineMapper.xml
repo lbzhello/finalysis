@@ -33,4 +33,116 @@
     <select id="getLatestDate" resultType="java.time.LocalDate">
         select date from k_line_2020_2039 order by date desc limit 1;
     </select>
+    <insert id="insertOrUpdate">
+        insert into k_line_2020_2039
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stockCode != null">
+                stock_code,
+            </if>
+            <if test="date != null">
+                date,
+            </if>
+            <if test="open != null">
+                open,
+            </if>
+            <if test="close != null">
+                close,
+            </if>
+            <if test="high != null">
+                high,
+            </if>
+            <if test="low != null">
+                low,
+            </if>
+            <if test="change != null">
+                change,
+            </if>
+            <if test="pctChange != null">
+                pct_change,
+            </if>
+            <if test="volume != null">
+                volume,
+            </if>
+            <if test="amount != null">
+                amount,
+            </if>
+            <if test="volumeRatio != null">
+                volume_ratio,
+            </if>
+            <if test="turn != null">
+                turn,
+            </if>
+            <if test="committee != null">
+                committee,
+            </if>
+            <if test="selling != null">
+                selling,
+            </if>
+            <if test="buying != null">
+                buying,
+            </if>
+        </trim>
+        values
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="stockCode != null">
+                #{stockCode},
+            </if>
+            <if test="date != null">
+                #{date},
+            </if>
+            <if test="open != null">
+                #{open},
+            </if>
+            <if test="close != null">
+                #{close},
+            </if>
+            <if test="high != null">
+                #{high},
+            </if>
+            <if test="low != null">
+                #{low},
+            </if>
+            <if test="change != null">
+                #{change},
+            </if>
+            <if test="pctChange != null">
+                #{pctChange},
+            </if>
+            <if test="volume != null">
+                #{pctChange},
+            </if>
+            <if test="amount != null">
+                #{amount},
+            </if>
+            <if test="volumeRatio != null">
+                #{volumeRatio},
+            </if>
+            <if test="turn != null">
+                #{turn},
+            </if>
+            <if test="committee != null">
+                #{committee},
+            </if>
+            <if test="selling != null">
+                #{selling},
+            </if>
+            <if test="buying != null">
+                #{buying},
+            </if>
+        </trim>
+        on conflict (stock_code, date) do update set
+        open = excluded.open,
+        close = excluded.close,
+        high = excluded.high,
+        low = excluded.low,
+        change = excluded.change,
+        pct_change = excluded.pct_change,
+        volume = excluded.volume,
+        amount = excluded.amount,
+        volume_ratio = excluded.volume_ratio,
+        turn = excluded.turn,
+        committee = excluded.committee,
+        selling = excluded.selling,
+        buying = excluded.buying
+    </insert>
 </mapper>
