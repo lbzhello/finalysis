@@ -174,6 +174,7 @@ public class TushareManager {
                     .collect(Collectors.toList());
 
             dailyIndicatorExtractor.extractDailyIndicator(startDate, endDate, stockCodes)
+                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 入库

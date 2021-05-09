@@ -211,10 +211,6 @@ public class TushareUtil {
                 start = start.plusDays(MAX_ITEMS);
             }
 
-//            // 获取日期区间
-//            String startStr = DateUtils.formatDate(start);
-//            String endStr = DateUtils.formatDate(end);
-
             // 计算每次循环的 codes 数
             // codes
             int div = Math.min(Math.toIntExact(MAX_ITEMS / diff), MAX_CODES);
