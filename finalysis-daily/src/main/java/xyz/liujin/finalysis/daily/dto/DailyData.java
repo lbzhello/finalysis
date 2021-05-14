@@ -39,8 +39,17 @@ public class DailyData {
     private BigDecimal volumeRatio;
     // 成交额
     private BigDecimal amount;
+
+    // 市盈率
+    private BigDecimal pe;
+    // 市盈率 TTM
+    private BigDecimal peTtm;
     // 换手
     private BigDecimal turn;
+    // 换手（自由流通股）
+    private BigDecimal turnF;
     // 总市值
     private BigDecimal marketValue;
+    // 流通市值
+    private BigDecimal circMv;
 }

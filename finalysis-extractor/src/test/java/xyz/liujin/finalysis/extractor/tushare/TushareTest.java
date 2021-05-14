@@ -22,6 +22,25 @@ public class TushareTest {
         System.out.println("hello");
     }
 
+    @Test
+    public void daily() {
+        Tushare.Daily.builder()
+                .trade_date("20210514")
+                .ts_code("600309.SH")
+                .build()
+                .req()
+                .subscribe(it -> {
+                    try {
+                        Map map = JSONUtil.toBean(it.body().string(), Map.class);
+                        System.out.println();
+                    } catch (IOException e) {
+
+
+                    }
+                });
+        DebugUtils.waitMillis(2000);
+    }
+
     /**
      * 股票日常指标获取
      */

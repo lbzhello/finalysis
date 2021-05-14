@@ -27,9 +27,11 @@ public class AvgLineController {
     @GetMapping("5-cross-10")
     public Mono<List<String>> fiveCrossTen(
             @ApiParam(value = "最大突破天数", example = "3")
-            @RequestParam(name = "days", required = false) Integer days
+            @RequestParam(name = "days", required = false) Integer days,
+            @ApiParam(value = "当前日期，默认数据库最新", example = "3")
+            @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        return avgLineService.fiveCrossTen(Optional.ofNullable(days).orElse(3)).collectList();
+        return avgLineService.fiveCrossTen(Optional.ofNullable(days).orElse(3), date).collectList();
     }
 
     @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
