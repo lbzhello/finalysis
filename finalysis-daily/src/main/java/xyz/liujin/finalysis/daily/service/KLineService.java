@@ -187,6 +187,11 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
         }
 
         BigDecimal avg = BigDecimal.valueOf(acc).divide(BigDecimal.valueOf(len), 4, RoundingMode.HALF_EVEN);
+
+        if (BigDecimal.ZERO.equals(avg)) {
+            return BigDecimal.ONE;
+        }
+
         return BigDecimal.valueOf(kLines.get(index).getVolume()).divide(avg, 4, RoundingMode.HALF_EVEN);
     }
 }
