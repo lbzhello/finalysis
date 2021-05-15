@@ -22,9 +22,10 @@ spring:
 #    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
 # 特定类打印日志
-#logging:
-#  level:
-#    xyz.liujin.finalysis.analysis.mapper: debug
+logging:
+  level:
+    root: info
+#    xyz.liujin.finalysis.daily.mapper.KLineMapper: debug
 
 ##mybatis的相关配置
 #mybatis:

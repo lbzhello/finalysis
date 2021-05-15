@@ -109,7 +109,7 @@
                 #{pctChange},
             </if>
             <if test="volume != null">
-                #{pctChange},
+                #{volume},
             </if>
             <if test="amount != null">
                 #{amount},
