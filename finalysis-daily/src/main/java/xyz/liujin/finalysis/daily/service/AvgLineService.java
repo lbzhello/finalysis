@@ -18,20 +18,20 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
-import xyz.liujin.finalysis.daily.converter.DailyDateConverter;
-import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
 import xyz.liujin.finalysis.daily.entity.DayAvgLine;
 import xyz.liujin.finalysis.daily.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.daily.qo.AvgLineQo;
-import xyz.liujin.finalysis.daily.qo.KLineQo;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.service.StockService;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -92,38 +92,6 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 });
     }
 
-    /**
-     * 5 日线超 10 日线股票详情信息
-     * @param days
-     * @param date
-     * @return
-     */
-    public Flux<DailyData> fiveAboveTenDetail(Integer days, LocalDate date) {
-        // 日期默认当前最新数据
-        LocalDate end = ObjectUtils.firstNonNull(date, getLatestDate(), LocalDate.now());
-        return fiveAboveTen(days, date)
-                .collectList()
-                .flux()
-                .flatMap(codes -> {
-                    if (CollectionUtil.isEmpty(codes)) {
-                        return Flux.just();
-                    }
-
-                    return kLineService.pageQuery(KLineQo.builder()
-                            .codes(codes)
-                            .date(end)
-                            .build())
-                            .map(DailyDateConverter::toDailyData)
-                            .doOnNext(dailyData -> {
-                                Stock stock = stockService.selectById(dailyData.getStockCode());
-                                if (Objects.nonNull(stock)) {
-                                    dailyData.setStockName(stock.getStockName());
-                                }
-                            });
-
-
-                });
-    }
 
     /**
      * 获取 5 日线大于 10 日线的股票

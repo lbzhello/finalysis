@@ -36,16 +36,24 @@
                     and k.date &lt;= #{endDate}
                 </if>
             <where>
+                <if test="codes != null and codes.size() > 0">
+                    and s.stock_code in
+                    <foreach collection="codes" item="code" open="(" separator="," close=")">
+                        #{code}
+                    </foreach>
+                </if>
                 <if test="minAmount != null">
                     and k.amount >= #{minAmount}
                 </if>
-                <if test="limit != null">
-                    limit #{limit}
-                </if>
-                <if test="offset != null">
-                    offset #{offset}
-                </if>
             </where>
+            <if test="page != null">
+                <if test="page.limit != null">
+                    limit #{page.limit}
+                </if>
+                <if test="page.offset != null">
+                    offset #{page.offset}
+                </if>
+            </if>
         )
         select * from daily_cte
     </select>

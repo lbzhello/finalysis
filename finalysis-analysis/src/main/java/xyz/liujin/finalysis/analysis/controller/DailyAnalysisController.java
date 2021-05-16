@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import xyz.liujin.finalysis.analysis.dto.DailyDateReq;
+import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
 import xyz.liujin.finalysis.analysis.service.DailyAnalysisService;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
@@ -25,7 +25,7 @@ public class DailyAnalysisController {
 
     @ApiOperation("获取股票日数据")
     @PostMapping("daily")
-    public Flux<DailyData> dailyData(@RequestBody DailyDateReq req) {
+    public Flux<DailyData> dailyData(@RequestBody DailyDateQo req) {
         return dailyAnalysisService.dailyData(req);
     }
 
@@ -51,7 +51,7 @@ public class DailyAnalysisController {
             @ApiParam(value = "当前日期，默认数据库最新")
             @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        return avgLineService.fiveAboveTenDetail(Optional.ofNullable(days).orElse(3),
+        return dailyAnalysisService.fiveAboveTenDetail(Optional.ofNullable(days).orElse(3),
                 date).collectList();
     }
 }

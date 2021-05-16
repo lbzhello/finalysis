@@ -2,7 +2,7 @@ package xyz.liujin.finalysis.daily.qo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.*;
-import xyz.liujin.finalysis.base.page.PageReq;
+import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class KLineQo extends PageReq {
+public class KLineQo {
     @ApiModelProperty("股票代码；可空")
     private String code;
 
@@ -27,4 +27,7 @@ public class KLineQo extends PageReq {
 
     @ApiModelProperty("结束日期；可空；date 存在时不生效")
     private LocalDate endDate;
+
+    @ApiModelProperty("分页信息")
+    private PageQo page;
 }

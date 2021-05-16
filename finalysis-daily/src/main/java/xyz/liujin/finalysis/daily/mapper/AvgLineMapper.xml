@@ -64,10 +64,10 @@
                 </foreach>
             </if>
         </where>
-        <if test="limit != null and limit != 0">
+        <if test="page != null and page.limit != null">
             limit #{limit}
         </if>
-        <if test="offset != null and offset >= 0">
+        <if test="page != null and page.offset != null">
             offset #{offset}
         </if>
     </select>

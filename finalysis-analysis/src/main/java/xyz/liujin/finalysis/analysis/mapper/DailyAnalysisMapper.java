@@ -1,6 +1,6 @@
 package xyz.liujin.finalysis.analysis.mapper;
 
-import xyz.liujin.finalysis.analysis.dto.DailyDateReq;
+import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
 import java.util.List;
@@ -11,5 +11,5 @@ public interface DailyAnalysisMapper {
      * @param req
      * @return
      */
-    List<DailyData> dailyData(DailyDateReq req);
+    List<DailyData> dailyData(DailyDateQo req);
 }
