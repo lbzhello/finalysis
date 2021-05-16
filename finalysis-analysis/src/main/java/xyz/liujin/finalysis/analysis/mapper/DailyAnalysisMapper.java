@@ -8,8 +8,8 @@ import java.util.List;
 public interface DailyAnalysisMapper {
     /**
      * 获取股票日数据
-     * @param req
+     * @param dailyDateQo
      * @return
      */
-    List<DailyData> dailyData(DailyDateQo req);
+    List<DailyData> dailyData(DailyDateQo dailyDateQo);
 }

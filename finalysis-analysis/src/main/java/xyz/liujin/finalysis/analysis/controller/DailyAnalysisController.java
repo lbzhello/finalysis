@@ -10,7 +10,6 @@ import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
 import xyz.liujin.finalysis.analysis.service.DailyAnalysisService;
 import xyz.liujin.finalysis.daily.dto.DailyData;
-import xyz.liujin.finalysis.daily.service.AvgLineService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -29,18 +28,16 @@ public class DailyAnalysisController {
         return dailyAnalysisService.dailyData(req);
     }
 
-    @Autowired
-    private AvgLineService avgLineService;
-
     @ApiOperation("获取 5 日线突破十日线的股票")
     @GetMapping("5-cross-10")
-    public Mono<List<String>> fiveCrossTen(
+    public Mono<List<DailyData>> fiveCrossTen(
             @ApiParam(value = "最大突破天数", example = "3")
             @RequestParam(name = "days", required = false) Integer days,
             @ApiParam(value = "当前日期，默认数据库最新", example = "3")
             @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        return avgLineService.fiveCrossTen(Optional.ofNullable(days).orElse(3), date).collectList();
+        return dailyAnalysisService.fiveCrossTenDetail(Optional.ofNullable(days).orElse(3), date)
+                .collectList();
     }
 
     @ApiOperation("获取 5 日线在 10 日线上方的股票的股票")
@@ -51,7 +48,7 @@ public class DailyAnalysisController {
             @ApiParam(value = "当前日期，默认数据库最新")
             @RequestParam(name = "date", required = false) LocalDate date
     ) {
-        return dailyAnalysisService.fiveAboveTenDetail(Optional.ofNullable(days).orElse(3),
-                date).collectList();
+        return dailyAnalysisService.fiveAboveTenDetail(Optional.ofNullable(days).orElse(3), date)
+                .collectList();
     }
 }
