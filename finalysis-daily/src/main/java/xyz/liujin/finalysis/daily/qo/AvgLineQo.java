@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.daily.qo;
 
 import lombok.*;
-import xyz.liujin.finalysis.base.page.Page;
+import xyz.liujin.finalysis.base.page.PageReq;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,7 +14,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AvgLineQo extends Page {
+public class AvgLineQo extends PageReq {
     private LocalDate start;
     private LocalDate end;
     private List<String> stockCodes;

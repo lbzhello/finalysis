@@ -8,15 +8,6 @@
     <select id="pageQuery" resultType="xyz.liujin.finalysis.daily.entity.KLine">
         select * from k_line_2020_2039
         <where>
-            <if test="code != null and code != ''">
-                and stock_code = #{code}
-            </if>
-            <if test="code == null and codes != null and codes.size() > 0">
-                and stock_code in
-                <foreach collection="codes" item="item" open="(" separator="," close=")">
-                    #{item}
-                </foreach>
-            </if>
             <if test="date != null">
                 and date = #{date}
             </if>
@@ -25,6 +16,15 @@
             </if>
             <if test="date == null and endDate != null">
                 and date &lt;= #{endDate}
+            </if>
+            <if test="code != null and code != ''">
+                and stock_code = #{code}
+            </if>
+            <if test="code == null and codes != null and codes.size() > 0">
+                and stock_code in
+                <foreach collection="codes" item="item" open="(" separator="," close=")">
+                    #{item}
+                </foreach>
             </if>
         </where>
         limit 1000;

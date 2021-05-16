@@ -18,8 +18,8 @@ public class DailyDateConverter {
                 .volume(kLine.getVolume())
                 .volumeRatio(kLine.getVolumeRatio())
                 .amount(kLine.getAmount())
-                .turn(kLine.getTurn())
-                .marketValue(null)
+                .turnoverRate(kLine.getTurn())
+                .totalMv(null)
                 .build();
     }
 }

@@ -45,11 +45,11 @@ public class DailyData {
     // 市盈率 TTM
     private BigDecimal peTtm;
     // 换手
-    private BigDecimal turn;
+    private BigDecimal turnoverRate;
     // 换手（自由流通股）
-    private BigDecimal turnF;
+    private BigDecimal turnoverRateF;
     // 总市值
-    private BigDecimal marketValue;
+    private BigDecimal totalMv;
     // 流通市值
     private BigDecimal circMv;
 }

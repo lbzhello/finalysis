@@ -72,7 +72,8 @@ create table k_line_1990_2019 partition of k_line
 alter table k_line_1990_2019
     add constraint pk_k_line_1990_2019 primary key (id);
 
-create unique index uk_k_line_1990_2019_stock_code_date on k_line_1990_2019 (stock_code, date);
+-- create unique index uk_k_line_1990_2019_stock_code_date on k_line_1990_2019 (stock_code, date);
+create unique index uk_k_line_1990_2019_date_stock_code on k_line_1990_2019 (date, stock_code);
 
 create table k_line_2020_2039 partition of k_line
     for values from ('2020-01-01') to ('2039-01-01');
@@ -80,7 +81,8 @@ create table k_line_2020_2039 partition of k_line
 alter table k_line_2020_2039
     add constraint pk_k_line_2020_2039 primary key (id);
 
-create unique index uk_k_line_2020_2039_stock_code_date on k_line_2020_2039 (stock_code, date);
+-- create unique index uk_k_line_2020_2039_stock_code_date on k_line_2020_2039 (stock_code, date);
+create unique index uk_k_line_2020_2039_date_stock_code on k_line_2020_2039 (date, stock_code);
 
 -- 股票日均线表
 create table if not exists avg_line
@@ -104,7 +106,8 @@ comment on column avg_line.avg is 'count 均值';
 alter table avg_line
     add constraint pk_avg_line primary key (id);
 
-create unique index uk_avg_line_stock_code_date_statistic on avg_line (stock_code, date, statistic);
+-- create unique index uk_avg_line_stock_code_date_statistic on avg_line (stock_code, date, statistic);
+create unique index uk_avg_line_date_stock_code_statistic on avg_line (date, stock_code, statistic);
 
 -- 2021-04-24
 -- 不同日期均线分割在不同表中
@@ -129,7 +132,8 @@ comment on column avg_line_5.avg is 'count 均值';
 alter table avg_line_5
     add constraint pk_avg_line_5 primary key (id);
 
-create unique index uk_avg_line_5_stock_code_date on avg_line_5 (stock_code, date);
+-- create unique index uk_avg_line_5_stock_code_date on avg_line_5 (stock_code, date);
+create unique index uk_avg_line_5_date_stock_code on avg_line_5 (date, stock_code);
 
 -- 股票 10 日均线表
 create table if not exists avg_line_10
@@ -151,7 +155,8 @@ comment on column avg_line_10.avg is 'count 均值';
 alter table avg_line_10
     add constraint pk_avg_line_10 primary key (id);
 
-create unique index uk_avg_line_10_stock_code_date on avg_line_10 (stock_code, date);
+-- create unique index uk_avg_line_10_stock_code_date on avg_line_10 (stock_code, date);
+create unique index uk_avg_line_10_date_stock_code on avg_line_10 (date, stock_code);
 
 -- 股票 20 日均线表
 create table if not exists avg_line_20
@@ -173,7 +178,8 @@ comment on column avg_line_20.avg is 'count 均值';
 alter table avg_line_20
     add constraint pk_avg_line_20 primary key (id);
 
-create unique index uk_avg_line_20_stock_code_date on avg_line_20 (stock_code, date);
+-- create unique index uk_avg_line_20_stock_code_date on avg_line_20 (stock_code, date);
+create unique index uk_avg_line_20_date_stock_code on avg_line_20 (date, stock_code);
 
 -- 股票 30 日均线表
 create table if not exists avg_line_30
@@ -195,7 +201,8 @@ comment on column avg_line_30.avg is 'count 均值';
 alter table avg_line_30
     add constraint pk_avg_line_30 primary key (id);
 
-create unique index uk_avg_line_30_stock_code_date on avg_line_30 (stock_code, date);
+-- create unique index uk_avg_line_30_stock_code_date on avg_line_30 (stock_code, date);
+create unique index uk_avg_line_30_date_stock_code on avg_line_30 (date, stock_code);
 
 -- 2021-05-01
 -- 均线视图，大区分查询应该基于此视图而不是具体的表

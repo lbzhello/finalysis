@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.analysis.mapper.DailyAnalysisMapper">
+    <select id="dailyData" resultType="xyz.liujin.finalysis.daily.dto.DailyData">
+        with daily_cte as (
+            select s.stock_code,
+                   s.stock_name,
+                   k.date,
+                   k.open,
+                   k.close,
+                   k.high,
+                   k.low,
+                   k.change,
+                   k.pct_change,
+                   k.volume,
+                   k.volume_ratio,
+                   k.amount,
+                   d.pe,
+                   d.pe_ttm,
+                   d.turnover_rate,
+                   d.turnover_rate_f,
+                   d.total_mv,
+                   d.circ_mv
+            from k_line_2020_2039 k
+            join daily_indicator d
+                on k.date = d.date and k.stock_code = d.stock_code
+            join stock s
+                on k.stock_code = s.stock_code
+                <if test="date != null">
+                    and k.date = #{date}
+                </if>
+                <if test="date == null and startDate != null">
+                    and k.date >= #{startDate}
+                </if>
+                <if test="date == null and endDate != null">
+                    and k.date &lt;= #{endDate}
+                </if>
+            <where>
+                <if test="minAmount != null">
+                    and k.amount >= #{minAmount}
+                </if>
+                <if test="limit != null">
+                    limit #{limit}
+                </if>
+                <if test="offset != null">
+                    offset #{offset}
+                </if>
+            </where>
+        )
+        select * from daily_cte
+    </select>
+</mapper>
