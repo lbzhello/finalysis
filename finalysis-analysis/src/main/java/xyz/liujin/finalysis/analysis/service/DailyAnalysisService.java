@@ -44,7 +44,8 @@ public class DailyAnalysisService {
         return avgLineService.fiveAboveTen(days, date)
                 .collectList()
                 .flux()
-                .flatMap(codes -> dailyData(DailyDateQo.builder()
+                .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :
+                        dailyData(DailyDateQo.builder()
                         // 日期默认当前最新数据
                         .date(ObjectUtils.firstNonNull(date, avgLineService.getLatestDate(), LocalDate.now()))
                         .codes(codes)
@@ -60,7 +61,8 @@ public class DailyAnalysisService {
         return avgLineService.fiveCrossTen(days, date)
                 .collectList()
                 .flux()
-                .flatMap(codes -> dailyData(DailyDateQo.builder()
+                .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :
+                        dailyData(DailyDateQo.builder()
                         .date(ObjectUtils.firstNonNull(date, avgLineService.getLatestDate(), LocalDate.now()))
                         .codes(codes)
                         .build()));
