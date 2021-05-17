@@ -47,6 +47,9 @@
                 </if>
             </where>
             <if test="page != null">
+                <if test="page.orderBy != null">
+                    order by ${page.orderBy}
+                </if>
                 <if test="page.limit != null">
                     limit #{page.limit}
                 </if>

@@ -6,10 +6,13 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
 import xyz.liujin.finalysis.analysis.mapper.DailyAnalysisMapper;
+import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
+import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -66,5 +69,32 @@ public class DailyAnalysisService {
                         .date(ObjectUtils.firstNonNull(date, avgLineService.getLatestDate(), LocalDate.now()))
                         .codes(codes)
                         .build()));
+    }
+
+    @Autowired
+    private DailyIndicatorService dailyIndicatorService;
+
+    /**
+     * 推荐股票
+     * @return
+     */
+    public Flux<DailyData> recommend() {
+        return avgLineService.fiveCrossTen(3, null)
+                .concatWith(avgLineService.fiveAboveTen(3, null))
+                .collectList()
+                .flux()
+                .flatMap(codes -> {
+                    return dailyData(DailyDateQo.builder()
+                            .date(dailyIndicatorService.getLatestDate())
+                            .codes(codes)
+                            .minAmount(BigDecimal.valueOf(1e9))
+                            .page(PageQo.builder()
+                                    .orderBy("volume_ratio desc")
+                                    .build())
+                            .build());
+                })
+                // todo 查找量比层大于 2？ 的股票
+                .map(dailyData -> dailyData)
+                .limitRequest(100);
     }
 }

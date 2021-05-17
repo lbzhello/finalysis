@@ -34,4 +34,6 @@ public class PageQo {
     @ApiModelProperty("偏移量")
     private Integer offset;
 
+    @ApiModelProperty("order by 从句")
+    private String orderBy;
 }
