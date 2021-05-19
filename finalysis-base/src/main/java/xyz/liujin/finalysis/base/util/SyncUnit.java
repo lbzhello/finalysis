@@ -45,7 +45,9 @@ public class SyncUnit {
                 }
             };
             new Thread(runnable).start();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
+            // 保证释放信号量
+            semaphore.release();
             logger.error("thread sleep interrupted", e);
         }
     }

@@ -62,6 +62,16 @@ public class Tushare {
     }
 
     /**
+     * 请求数据，直接获取请求体
+     * @return
+     */
+    public Flux<String> reqBody() {
+        return HttpUtils.postJSON(API)
+                .body(JSONUtil.toJsonStr(this))
+                .reqBody();
+    }
+
+    /**
      * params 参数模型抽象
      */
     public interface Params {
@@ -80,6 +90,14 @@ public class Tushare {
         }
 
         /**
+         * 根据接口名字发送请求，获取请求体
+         * @return
+         */
+        default Flux<String> reqBody() {
+            return reqBody("");
+        }
+
+        /**
          * 根据接口名字发送请求
          * @param fields 请求字段；示例 "name,list_status,list_date"
          * @return
@@ -92,6 +110,21 @@ public class Tushare {
                     .fields(fields)
                     .build()
                     .req();
+        }
+
+        /**
+         * 根据接口名字发送请求，获取请求体
+         * @param fields 请求字段；示例 "name,list_status,list_date"
+         * @return
+         */
+        default Flux<String> reqBody(String fields) {
+            return Tushare.builder()
+                    .token(TOKEN)
+                    .api_name(getApiName())
+                    .params(JSONUtil.parseObj(this))
+                    .fields(fields)
+                    .build()
+                    .reqBody();
         }
     }
 

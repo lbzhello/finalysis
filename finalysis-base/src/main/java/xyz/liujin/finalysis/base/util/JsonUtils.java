@@ -9,6 +9,12 @@ import java.util.List;
 import java.util.Map;
 
 public class JsonUtils {
+    /**
+     * csv 格式转 json
+     * @param fields
+     * @param items
+     * @return
+     */
     public static Flux<Map<String, ?>> parseCsv(@Nullable List<String> fields, @Nullable List<? extends List<?>> items) {
         if (CollectionUtil.isEmpty(fields) || CollectionUtil.isEmpty(items)) {
             return Flux.just();

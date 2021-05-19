@@ -79,6 +79,7 @@ public class DailyAnalysisService {
      * @return
      */
     public Flux<DailyData> recommend() {
+        // todo 增加底部放量的股票
         return avgLineService.fiveCrossTen(3, null)
                 .concatWith(avgLineService.fiveAboveTen(3, null))
                 .collectList()

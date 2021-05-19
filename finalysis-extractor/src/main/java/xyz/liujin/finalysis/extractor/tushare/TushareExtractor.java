@@ -40,10 +40,9 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
     public Flux<Stock> extractStock() {
         return Tushare.StockBasic.builder()
                 .build()
-                .req("symbol,name,list_status,list_date")
-                .flatMap(response -> {
+                .reqBody("symbol,name,list_status,list_date")
+                .flatMap(bodyStr -> {
                     try {
-                        String bodyStr = response.body().string();
                         // 获取映射文件
                         File file = ResourceUtils.getFile("classpath:tushare/stock_basic_2_stock.yml");
                         return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)
@@ -101,10 +100,9 @@ public class TushareExtractor implements StockExtractor, KLineExtractor {
                             .start_date(TushareUtil.formatDate(tuple.getT1()))
                             .end_date(TushareUtil.formatDate(tuple.getT2()))
                             .build()
-                            .req()
-                            .flatMap(response -> {
+                            .reqBody()
+                            .flatMap(body -> {
                                 try {
-                                    String body = response.body().string();
                                     // 获取映射文件
                                     File file = ResourceUtils.getFile("classpath:tushare/daily_2_k_line.yml");
                                     return CsvMapper.yamlFile(TushareResp.FIELDS_PATH, TushareResp.ITEMS_PATH, file)

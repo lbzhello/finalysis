@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class HttpUtils {
@@ -95,7 +96,27 @@ public class HttpUtils {
         }
 
         /**
+         * 获取请求体
+         * @return
+         */
+        public Flux<String> reqBody() {
+           return req().map(response -> {
+               try {
+                   try (ResponseBody responseBody = response.body()) {
+                       if (Objects.nonNull(responseBody)) {
+                           return responseBody.string();
+                       }
+                   }
+               } catch (Exception e) {
+                   logger.error("failed to get body str {}", response.toString());
+               }
+               return "";
+           });
+        }
+
+        /**
          * 转成 flux 异步流
+         * 注意使用后 ResponseBody 需要关闭
          * @return
          */
         public Flux<Response> req() {

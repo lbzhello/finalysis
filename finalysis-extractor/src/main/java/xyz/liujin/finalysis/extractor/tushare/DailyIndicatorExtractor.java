@@ -43,10 +43,9 @@ public class DailyIndicatorExtractor {
                             .start_date(TushareUtil.formatDate(tuple.getT1()))
                             .end_date(TushareUtil.formatDate(tuple.getT2()))
                             .build()
-                            .req("")
-                            .flatMap(response -> {
+                            .reqBody()
+                            .flatMap(bodyStr -> {
                                 try {
-                                    String bodyStr = response.body().string();
                                     TushareResp tushareResp = JSONUtil.toBean(bodyStr, TushareResp.class);
 
                                     if (TushareUtil.hasError(tushareResp)) {
