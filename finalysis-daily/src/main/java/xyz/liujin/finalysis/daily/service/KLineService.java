@@ -139,7 +139,6 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                         .le(KLine::getDate, _end)
                         .orderByDesc(KLine::getDate)
                         .list())
-                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .flatMap(kLines -> Flux.create((Consumer<FluxSink<KLine>>) sink -> {
                     // 计算量比，入库
                     for (int i = 0; i < kLines.size(); i++) {
@@ -156,6 +155,7 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
                     sink.complete();
                 }))
                 .collectList()
+                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(kLines -> {
                     updateBatchById(kLines, 100);
                 });

@@ -79,7 +79,6 @@ public class TushareManager {
             sink.next("start to extract stock. ");
 
             tushareExtractor.extractStock()
-                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     // 获取新增的股票
                     .filter(stock -> {
                         Stock exist = stockService.getById(stock.getStockCode());

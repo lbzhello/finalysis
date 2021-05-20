@@ -19,7 +19,7 @@ public class TaskPool implements Executor {
                 corePoolSize,
                 maxPoolSize,
                 1, TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(1),
+                new ArrayBlockingQueue<>(5000),
                 ThreadFactoryBuilder.create()
                         .setNamePrefix("finalysis-pool-")
                         .build()
