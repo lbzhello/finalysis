@@ -20,8 +20,8 @@ import java.util.List;
  * 获取股票每日指标
  */
 @Component
-public class DailyIndicatorExtractor {
-    private static Logger logger = LoggerFactory.getLogger(DailyIndicatorExtractor.class);
+public class TushareDailyIndicatorExtractor {
+    private static Logger logger = LoggerFactory.getLogger(TushareDailyIndicatorExtractor.class);
 
     // 用于控制方法执行速率 每分钟最多访问该接口200次
     private SyncUnit syncUnit = SyncUnit.create();

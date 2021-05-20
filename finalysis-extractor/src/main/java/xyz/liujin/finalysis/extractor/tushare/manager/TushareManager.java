@@ -15,8 +15,9 @@ import xyz.liujin.finalysis.daily.event.DailyIndicatorChangeEvent;
 import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
 import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 import xyz.liujin.finalysis.daily.service.KLineService;
-import xyz.liujin.finalysis.extractor.tushare.DailyIndicatorExtractor;
-import xyz.liujin.finalysis.extractor.tushare.TushareExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareDailyIndicatorExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareKLineExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareStockExtractor;
 import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.event.StockChangeEvent;
 import xyz.liujin.finalysis.stock.service.StockService;
@@ -35,7 +36,10 @@ public class TushareManager {
     private static Logger logger = LoggerFactory.getLogger(TushareManager.class);
 
     @Autowired
-    private TushareExtractor tushareExtractor;
+    private TushareStockExtractor tushareStockExtractor;
+
+    @Autowired
+    private TushareKLineExtractor tushareKLineExtractor;
 
     @Autowired
     private StockService stockService;
@@ -47,7 +51,7 @@ public class TushareManager {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private DailyIndicatorExtractor dailyIndicatorExtractor;
+    private TushareDailyIndicatorExtractor tushareDailyIndicatorExtractor;
 
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
@@ -74,11 +78,11 @@ public class TushareManager {
      */
     public Flux<String> refreshStock() {
         return Flux.create(sink -> {
-            logger.debug("start extract stock {}", tushareExtractor.getClass());
+            logger.debug("start extract stock {}", tushareKLineExtractor.getClass());
 
             sink.next("start to extract stock. ");
 
-            tushareExtractor.extractStock()
+            tushareStockExtractor.extractStock()
                     // 获取新增的股票
                     .filter(stock -> {
                         Stock exist = stockService.getById(stock.getStockCode());
@@ -114,7 +118,7 @@ public class TushareManager {
      */
     public Flux<String> refreshKLine(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> stockCodes) {
         return Flux.create(sink -> {
-            logger.debug("start refreshKLine. class: {}", tushareExtractor.getClass());
+            logger.debug("start refreshKLine. class: {}", tushareKLineExtractor.getClass());
 
             // yyyy-MM-dd
             LocalDate startDate = Optional.ofNullable(start).orElseGet(() -> {
@@ -132,7 +136,7 @@ public class TushareManager {
             sink.next("start to extract k line. ");
             logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
-            tushareExtractor.extractKLine(startDate, endDate, codes)
+            tushareKLineExtractor.extractKLine(startDate, endDate, codes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
@@ -167,7 +171,7 @@ public class TushareManager {
      */
     public Flux<String> refreshDailyIndicator(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
         return Flux.create(sink -> {
-            logger.debug("start refresh daily indicator {}", tushareExtractor.getClass());
+            logger.debug("start refresh daily indicator {}", tushareKLineExtractor.getClass());
             sink.next("start to extract daily indicator");
             // 默认从数据库获取最新日期的下一个日期
             LocalDate startDate = Optional.ofNullable(start).orElse(dailyIndicatorService.getNextDate());
@@ -178,7 +182,7 @@ public class TushareManager {
                     .map(Stock::getStockCode)
                     .collect(Collectors.toList());
 
-            dailyIndicatorExtractor.extractDailyIndicator(startDate, endDate, stockCodes)
+            tushareDailyIndicatorExtractor.extractDailyIndicator(startDate, endDate, stockCodes)
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .parallel(TaskPool.availableProcessors())
                     .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))

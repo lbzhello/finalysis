@@ -11,10 +11,10 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = DailyIndicatorExtractor.class)
-public class DailyIndicatorExtractorTest {
+@SpringBootTest(classes = TushareDailyIndicatorExtractor.class)
+public class TushareDailyIndicatorExtractorTest {
     @Autowired
-    private DailyIndicatorExtractor dailyIndicatorExtractor;
+    private TushareDailyIndicatorExtractor dailyIndicatorExtractor;
 
     @Test
     public void extractDailyIndicator() {

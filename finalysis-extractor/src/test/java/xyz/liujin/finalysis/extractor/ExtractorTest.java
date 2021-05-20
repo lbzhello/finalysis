@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.lang.NonNull;
 import org.springframework.web.reactive.function.client.WebClient;
 import xyz.liujin.finalysis.extractor.szse.SzseConst;
-import xyz.liujin.finalysis.extractor.tushare.TushareExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareKLineExtractor;
+import xyz.liujin.finalysis.extractor.tushare.TushareStockExtractor;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -24,8 +25,9 @@ public class ExtractorTest {
 
     @Test
     public void tushareStockTest() {
-        TushareExtractor tushareExtractor = new TushareExtractor();
-        tushareExtractor.extractStock()
+        TushareKLineExtractor tushareKLineExtractor = new TushareKLineExtractor();
+        TushareStockExtractor tushareStockExtractor = new TushareStockExtractor();
+        tushareStockExtractor.extractStock()
                 .subscribe(it -> {
                     System.out.println(it);
                 });
