@@ -37,7 +37,7 @@ public class TushareSchedule {
     public void refreshDaily() {
         logger.debug("auto refresh data daily {}", LocalDateTime.now());
 
-        tushareManager.refreshAll();
+        tushareManager.refreshAll(null, null, null);
     }
 
 

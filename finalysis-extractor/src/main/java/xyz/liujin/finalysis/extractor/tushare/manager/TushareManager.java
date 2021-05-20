@@ -56,10 +56,16 @@ public class TushareManager {
      * 自动更新股票数据
      * 1. 更新股票数据
      * 2. 更新 K 线数据
+     * 3. 更新每日指标数据
+     * @param start 开始日期；默认数据库最新
+     * @param end   结束日期；默认当日
+     * @param codes 股票代码列表；默认所有
      * @return
      */
-    public Flux<String> refreshAll() {
-        return Flux.merge(refreshStock(), refreshKLine(null, null, null), refreshDailyIndicator(null, null, null));
+    public Flux<String> refreshAll(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
+        return Flux.merge(refreshStock(),
+                refreshKLine(start, end, codes),
+                refreshDailyIndicator(start, end, codes));
     }
 
     /**

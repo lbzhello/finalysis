@@ -21,8 +21,15 @@ public class ExtractorController {
 
     @ApiOperation(value = "启动所有任务", notes = "1. 更新股票数据；2. 更新 k 线数据；")
     @GetMapping("all")
-    public Flux<String> all() {
-        return tushareManager.refreshAll();
+    public Flux<String> all(@ApiParam(value = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2021-02-12")
+                            @RequestParam(name = "start", required = false) LocalDate start,
+
+                            @ApiParam(value = "结束日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
+                            @RequestParam(name = "end", required = false) LocalDate end,
+
+                            @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
+                            @RequestParam(name = "codes", required = false) List<String> codes) {
+        return tushareManager.refreshAll(start, end, codes);
     }
 
     @ApiOperation("更新股票数据")
