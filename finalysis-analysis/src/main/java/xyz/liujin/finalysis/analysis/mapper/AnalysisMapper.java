@@ -5,7 +5,7 @@ import xyz.liujin.finalysis.daily.dto.DailyData;
 
 import java.util.List;
 
-public interface DailyAnalysisMapper {
+public interface AnalysisMapper {
     /**
      * 获取股票日数据
      * @param dailyDateQo

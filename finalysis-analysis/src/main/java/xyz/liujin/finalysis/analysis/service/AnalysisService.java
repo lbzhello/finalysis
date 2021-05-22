@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
-import xyz.liujin.finalysis.analysis.mapper.DailyAnalysisMapper;
+import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -17,9 +17,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Service
-public class DailyAnalysisService {
+public class AnalysisService {
     @Autowired
-    private DailyAnalysisMapper dailyAnalysisMapper;
+    private AnalysisMapper analysisMapper;
 
     @Autowired
     private AvgLineService avgLineService;
@@ -30,7 +30,7 @@ public class DailyAnalysisService {
      * @return
      */
     public Flux<DailyData> dailyData(DailyDateQo dailyDateQo) {
-        List<DailyData> dailyData = dailyAnalysisMapper.dailyData(dailyDateQo);
+        List<DailyData> dailyData = analysisMapper.dailyData(dailyDateQo);
         if (CollectionUtil.isEmpty(dailyData)) {
             return Flux.empty();
         }
