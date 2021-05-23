@@ -47,7 +47,7 @@ public class AnalysisService {
      */
     public Flux<DailyData> recommend() {
         // 获取最近 10 天内，存在量比大于 2 的股票
-        Set<String> heavenVolRatioCodes = Set.copyOf(heavenVolumeRatio(10, BigDecimal.valueOf(2)));
+        Set<String> heavenVolRatioCodes = Set.copyOf(heavenVolumeRatio(10, BigDecimal.valueOf(1.5)));
         return avgLineService.fiveCrossTen(3, null)
                 .concatWith(avgLineService.fiveAboveTen(3, null))
                 .collectList()
