@@ -15,6 +15,7 @@ public enum  AnalysisOpt {
     FIVE_CROSS_TEN("FIVE_CROSS_TEN", "5 日线突破 10 日线"),
     FIVE_ABOVE_TEN("FIVE_ABOVE_TEN", "5 日线在 10 日线上方"),
     HEAVY_VOL("HEAVY_VOL", "放量"),
+    HEAVY_VOL_5("HEAVY_VOL_5", "5 内存在放量"),
     NIL("NIL", "无"),
     ;
 

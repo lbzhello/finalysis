@@ -32,6 +32,11 @@ public class AnalysisController {
         return analysisService.dailyData(req);
     }
 
+    @GetMapping("heaven-volume-ratio")
+    public Flux<DailyData> heavenVolumeRatio() {
+        return analysisService.heavenVolumeRatio(2);
+    }
+
     @ApiOperation("获取 5 日线突破十日线的股票")
     @GetMapping("5-cross-10")
     public Flux<DailyData> fiveCrossTen(

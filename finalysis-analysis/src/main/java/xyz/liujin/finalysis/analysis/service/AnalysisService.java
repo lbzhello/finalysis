@@ -37,6 +37,44 @@ public class AnalysisService {
         return Flux.fromIterable(dailyData);
     }
 
+    @Autowired
+    private DailyIndicatorService dailyIndicatorService;
+
+    /**
+     * 推荐股票
+     * @return
+     */
+    public Flux<DailyData> recommend() {
+        // todo 增加底部放量的股票
+        return avgLineService.fiveCrossTen(3, null)
+                .concatWith(avgLineService.fiveAboveTen(3, null))
+                .collectList()
+                .flux()
+                .flatMap(codes -> {
+                    return dailyData(DailyDateQo.builder()
+                            .date(dailyIndicatorService.getLatestDate())
+                            .codes(codes)
+                            .minAmount(BigDecimal.valueOf(1e9))
+                            .page(PageQo.builder()
+                                    .orderBy("volume_ratio desc")
+                                    .build())
+                            .build());
+                })
+                // todo 查找量比层大于 2？ 的股票
+                .map(dailyData -> dailyData)
+                .limitRequest(100);
+    }
+
+    /**
+     * 最近放量的股票
+     * @param days 最近天数
+     * @return
+     */
+    public Flux<DailyData> heavenVolumeRatio(Integer days) {
+        List<String> list = analysisMapper. heavenVolumeRatio(LocalDate.of(2021, 5, 21));
+        return null;
+    }
+
     /**
      * 5 日线超 10 日线股票详情信息
      * @param days
@@ -71,31 +109,5 @@ public class AnalysisService {
                         .build()));
     }
 
-    @Autowired
-    private DailyIndicatorService dailyIndicatorService;
 
-    /**
-     * 推荐股票
-     * @return
-     */
-    public Flux<DailyData> recommend() {
-        // todo 增加底部放量的股票
-        return avgLineService.fiveCrossTen(3, null)
-                .concatWith(avgLineService.fiveAboveTen(3, null))
-                .collectList()
-                .flux()
-                .flatMap(codes -> {
-                    return dailyData(DailyDateQo.builder()
-                            .date(dailyIndicatorService.getLatestDate())
-                            .codes(codes)
-                            .minAmount(BigDecimal.valueOf(1e9))
-                            .page(PageQo.builder()
-                                    .orderBy("volume_ratio desc")
-                                    .build())
-                            .build());
-                })
-                // todo 查找量比层大于 2？ 的股票
-                .map(dailyData -> dailyData)
-                .limitRequest(100);
-    }
 }
