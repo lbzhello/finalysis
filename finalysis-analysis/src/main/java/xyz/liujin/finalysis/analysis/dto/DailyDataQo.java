@@ -28,6 +28,8 @@ public class DailyDataQo {
     private List<String> codes;
     @ApiModelProperty("最小成交额")
     private BigDecimal minAmount;
+    @ApiModelProperty("最小量比")
+    private BigDecimal minVolRatio;
     @ApiModelProperty("分页信息")
     private PageQo page;
 }

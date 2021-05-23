@@ -15,6 +15,7 @@ import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class AnalysisService {
@@ -45,12 +46,14 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> recommend() {
-        // todo 增加底部放量的股票
+        // 获取最近 10 天内，存在量比大于 2 的股票
+        Set<String> heavenVolRatioCodes = Set.copyOf(heavenVolumeRatio(10, BigDecimal.valueOf(2)));
         return avgLineService.fiveCrossTen(3, null)
                 .concatWith(avgLineService.fiveAboveTen(3, null))
                 .collectList()
                 .flux()
                 .flatMap(codes -> {
+                    boolean b = codes.retainAll(heavenVolRatioCodes);
                     return dailyData(DailyDataQo.builder()
                             .date(dailyIndicatorService.getLatestDate())
                             .codes(codes)
@@ -60,19 +63,36 @@ public class AnalysisService {
                                     .build())
                             .build());
                 })
-                // todo 查找量比层大于 2？ 的股票
                 .map(dailyData -> dailyData)
                 .limitRequest(100);
     }
 
     /**
-     * 最近放量的股票
+     * 最近 days 天内存在量比大于等于 minVolRatio 的股票详情
      * @param days 最近天数
      * @return
      */
-    public Flux<DailyData> heavenVolumeRatio(Integer days) {
-        List<String> list = analysisMapper. heavenVolumeRatio(LocalDate.of(2021, 5, 21));
-        return null;
+    public Flux<DailyData> heavenVolumeRatioDetail(int days, BigDecimal minVolRatio) {
+        return dailyData(DailyDataQo.builder()
+                .date(dailyIndicatorService.getLatestDate())
+                .codes(heavenVolumeRatio(days, minVolRatio))
+                .page(PageQo.builder()
+                        .orderBy("volume_ratio desc")
+                        .build())
+                .build());
+    }
+
+    /**
+     * 最近 days 天内存在量比大于等于 minVolRatio 的股票
+     * @param days 最近天数
+     * @return
+     */
+    public List<String> heavenVolumeRatio(int days, BigDecimal minVolRatio) {
+        // 计算天数区间
+        LocalDate end  = dailyIndicatorService.getLatestDate();
+        LocalDate start = end.minusDays(days - 1);
+
+        return analysisMapper.heavenVolumeRatio(start, end, minVolRatio);
     }
 
     /**

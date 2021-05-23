@@ -4,6 +4,7 @@ import org.apache.ibatis.annotations.Param;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,5 +20,7 @@ public interface AnalysisMapper {
      * 最近（几天内放量的股票）
      * @return
      */
-    List<String> heavenVolumeRatio(@Param("startDate") LocalDate startDate);
+    List<String> heavenVolumeRatio(@Param("startDate") LocalDate startDate,
+                                   @Param("endDate") LocalDate endDate,
+                                   @Param("minVolRatio")BigDecimal minVolRatio);
 }

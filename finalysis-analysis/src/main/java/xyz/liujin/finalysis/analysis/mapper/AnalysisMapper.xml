@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xyz.liujin.finalysis.analysis.mapper.AnalysisMapper">
-    <select id="heavenVolumeRatio">
+    <select id="heavenVolumeRatio" resultType="java.lang.String">
         select distinct stock_code from daily_indicator
         <where>
             <if test="startDate != null">
@@ -10,11 +10,10 @@
             <if test="endDate != null">
                 and date &lt;= #{endDate}
             </if>
-            <if test="volumeRatio != null">
-                and volume_ratio >= #{volumeRatio}
+            <if test="minVolRatio != null">
+                and volume_ratio >= #{minVolRatio}
             </if>
         </where>
-        order by volume_ratio desc
     </select>
     <select id="dailyData" resultType="xyz.liujin.finalysis.daily.dto.DailyData">
         with daily_cte as (
@@ -65,6 +64,53 @@
         select * from daily_cte
         <include refid="page"/>
     </select>
+    <sql id="daily_cte">
+        with daily_cte as (
+            select s.stock_code,
+                   s.stock_name,
+                   k.date,
+                   k.open,
+                   k.close,
+                   k.high,
+                   k.low,
+                   k.change,
+                   k.pct_change,
+                   k.volume,
+                   k.volume_ratio,
+                   k.amount,
+                   d.pe,
+                   d.pe_ttm,
+                   d.turnover_rate,
+                   d.turnover_rate_f,
+                   d.total_mv,
+                   d.circ_mv
+            from k_line_2020_2039 k
+            join daily_indicator d
+                on k.date = d.date and k.stock_code = d.stock_code
+            join stock s
+                on k.stock_code = s.stock_code
+                <if test="date != null">
+                    and k.date = #{date}
+                </if>
+                <if test="date == null and startDate != null">
+                    and k.date >= #{startDate}
+                </if>
+                <if test="date == null and endDate != null">
+                    and k.date &lt;= #{endDate}
+                </if>
+            <where>
+                <if test="codes != null and codes.size() > 0">
+                    and s.stock_code in
+                    <foreach collection="codes" item="code" open="(" separator="," close=")">
+                        #{code}
+                    </foreach>
+                </if>
+                <if test="minAmount != null">
+                    and k.amount >= #{minAmount}
+                </if>
+            </where>
+        )
+    </sql>
     <!-- 分页查询 -->
     <sql id="page">
         <if test="page != null">

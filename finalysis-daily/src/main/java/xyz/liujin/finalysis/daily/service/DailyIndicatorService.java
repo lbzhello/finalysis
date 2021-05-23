@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.daily.mapper.DailyIndicatorMapper;
 
@@ -28,11 +27,11 @@ public class DailyIndicatorService extends ServiceImpl<DailyIndicatorMapper, Dai
     }
 
     /**
-     * 获取数据库最新的日期，默认年初第一天
+     * 获取数据库最新的日期，当天
      * @return
      */
     public LocalDate getLatestDate() {
-        return Optional.ofNullable(getBaseMapper().getLatestDate()).orElse(DateUtils.beginOfYear());
+        return Optional.ofNullable(getBaseMapper().getLatestDate()).orElse(LocalDate.now());
     }
 
     /**

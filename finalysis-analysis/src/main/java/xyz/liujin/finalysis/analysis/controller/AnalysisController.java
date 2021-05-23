@@ -8,8 +8,10 @@ import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
+import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Optional;
 
@@ -32,9 +34,16 @@ public class AnalysisController {
         return analysisService.dailyData(req);
     }
 
+    @ApiOperation("获取最近放量的股票")
     @GetMapping("heaven-volume-ratio")
-    public Flux<DailyData> heavenVolumeRatio() {
-        return analysisService.heavenVolumeRatio(2);
+    public Flux<DailyData> heavenVolumeRatio(
+            @ApiParam("统计天数；默认 5")
+            @RequestParam(name = "days", required = false) Integer days,
+            @ApiParam("统计天数内存在的最小量比")
+            @RequestParam(name = "minVolRatio", required = false) BigDecimal minVolRatio) {
+        days = ObjectUtils.firstNonNull(days, 5);
+        minVolRatio = ObjectUtils.firstNonNull(minVolRatio, BigDecimal.valueOf(2));
+        return analysisService.heavenVolumeRatioDetail(days, minVolRatio);
     }
 
     @ApiOperation("获取 5 日线突破十日线的股票")
