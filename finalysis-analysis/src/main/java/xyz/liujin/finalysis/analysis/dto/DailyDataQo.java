@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class DailyDateQo {
+public class DailyDataQo {
     @ApiModelProperty("当前日期")
     private LocalDate date;
     @ApiModelProperty("开始日期；当前日期设定后无效")

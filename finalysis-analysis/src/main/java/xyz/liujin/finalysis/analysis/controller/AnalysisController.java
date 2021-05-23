@@ -6,7 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
+import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
@@ -28,7 +28,7 @@ public class AnalysisController {
 
     @ApiOperation("获取股票日数据")
     @PostMapping("daily")
-    public Flux<DailyData> dailyData(@RequestBody DailyDateQo req) {
+    public Flux<DailyData> dailyData(@RequestBody DailyDataQo req) {
         return analysisService.dailyData(req);
     }
 

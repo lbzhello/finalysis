@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.DailyDateQo;
+import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -26,11 +26,11 @@ public class AnalysisService {
 
     /**
      * 股票日指标详情信息
-     * @param dailyDateQo
+     * @param dailyDataQo
      * @return
      */
-    public Flux<DailyData> dailyData(DailyDateQo dailyDateQo) {
-        List<DailyData> dailyData = analysisMapper.dailyData(dailyDateQo);
+    public Flux<DailyData> dailyData(DailyDataQo dailyDataQo) {
+        List<DailyData> dailyData = analysisMapper.dailyData(dailyDataQo);
         if (CollectionUtil.isEmpty(dailyData)) {
             return Flux.empty();
         }
@@ -51,7 +51,7 @@ public class AnalysisService {
                 .collectList()
                 .flux()
                 .flatMap(codes -> {
-                    return dailyData(DailyDateQo.builder()
+                    return dailyData(DailyDataQo.builder()
                             .date(dailyIndicatorService.getLatestDate())
                             .codes(codes)
                             .minAmount(BigDecimal.valueOf(1e9))
@@ -86,7 +86,7 @@ public class AnalysisService {
                 .collectList()
                 .flux()
                 .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :
-                        dailyData(DailyDateQo.builder()
+                        dailyData(DailyDataQo.builder()
                         // 日期默认当前最新数据
                         .date(ObjectUtils.firstNonNull(date, avgLineService.getLatestDate(), LocalDate.now()))
                         .codes(codes)
@@ -103,7 +103,7 @@ public class AnalysisService {
                 .collectList()
                 .flux()
                 .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :
-                        dailyData(DailyDateQo.builder()
+                        dailyData(DailyDataQo.builder()
                         .date(ObjectUtils.firstNonNull(date, avgLineService.getLatestDate(), LocalDate.now()))
                         .codes(codes)
                         .build()));
