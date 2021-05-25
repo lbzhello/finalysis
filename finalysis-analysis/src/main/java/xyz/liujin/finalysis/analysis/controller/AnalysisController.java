@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
+import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -23,9 +24,9 @@ public class AnalysisController {
     private AnalysisService analysisService;
 
     @ApiOperation("推荐股票")
-    @GetMapping("recommend")
-    public Flux<DailyData> recommend() {
-        return analysisService.recommend();
+    @PostMapping("recommend")
+    public Flux<DailyData> recommend(@RequestBody RecommendQo req) {
+        return analysisService.recommend(req);
     }
 
     @ApiOperation("获取股票日数据")
@@ -38,9 +39,9 @@ public class AnalysisController {
     @GetMapping("heaven-volume-ratio")
     public Flux<DailyData> heavenVolumeRatio(
             @ApiParam("统计天数；默认 5")
-            @RequestParam(name = "days", required = false) Integer days,
+            @RequestParam(name = "days", defaultValue = "5") Integer days,
             @ApiParam("统计天数内存在的最小量比")
-            @RequestParam(name = "minVolRatio", required = false) BigDecimal minVolRatio) {
+            @RequestParam(name = "minVolRatio", defaultValue = "2") BigDecimal minVolRatio) {
         days = ObjectUtils.firstNonNull(days, 5);
         minVolRatio = ObjectUtils.firstNonNull(minVolRatio, BigDecimal.valueOf(2));
         return analysisService.heavenVolumeRatioDetail(days, minVolRatio);

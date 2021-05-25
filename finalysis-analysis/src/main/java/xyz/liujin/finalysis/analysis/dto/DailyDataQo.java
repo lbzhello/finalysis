@@ -18,17 +18,17 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DailyDataQo {
-    @ApiModelProperty("当前日期")
+    @ApiModelProperty(value = "当前日期")
     private LocalDate date;
-    @ApiModelProperty("开始日期；当前日期设定后无效")
+    @ApiModelProperty(value = "开始日期；当前日期设定后无效")
     private LocalDate startDate;
-    @ApiModelProperty("结束日期；当前日期设定后无效")
+    @ApiModelProperty(value = "结束日期；当前日期设定后无效")
     private LocalDate endDate;
-    @ApiModelProperty("股票代码")
+    @ApiModelProperty(value = "股票代码", hidden = true)
     private List<String> codes;
-    @ApiModelProperty("最小成交额")
+    @ApiModelProperty(value = "最小成交额", example = "1e9")
     private BigDecimal minAmount;
-    @ApiModelProperty("最小量比")
+    @ApiModelProperty(value = "最小量比", example = "")
     private BigDecimal minVolRatio;
     @ApiModelProperty("分页信息")
     private PageQo page;

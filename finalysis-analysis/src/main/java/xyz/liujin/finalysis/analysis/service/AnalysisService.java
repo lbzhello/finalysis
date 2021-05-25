@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
+import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -45,7 +46,7 @@ public class AnalysisService {
      * 推荐股票
      * @return
      */
-    public Flux<DailyData> recommend() {
+    public Flux<DailyData> recommend(RecommendQo recommendQo) {
         // 获取最近 10 天内，存在量比大于 2 的股票
         Set<String> heavenVolRatioCodes = Set.copyOf(heavenVolumeRatio(10, BigDecimal.valueOf(1.5)));
         return avgLineService.fiveCrossTen(3, null)

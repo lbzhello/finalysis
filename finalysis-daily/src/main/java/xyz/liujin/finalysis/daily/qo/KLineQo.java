@@ -13,10 +13,10 @@ import java.util.List;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class KLineQo {
-    @ApiModelProperty("股票代码；可空")
+    @ApiModelProperty(value = "股票代码；可空", hidden = true)
     private String code;
 
-    @ApiModelProperty("股票代码列表；可空；code 存在时不生效")
+    @ApiModelProperty(value = "股票代码列表；可空；code 存在时不生效", hidden = true)
     private List<String> codes;
 
     @ApiModelProperty("K 线日期；可空")

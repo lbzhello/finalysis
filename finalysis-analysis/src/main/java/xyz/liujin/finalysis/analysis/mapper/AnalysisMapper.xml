@@ -59,6 +59,9 @@
                 <if test="minAmount != null">
                     and k.amount >= #{minAmount}
                 </if>
+                <if test="minVolRatio != null">
+                    and k.volume_ratio >= #{minVolRatio}
+                </if>
             </where>
         )
         select * from daily_cte
