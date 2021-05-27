@@ -5,8 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
+import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
 import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
+import xyz.liujin.finalysis.analysis.strategy.AnalysisStrategy;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -25,6 +27,9 @@ public class AnalysisService {
 
     @Autowired
     private AvgLineService avgLineService;
+
+    @Autowired
+    private AnalysisStrategy analysisStrategy;
 
     /**
      * 股票日指标详情信息
@@ -47,8 +52,13 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> recommend(RecommendQo recommendQo) {
+//        Set<AnalysisStrategy> analysisStrategies = AnalysisStrategy.findStrategies(recommendQo);
+//        analysisStrategies.stream()
+//                .map(analysisStrategy -> {
+//                    List<String> stocks = analysisStrategy.findStocks(recommendQo);
+//                })
         // 获取最近 10 天内，存在量比大于 2 的股票
-        Set<String> heavenVolRatioCodes = Set.copyOf(heavenVolumeRatio(10, BigDecimal.valueOf(1.5)));
+        Set<String> heavenVolRatioCodes = Set.copyOf(analysisStrategy.heavenVolumeRatio(recommendQo.getHeavenVolRatio()));
         return avgLineService.fiveCrossTen(3, null)
                 .concatWith(avgLineService.fiveAboveTen(3, null))
                 .collectList()
@@ -76,25 +86,28 @@ public class AnalysisService {
     public Flux<DailyData> heavenVolumeRatioDetail(int days, BigDecimal minVolRatio) {
         return dailyData(DailyDataQo.builder()
                 .date(dailyIndicatorService.getLatestDate())
-                .codes(heavenVolumeRatio(days, minVolRatio))
+                .codes(analysisStrategy.heavenVolumeRatio(HeavenVolRatioQo.builder()
+                        .days(days)
+                        .minVolRatio(minVolRatio)
+                        .build()))
                 .page(PageQo.builder()
                         .orderBy("volume_ratio desc")
                         .build())
                 .build());
     }
 
-    /**
-     * 最近 days 天内存在量比大于等于 minVolRatio 的股票
-     * @param days 最近天数
-     * @return
-     */
-    public List<String> heavenVolumeRatio(int days, BigDecimal minVolRatio) {
-        // 计算天数区间
-        LocalDate end  = dailyIndicatorService.getLatestDate();
-        LocalDate start = end.minusDays(days - 1);
-
-        return analysisMapper.heavenVolumeRatio(start, end, minVolRatio);
-    }
+//    /**
+//     * 最近 days 天内存在量比大于等于 minVolRatio 的股票
+//     * @param days 最近天数
+//     * @return
+//     */
+//    public List<String> heavenVolumeRatio(int days, BigDecimal minVolRatio) {
+//        // 计算天数区间
+//        LocalDate end  = dailyIndicatorService.getLatestDate();
+//        LocalDate start = end.minusDays(days - 1);
+//
+//        return analysisMapper.heavenVolumeRatio(start, end, minVolRatio);
+//    }
 
     /**
      * 5 日线超 10 日线股票详情信息

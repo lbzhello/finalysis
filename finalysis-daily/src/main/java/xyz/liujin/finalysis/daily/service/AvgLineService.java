@@ -57,7 +57,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param days 最大突破天数，最多十天
      * @return
      */
-    public Flux<String> fiveCrossTen(Integer days, LocalDate date) {
+    public Flux<String> fiveCrossTen(Integer days, @Nullable LocalDate date) {
         int _days = Math.min(days, 10);
         // 当前天数 5 日线大于等于 10 日线
         LocalDate end = ObjectUtils.firstNonNull(date, getLatestDate(), LocalDate.now());
