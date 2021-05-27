@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.analysis.mapper;
 
 import org.apache.ibatis.annotations.Param;
+import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
@@ -22,5 +23,6 @@ public interface AnalysisMapper {
      */
     List<String> heavenVolumeRatio(@Param("startDate") LocalDate startDate,
                                    @Param("endDate") LocalDate endDate,
-                                   @Param("minVolRatio")BigDecimal minVolRatio);
+                                   @Param("minVolRatio") BigDecimal minVolRatio,
+                                   @Nullable @Param("codes") List<String> codes);
 }

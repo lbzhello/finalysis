@@ -56,7 +56,7 @@
             <if test="end != null">
                 and date &lt;= #{end}
             </if>
-            <if test="stockCodes != null">
+            <if test="stockCodes != null and stockCodes.size() > 0">
                 and stock_code in
                 <foreach collection="stockCodes" item="code"
                          open="(" separator="," close=")">

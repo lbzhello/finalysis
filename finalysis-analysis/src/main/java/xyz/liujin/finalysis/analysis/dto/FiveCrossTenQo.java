@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @ApiModel("日线突破指标")
 @Data
@@ -20,4 +21,7 @@ public class FiveCrossTenQo {
 
     @ApiModelProperty(value = "当前日期，默认数据库最新", hidden = true)
     private LocalDate date;
+
+    @ApiModelProperty(value = "需要统计的股票列表", hidden = true)
+    private List<String> codes;
 }

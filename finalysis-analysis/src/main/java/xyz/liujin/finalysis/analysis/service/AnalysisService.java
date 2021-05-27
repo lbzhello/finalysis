@@ -17,8 +17,10 @@ import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @Service
 public class AnalysisService {
@@ -52,29 +54,45 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> recommend(RecommendQo recommendQo) {
-//        Set<AnalysisStrategy> analysisStrategies = AnalysisStrategy.findStrategies(recommendQo);
-//        analysisStrategies.stream()
-//                .map(analysisStrategy -> {
-//                    List<String> stocks = analysisStrategy.findStocks(recommendQo);
-//                })
         // 获取最近 10 天内，存在量比大于 2 的股票
-        Set<String> heavenVolRatioCodes = Set.copyOf(analysisStrategy.heavenVolumeRatio(recommendQo.getHeavenVolRatio()));
-        return avgLineService.fiveCrossTen(3, null)
-                .concatWith(avgLineService.fiveAboveTen(3, null))
-                .collectList()
-                .flux()
-                .flatMap(codes -> {
-                    boolean b = codes.retainAll(heavenVolRatioCodes);
-                    return dailyData(DailyDataQo.builder()
-                            .date(dailyIndicatorService.getLatestDate())
-                            .codes(codes)
-                            .minAmount(BigDecimal.valueOf(1e9))
-                            .page(PageQo.builder()
-                                    .orderBy("volume_ratio desc")
-                                    .build())
-                            .build());
+        List<Flux<String>> recommends = new ArrayList<>();
+        // 放量指标
+        if (Objects.nonNull(recommendQo.getHeavenVolRatio())) {
+            recommends.add(analysisStrategy.heavenVolumeRatio(recommendQo.getHeavenVolRatio()));
+        }
+        // 日线突破指标、上升趋势指标取并集
+        if (Objects.nonNull(recommendQo.getFiveCrossTen()) && Objects.nonNull(recommendQo.getFiveAboveTen())) {
+            recommends.add(analysisStrategy.fiveCrossTen(recommendQo.getFiveCrossTen())
+                    .concatWith(analysisStrategy.fiveAboveTen(recommendQo.getFiveAboveTen()))
+                    .collectList()
+                    .flux()
+                    .flatMap(codes -> Flux.fromIterable(new HashSet<>(codes))));
+        } else {
+            // 日线突破
+            if (Objects.nonNull(recommendQo.getFiveCrossTen())) {
+                recommends.add(analysisStrategy.fiveCrossTen(recommendQo.getFiveCrossTen()));
+            }
+            // 上升趋势
+            if (Objects.nonNull(recommendQo.getFiveAboveTen())) {
+                recommends.add(analysisStrategy.fiveAboveTen(recommendQo.getFiveAboveTen()));
+            }
+        }
+        return Flux.fromIterable(recommends)
+                .flatMap(codeFlux -> codeFlux.collectList().flux())
+                // 取交集，即满足所有指标的股票
+                .reduce((left, right) -> {
+                    left.retainAll(right);
+                    return left;
                 })
-                .map(dailyData -> dailyData)
+                .flux()
+                .flatMap(codes -> dailyData(DailyDataQo.builder()
+                        .date(dailyIndicatorService.getLatestDate())
+                        .codes(codes)
+                        .minAmount(BigDecimal.valueOf(1e9))
+                        .page(PageQo.builder()
+                                .orderBy("volume_ratio desc")
+                                .build())
+                        .build()))
                 .limitRequest(100);
     }
 
@@ -84,16 +102,22 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> heavenVolumeRatioDetail(int days, BigDecimal minVolRatio) {
-        return dailyData(DailyDataQo.builder()
-                .date(dailyIndicatorService.getLatestDate())
-                .codes(analysisStrategy.heavenVolumeRatio(HeavenVolRatioQo.builder()
-                        .days(days)
-                        .minVolRatio(minVolRatio)
-                        .build()))
-                .page(PageQo.builder()
-                        .orderBy("volume_ratio desc")
-                        .build())
-                .build());
+        return analysisStrategy.heavenVolumeRatio(HeavenVolRatioQo.builder()
+                .days(days)
+                .minVolRatio(minVolRatio)
+                .build())
+                .collectList()
+                .flux()
+                .flatMap(codes -> {
+                    return dailyData(DailyDataQo.builder()
+                            .date(dailyIndicatorService.getLatestDate())
+                            .codes(codes)
+                            .page(PageQo.builder()
+                                    .orderBy("volume_ratio desc")
+                                    .build())
+                            .build());
+                });
+
     }
 
 //    /**
@@ -133,7 +157,7 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> fiveCrossTenDetail(Integer days, LocalDate date) {
-        return avgLineService.fiveCrossTen(days, date)
+        return avgLineService.fiveCrossTen(days, date, null)
                 .collectList()
                 .flux()
                 .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :

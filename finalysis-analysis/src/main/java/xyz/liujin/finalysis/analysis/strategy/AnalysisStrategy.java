@@ -3,6 +3,7 @@ package xyz.liujin.finalysis.analysis.strategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.FiveAboveTenQo;
 import xyz.liujin.finalysis.analysis.dto.FiveCrossTenQo;
 import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
@@ -43,24 +44,39 @@ public class AnalysisStrategy {
      * 最近 days 天内存在量比大于等于 minVolRatio 的股票
      * @return
      */
-    public List<String> heavenVolumeRatio(@Nullable HeavenVolRatioQo heavenVolRatioQo) {
+    public Flux<String> heavenVolumeRatio(@Nullable HeavenVolRatioQo heavenVolRatioQo) {
         int days = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getDays).orElse(10);
         BigDecimal minVolRatio = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getMinVolRatio).orElse(BigDecimal.valueOf(1.5));
+        List<String> codes = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getCodes).orElse(null);
+
         // 计算天数区间
         LocalDate end  = dailyIndicatorService.getLatestDate();
         LocalDate start = end.minusDays(days - 1);
 
-        return analysisMapper.heavenVolumeRatio(start, end, minVolRatio);
+        return Flux.fromIterable(analysisMapper.heavenVolumeRatio(start, end, minVolRatio, codes));
     }
 
-    public List<String> fiveCrossTen(@Nullable FiveCrossTenQo fiveCrossTenQo) {
+    /**
+     * 获取 5 日线突破（上穿） 10 日线的股票
+     * @param fiveCrossTenQo
+     * @return
+     */
+    public Flux<String> fiveCrossTen(@Nullable FiveCrossTenQo fiveCrossTenQo) {
         Integer days = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getDays).orElse(3);
-        avgLineService.fiveCrossTen(days, Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getDate).orElse(null));
-        return null;
+        LocalDate date = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getDate).orElse(null);
+        List<String> codes = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getCodes).orElse(null);
+        return avgLineService.fiveCrossTen(days, date, codes);
     }
 
-    public List<String> fiveAboveTen(@Nullable FiveAboveTenQo fiveAboveTenQo) {
-        return null;
+    /**
+     * 获取 5 日线在 10 日线上方的股票
+     * @param fiveAboveTenQo
+     * @return
+     */
+    public Flux<String> fiveAboveTen(@Nullable FiveAboveTenQo fiveAboveTenQo) {
+        Integer days = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDays).orElse(3);
+        LocalDate date = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDate).orElse(null);
+        return avgLineService.fiveAboveTen(days, date);
     }
 
     /**
