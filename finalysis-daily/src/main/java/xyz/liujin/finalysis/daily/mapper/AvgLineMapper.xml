@@ -20,11 +20,22 @@
     <select id="trend5Up10" resultType="java.lang.String">
         select stock_code from stock as s
         where not exists (
-            select * from v_avg_line
-            where stock_code = s.stock_code
-            and date >= #{start} and date &lt;= #{end}
-            and avg5 &lt; avg10
+            select * from v_avg_line as v
+            where v.stock_code = s.stock_code
+            <if test="start != null">
+                and v.date >= #{start}
+            </if>
+            <if test="end != null">
+                and v.date &lt;= #{end}
+            </if>
+            and v.avg5 &lt; v.avg10
         )
+        <if test="codes != null and codes.size() > 0">
+            and s.stock_code in
+            <foreach collection="codes" item="code" open="(" separator="," close=")">
+                #{code}
+            </foreach>
+        </if>
         order by stock_code;
     </select>
 

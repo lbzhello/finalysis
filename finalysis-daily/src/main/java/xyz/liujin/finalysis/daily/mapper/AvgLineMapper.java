@@ -3,6 +3,7 @@ package xyz.liujin.finalysis.daily.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.lang.NonNull;
+import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
 import xyz.liujin.finalysis.daily.entity.DayAvgLine;
 import xyz.liujin.finalysis.daily.qo.AvgLineQo;
@@ -37,5 +38,6 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
     List<DayAvgLine> findDayAvg(AvgLineQo avgLineQo);
 
     List<String> trend5Up10(@NonNull @Param("start") LocalDate start,
-                       @NonNull @Param("end") LocalDate end);
+                            @NonNull @Param("end") LocalDate end,
+                            @Nullable @Param("codes") List<String> codes);
 }

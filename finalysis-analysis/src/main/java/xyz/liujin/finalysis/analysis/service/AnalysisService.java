@@ -88,7 +88,7 @@ public class AnalysisService {
                 .flatMap(codes -> dailyData(DailyDataQo.builder()
                         .date(dailyIndicatorService.getLatestDate())
                         .codes(codes)
-                        .minAmount(BigDecimal.valueOf(1e9))
+                        .minAmount(recommendQo.getMinAmount())
                         .page(PageQo.builder()
                                 .orderBy("volume_ratio desc")
                                 .build())
@@ -140,7 +140,7 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> fiveAboveTenDetail(Integer days, LocalDate date) {
-        return avgLineService.fiveAboveTen(days, date)
+        return avgLineService.fiveAboveTen(days, date, null)
                 .collectList()
                 .flux()
                 .flatMap(codes -> CollectionUtil.isEmpty(codes) ? Flux.empty() :

@@ -98,7 +98,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param days 最小持续天数
      * @return
      */
-    public Flux<String> fiveAboveTen(Integer days, @Nullable LocalDate date) {
+    public Flux<String> fiveAboveTen(Integer days, @Nullable LocalDate date, @Nullable List<String> codes) {
         // 结束日期默认当前最新数据
         LocalDate end = ObjectUtils.firstNonNull(date, getLatestDate(), LocalDate.now());
 
@@ -106,7 +106,7 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
         LocalDate start = end.minusDays(days - 1);
 
         // 5 日均线大于 10 日均线为升势
-        return trend5Up10(start, end);
+        return trend5Up10(start, end, codes);
     }
 
     /**
@@ -115,9 +115,9 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
      * @param end
      * @return
      */
-    public Flux<String> trend5Up10(@NonNull LocalDate start, @NonNull LocalDate end) {
+    public Flux<String> trend5Up10(@NonNull LocalDate start, @NonNull LocalDate end, @Nullable List<String> codes) {
         // highAvg 日均线大于 lowAvg 日均线为升势
-        return Flux.fromIterable(getBaseMapper().trend5Up10(start, end));
+        return Flux.fromIterable(getBaseMapper().trend5Up10(start, end, codes));
     }
 
     /**

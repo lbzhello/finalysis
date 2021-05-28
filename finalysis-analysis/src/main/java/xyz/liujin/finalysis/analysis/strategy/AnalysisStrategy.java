@@ -76,7 +76,8 @@ public class AnalysisStrategy {
     public Flux<String> fiveAboveTen(@Nullable FiveAboveTenQo fiveAboveTenQo) {
         Integer days = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDays).orElse(3);
         LocalDate date = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDate).orElse(null);
-        return avgLineService.fiveAboveTen(days, date);
+        List<String> codes = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getCodes).orElse(null);
+        return avgLineService.fiveAboveTen(days, date, codes);
     }
 
     /**
