@@ -7,17 +7,15 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.FiveAboveTenQo;
 import xyz.liujin.finalysis.analysis.dto.FiveCrossTenQo;
 import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
-import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
+import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.service.AvgLineService;
 import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 /**
  * 股票分析策略
@@ -45,13 +43,16 @@ public class AnalysisStrategy {
      * @return
      */
     public Flux<String> heavenVolumeRatio(@Nullable HeavenVolRatioQo heavenVolRatioQo) {
-        int days = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getDays).orElse(10);
-        BigDecimal minVolRatio = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getMinVolRatio).orElse(BigDecimal.valueOf(1.5));
-        List<String> codes = Optional.ofNullable(heavenVolRatioQo).map(HeavenVolRatioQo::getCodes).orElse(null);
+        heavenVolRatioQo = Optional.ofNullable(heavenVolRatioQo).orElse(HeavenVolRatioQo.DEFAULT);
+        int days = Optional.ofNullable(heavenVolRatioQo.getDays()).orElse(10);
+        BigDecimal minVolRatio = Optional.ofNullable(heavenVolRatioQo.getMinVolRatio()).orElse(BigDecimal.valueOf(1.5));
+        List<String> codes = Optional.ofNullable(heavenVolRatioQo.getCodes()).orElse(null);
 
-        // 计算天数区间
-        LocalDate end  = dailyIndicatorService.getLatestDate();
-        LocalDate start = end.minusDays(days - 1);
+        // 结束日期默认数据库最新，或者当前日期
+        LocalDate end = ObjectUtils.firstNonNull(heavenVolRatioQo.getEndDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
+
+        // 开始日期默认根据 days 计算
+        LocalDate start = Optional.ofNullable(heavenVolRatioQo.getStartDate()).orElse(end.minusDays(days - 1));
 
         return Flux.fromIterable(analysisMapper.heavenVolumeRatio(start, end, minVolRatio, codes));
     }
@@ -62,9 +63,10 @@ public class AnalysisStrategy {
      * @return
      */
     public Flux<String> fiveCrossTen(@Nullable FiveCrossTenQo fiveCrossTenQo) {
-        Integer days = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getDays).orElse(3);
-        LocalDate date = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getDate).orElse(null);
-        List<String> codes = Optional.ofNullable(fiveCrossTenQo).map(FiveCrossTenQo::getCodes).orElse(null);
+        fiveCrossTenQo = Optional.ofNullable(fiveCrossTenQo).orElse(FiveCrossTenQo.DEFAULT);
+        Integer days = Optional.ofNullable(fiveCrossTenQo.getDays()).orElse(3);
+        LocalDate date = Optional.ofNullable(fiveCrossTenQo.getDate()).orElse(null);
+        List<String> codes = Optional.ofNullable(fiveCrossTenQo.getCodes()).orElse(null);
         return avgLineService.fiveCrossTen(days, date, codes);
     }
 
@@ -74,35 +76,11 @@ public class AnalysisStrategy {
      * @return
      */
     public Flux<String> fiveAboveTen(@Nullable FiveAboveTenQo fiveAboveTenQo) {
-        Integer days = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDays).orElse(3);
-        LocalDate date = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getDate).orElse(null);
-        List<String> codes = Optional.ofNullable(fiveAboveTenQo).map(FiveAboveTenQo::getCodes).orElse(null);
+        fiveAboveTenQo = Optional.ofNullable(fiveAboveTenQo).orElse(FiveAboveTenQo.DEFAULT);
+        Integer days = Optional.ofNullable(fiveAboveTenQo.getDays()).orElse(3);
+        LocalDate date = Optional.ofNullable(fiveAboveTenQo.getDate()).orElse(null);
+        List<String> codes = Optional.ofNullable(fiveAboveTenQo.getCodes()).orElse(null);
         return avgLineService.fiveAboveTen(days, date, codes);
     }
 
-    /**
-     * 获取推荐股票时需要参考的指标
-     * 判断条件：对应字段非 null
-     * @return
-     */
-    static Set<AnalysisStrategy> findStrategies(@Nullable RecommendQo recommendQo) {
-        if (Objects.isNull(recommendQo)) {
-            return Set.of();
-        }
-
-//        Set<AnalysisStrategy> analysisStrategies = new HashSet<>();
-//        if (Objects.nonNull(heavenVolRatio)) {
-//            analysisStrategies.add(AnalysisStrategy.HEAVY_VOL_RATIO);
-//        }
-//
-//        if (Objects.nonNull(fiveCrossTen)) {
-//            analysisStrategies.add(AnalysisStrategy.FIVE_CROSS_TEN);
-//        }
-//
-//        if (Objects.nonNull(fiveAboveTen)) {
-//            analysisStrategies.add(AnalysisStrategy.FIVE_ABOVE_TEN);
-//        }
-
-        return null;
-    }
 }

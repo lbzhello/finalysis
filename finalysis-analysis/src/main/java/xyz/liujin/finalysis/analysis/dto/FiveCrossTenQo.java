@@ -24,4 +24,8 @@ public class FiveCrossTenQo {
 
     @ApiModelProperty(value = "需要统计的股票列表", hidden = true)
     private List<String> codes;
+
+    public static FiveCrossTenQo DEFAULT = FiveCrossTenQo.builder()
+            .days(3)
+            .build();
 }
