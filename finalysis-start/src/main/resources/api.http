@@ -1,0 +1,74 @@
+###
+GET http://localhost:8080
+Accept: */*
+
+
+### 推荐股票-最近存在放量的股票，根据成交额排序
+POST http://localhost:8080/analysis/recommend
+Content-Type: application/json
+
+{
+  "heavenVolRatio": {
+    "days": 5,
+    "minVolRatio": 2
+  },
+  "page": {
+    "limit": 1000,
+    "offset": 0,
+    "orderBy": "amount desc",
+    "pageNo": 1,
+    "pageSize": 1000
+  }
+}
+
+### 推荐股票-突破形态，最近存在放量
+POST http://localhost:8080/analysis/recommend
+Content-Type: application/json
+
+{
+  "fiveCrossTen": {
+    "days": 10
+  },
+  "heavenVolRatio": {
+    "days": 5,
+    "minVolRatio": 2
+  },
+  "minAmount": 200000000,
+  "page": {
+    "limit": 1000,
+    "offset": 0,
+    "pageNo": 1,
+    "pageSize": 1000
+  }
+}
+
+### 推荐股票
+POST http://localhost:8080/analysis/recommend
+Content-Type: application/json
+
+{
+  "date": "2021-06-03",
+  "fiveAboveTen": {
+    "days": 3
+  },
+  "fiveCrossTen": {
+    "days": 5
+  },
+  "heavenVolRatio": {
+    "days": 10,
+    "minVolRatio": 2
+  },
+  "minAmount": 100000000,
+  "page": {
+    "limit": 1000,
+    "offset": 0,
+    "pageNo": 1,
+    "pageSize": 1000
+  }
+}
+
+###
+GET http://localhost:8080/extract/all
+Accept: application/json
+
+### 爬取所有股票信息

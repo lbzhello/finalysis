@@ -17,10 +17,7 @@ import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class AnalysisService {
@@ -77,6 +74,17 @@ public class AnalysisService {
                 recommends.add(analysisStrategy.fiveAboveTen(recommendQo.getFiveAboveTen()));
             }
         }
+
+        // 默认根据量比排序
+        String orderBy = Optional.ofNullable(recommendQo.getPage())
+                .map(PageQo::getOrderBy)
+                .orElse("volume_ratio desc");
+
+        // 返回条目限制，默认 1000
+        Integer limit = Optional.ofNullable(recommendQo.getPage())
+                .map(PageQo::getLimit)
+                .orElse(1000);
+
         return Flux.fromIterable(recommends)
                 .flatMap(codeFlux -> codeFlux.collectList().flux())
                 // 取交集，即满足所有指标的股票
@@ -90,10 +98,10 @@ public class AnalysisService {
                         .codes(codes)
                         .minAmount(recommendQo.getMinAmount())
                         .page(PageQo.builder()
-                                .orderBy("volume_ratio desc")
+                                .orderBy(orderBy)
                                 .build())
                         .build()))
-                .limitRequest(100);
+                .limitRequest(limit);
     }
 
     /**

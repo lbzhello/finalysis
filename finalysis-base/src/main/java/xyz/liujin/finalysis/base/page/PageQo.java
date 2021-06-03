@@ -24,9 +24,9 @@ public class PageQo {
     @Builder.Default
     private Integer pageSize = DEFAULT_PAGE_SIZE;
 
-    @ApiModelProperty("总条目数")
+    @ApiModelProperty(value = "总条目数", hidden = true)
     private Integer total;
-    @ApiModelProperty("总页数")
+    @ApiModelProperty(value = "总页数", hidden = true)
     private Integer totalPage;
 
     @ApiModelProperty(value = "返回数量限制", example = "1000")
