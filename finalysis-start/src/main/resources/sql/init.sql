@@ -303,6 +303,6 @@ comment on column recommend.date is '交易日期';
 comment on column recommend.stock_code is '股票代码';
 comment on column recommend.vol_amount is '量额，成交量和成交额的乘积';
 
-alter table recommend add constraint pk_commend primary key (id);
+alter table recommend add constraint pk_recommend primary key (id);
 
 create unique index uk_recommend_date_stock_code on recommend(date, stock_code);
