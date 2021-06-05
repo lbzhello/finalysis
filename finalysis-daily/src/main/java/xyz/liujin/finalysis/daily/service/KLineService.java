@@ -14,6 +14,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.executor.TaskPool;
+import xyz.liujin.finalysis.base.util.DecimalUtils;
 import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.dto.KLineDto;
 import xyz.liujin.finalysis.daily.entity.KLine;
@@ -188,7 +189,8 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
 
         BigDecimal avg = BigDecimal.valueOf(acc).divide(BigDecimal.valueOf(len), 4, RoundingMode.HALF_EVEN);
 
-        if (BigDecimal.ZERO.compareTo(avg) == 0) {
+
+        if (DecimalUtils.isZeroOrNull(avg)) {
             return BigDecimal.ONE;
         }
 

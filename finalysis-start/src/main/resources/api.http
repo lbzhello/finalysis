@@ -1,19 +1,19 @@
-###
-GET http://localhost:8080
+### 爬取所有股票信息
+GET http://localhost:8080/extract/all
 Accept: */*
-
 
 ### 推荐股票-最近存在放量的股票，根据成交额排序
 POST http://localhost:8080/analysis/recommend
 Content-Type: application/json
 
 {
+  "store": true,
   "heavenVolRatio": {
-    "days": 5,
+    "days": 6,
     "minVolRatio": 2
   },
   "page": {
-    "limit": 1000,
+    "limit": 2000,
     "offset": 0,
     "orderBy": "amount desc",
     "pageNo": 1,
@@ -68,7 +68,3 @@ Content-Type: application/json
 }
 
 ###
-GET http://localhost:8080/extract/all
-Accept: application/json
-
-### 爬取所有股票信息

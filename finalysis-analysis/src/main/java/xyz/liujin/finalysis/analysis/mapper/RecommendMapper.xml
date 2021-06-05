@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.analysis.mapper.RecommendMapper">
+    <select id="insertOrUpdate">
+        insert into recommend
+            (date, stock_code, vol_amount)
+        values
+            (#{date}, #{stockCode}, #{volAmount})
+        on conflict (date, stock_code) do update
+        set date = excluded.date,
+            stock_code = excluded.stock_code,
+            vol_amount = excluded.vol_amount
+    </select>
+</mapper>

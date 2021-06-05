@@ -28,6 +28,8 @@ public class RecommendQo {
     private FiveAboveTenQo fiveAboveTen;
     @ApiModelProperty(value = "成交额指标", example = "100000000")
     private BigDecimal minAmount;
+    @ApiModelProperty(value = "结果是否入库", example = "false")
+    private boolean store;
     @ApiModelProperty("分页信息")
     private PageQo page;
 

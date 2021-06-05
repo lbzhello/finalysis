@@ -30,6 +30,9 @@ public class AnalysisService {
     @Autowired
     private AnalysisStrategy analysisStrategy;
 
+    @Autowired
+    private RecommendService recommendService;
+
     /**
      * 股票日指标详情信息
      * @param dailyDataQo
@@ -51,6 +54,9 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> recommend(RecommendQo recommendQo) {
+        // 日期默认数据库最新或当天
+        LocalDate date = ObjectUtils.firstNonNull(recommendQo.getDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
+
         // 获取最近 10 天内，存在量比大于 2 的股票
         List<Flux<String>> recommends = new ArrayList<>();
         // 放量指标
@@ -93,8 +99,14 @@ public class AnalysisService {
                     return left;
                 })
                 .flux()
+                .doOnNext(codes -> {
+                    // 是否将推荐股票入库，方便以后统计
+                    if (recommendQo.isStore()) {
+                        recommendService.saveAsync(date, codes);
+                    }
+                })
                 .flatMap(codes -> dailyData(DailyDataQo.builder()
-                        .date(dailyIndicatorService.getLatestDate())
+                        .date(date)
                         .codes(codes)
                         .minAmount(recommendQo.getMinAmount())
                         .page(PageQo.builder()

@@ -286,3 +286,23 @@ alter table daily_indicator
     add constraint pk_daily_indicator primary key (id);
 
 create unique index uk_daily_indicator_date_stock_code on daily_indicator (date, stock_code);
+
+-- 每日推荐股票
+drop table if exists recommend;
+create table if not exists recommend
+(
+    id              bigserial,
+    date            date           not null default now(),
+    stock_code      varchar(6)     not null default '',
+    vol_amount      decimal(24, 2) not null default 0
+);
+
+comment on table recommend is '每日股票推荐表';
+comment on column recommend.id is '自增主键';
+comment on column recommend.date is '交易日期';
+comment on column recommend.stock_code is '股票代码';
+comment on column recommend.vol_amount is '量额，成交量和成交额的乘积';
+
+alter table recommend add constraint pk_commend primary key (id);
+
+create unique index uk_recommend_date_stock_code on recommend(date, stock_code);
