@@ -127,3 +127,49 @@ begin
     return latest_date;
 end
 $$ language plpgsql;
+
+-- 2021-06-06
+-- 创建【删除推荐表多余数据】函数
+-- 保留每日量额前 500 的数据
+drop function if exists create_recommend_500();
+create function create_recommend_500() returns int as $$
+begin
+    -- 保留每日量额前 500 的数据
+    drop function if exists recommend_500(date);
+    create function recommend_500(day date) returns integer as $f$
+    declare
+        sum integer := 0;
+    begin
+        delete from recommend as a where exists(
+            select *
+            from (
+                select row_number() over (order by vol_amount desc) as num, *
+                from recommend as r
+                where r.date = day
+            ) as b
+            where a.id = b.id and b.date = day and b.num > 500
+        );
+        -- 查询总数，应该小于等于 500
+        select into sum count(*) from recommend where date = day;
+        return sum;
+    end
+    $f$ language plpgsql;
+
+    -- 保留当日量额前 500 的数据
+    drop function if exists recommend_500();
+    create function recommend_500() returns int as $f$
+    declare
+        day date := now();
+        sum int := 0;
+    begin
+        select into day date from recommend order by date desc limit 1;
+        select into sum recommend_500(day);
+        return sum;
+    end
+    $f$ language plpgsql;
+
+    return 0;
+end
+$$ language plpgsql;
+
+select create_recommend_500();
