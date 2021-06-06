@@ -306,3 +306,33 @@ comment on column recommend.vol_amount is '量额，成交量和成交额的乘�
 alter table recommend add constraint pk_recommend primary key (id);
 
 create unique index uk_recommend_date_stock_code on recommend(date, stock_code);
+
+-- 推荐表数据视图
+drop view if exists v_recommend;
+create view v_recommend as select
+    s.stock_code,
+    s.stock_name,
+    k.date,
+    r.vol_amount,
+    k.open,
+    k.close,
+    k.high,
+    k.low,
+    k.change,
+    k.pct_change,
+    k.volume_ratio,
+    k.volume,
+    k.amount,
+    d.pe,
+    d.pe_ttm,
+    d.turnover_rate,
+    d.turnover_rate_f,
+    d.total_mv,
+    d.circ_mv
+from recommend r
+join k_line_2020_2039 k
+     on r.date = k.date and r.stock_code = k.stock_code
+join daily_indicator d
+     on r.date = d.date and r.stock_code = d.stock_code
+join stock s
+     on r.stock_code = s.stock_code;
