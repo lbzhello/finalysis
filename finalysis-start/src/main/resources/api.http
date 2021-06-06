@@ -7,14 +7,14 @@ POST http://localhost:8080/analysis/recommend
 Content-Type: application/json
 
 {
-  "store": true,
+  "store": false,
+  "date": "2021-06-04",
   "heavenVolRatio": {
     "days": 6,
     "minVolRatio": 2
   },
   "page": {
     "limit": 500,
-    "offset": 0,
     "orderBy": "amount desc"
   }
 }
