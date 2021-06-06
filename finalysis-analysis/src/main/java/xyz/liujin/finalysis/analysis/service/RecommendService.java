@@ -24,8 +24,11 @@ import xyz.liujin.finalysis.daily.dto.DailyData;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
@@ -45,13 +48,22 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
     public void saveAsync(LocalDate date, @Nullable List<String> codes) {
         logger.debug("begin save date to table recommend, date {}", date);
         selectRecommend(date, codes)
-                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                .collectList()
+                .flux()
+                // 量额从大到小排序
+                // 只保留 500 条数据
+                .flatMap(recommends -> Flux.fromIterable(recommends.stream()
+                        .sorted(Comparator.comparing((Recommend recommend) ->
+                                Optional.ofNullable(recommend.getVolAmount()).orElse(BigDecimal.ZERO)).reversed())
+                        .collect(Collectors.toList())))
+                .limitRequest(500)
                 // 入库
                 .doOnNext(recommend -> recommendMapper.insertOrUpdate(recommend))
                 .count()
+                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(count -> {
                     logger.debug("saved to recommend table, count {}", count);
-                    recommendMapper.retainRecommend500(date);
+                    // recommendMapper.retainRecommend500(date);
                 });
     }
 
