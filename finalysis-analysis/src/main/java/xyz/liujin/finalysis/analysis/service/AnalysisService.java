@@ -4,9 +4,7 @@ import cn.hutool.core.collection.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
-import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
-import xyz.liujin.finalysis.analysis.dto.RecommendQo;
+import xyz.liujin.finalysis.analysis.dto.*;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.strategy.AnalysisStrategy;
 import xyz.liujin.finalysis.base.page.PageQo;
@@ -54,30 +52,53 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> recommend(RecommendQo recommendQo) {
-        // 日期默认数据库最新或当天
+        // 推荐日期，默认数据库最新或当天
         LocalDate date = ObjectUtils.firstNonNull(recommendQo.getDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
 
         // 获取最近 10 天内，存在量比大于 2 的股票
         List<Flux<String>> recommends = new ArrayList<>();
+
         // 放量指标
-        if (Objects.nonNull(recommendQo.getHeavenVolRatio())) {
-            recommends.add(analysisStrategy.heavenVolumeRatio(recommendQo.getHeavenVolRatio()));
+        HeavenVolRatioQo heavenVolRatio = recommendQo.getHeavenVolRatio();
+        // 日期默认推荐日期
+        if (Objects.nonNull(heavenVolRatio) && Objects.isNull(heavenVolRatio.getDate())) {
+            heavenVolRatio.setDate(date);
         }
+
+        // 均线突破指标
+        FiveCrossTenQo fiveCrossTen = recommendQo.getFiveCrossTen();
+        // 日期默认推荐日期
+        if (Objects.nonNull(fiveCrossTen) && Objects.isNull(fiveCrossTen.getDate())) {
+            fiveCrossTen.setDate(date);
+        }
+
+        // 增长趋势指标
+        FiveAboveTenQo fiveAboveTen = recommendQo.getFiveAboveTen();
+        // 日期默认推荐日期
+        if (Objects.nonNull(fiveAboveTen) && Objects.isNull(fiveAboveTen.getDate())) {
+            fiveAboveTen.setDate(date);
+        }
+
+        // 放量指标
+        if (Objects.nonNull(heavenVolRatio)) {
+            recommends.add(analysisStrategy.heavenVolumeRatio(heavenVolRatio));
+        }
+
         // 日线突破指标、上升趋势指标取并集
-        if (Objects.nonNull(recommendQo.getFiveCrossTen()) && Objects.nonNull(recommendQo.getFiveAboveTen())) {
-            recommends.add(analysisStrategy.fiveCrossTen(recommendQo.getFiveCrossTen())
-                    .concatWith(analysisStrategy.fiveAboveTen(recommendQo.getFiveAboveTen()))
+        if (Objects.nonNull(fiveCrossTen) && Objects.nonNull(fiveAboveTen)) {
+            recommends.add(analysisStrategy.fiveCrossTen(fiveCrossTen)
+                    .concatWith(analysisStrategy.fiveAboveTen(fiveAboveTen))
                     .collectList()
                     .flux()
                     .flatMap(codes -> Flux.fromIterable(new HashSet<>(codes))));
         } else {
             // 日线突破
-            if (Objects.nonNull(recommendQo.getFiveCrossTen())) {
-                recommends.add(analysisStrategy.fiveCrossTen(recommendQo.getFiveCrossTen()));
+            if (Objects.nonNull(fiveCrossTen)) {
+                recommends.add(analysisStrategy.fiveCrossTen(fiveCrossTen));
             }
             // 上升趋势
-            if (Objects.nonNull(recommendQo.getFiveAboveTen())) {
-                recommends.add(analysisStrategy.fiveAboveTen(recommendQo.getFiveAboveTen()));
+            if (Objects.nonNull(fiveAboveTen)) {
+                recommends.add(analysisStrategy.fiveAboveTen(fiveAboveTen));
             }
         }
 

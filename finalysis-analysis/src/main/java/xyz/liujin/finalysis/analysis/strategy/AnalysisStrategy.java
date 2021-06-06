@@ -44,15 +44,15 @@ public class AnalysisStrategy {
      */
     public Flux<String> heavenVolumeRatio(@Nullable HeavenVolRatioQo heavenVolRatioQo) {
         heavenVolRatioQo = Optional.ofNullable(heavenVolRatioQo).orElse(HeavenVolRatioQo.DEFAULT);
-        int days = Optional.ofNullable(heavenVolRatioQo.getDays()).orElse(10);
-        BigDecimal minVolRatio = Optional.ofNullable(heavenVolRatioQo.getMinVolRatio()).orElse(BigDecimal.valueOf(1.5));
+        int days = Optional.ofNullable(heavenVolRatioQo.getDays()).orElse(6);
+        BigDecimal minVolRatio = Optional.ofNullable(heavenVolRatioQo.getMinVolRatio()).orElse(BigDecimal.valueOf(2));
         List<String> codes = Optional.ofNullable(heavenVolRatioQo.getCodes()).orElse(null);
 
         // 结束日期默认数据库最新，或者当前日期
-        LocalDate end = ObjectUtils.firstNonNull(heavenVolRatioQo.getEndDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
+        LocalDate end = ObjectUtils.firstNonNull(heavenVolRatioQo.getDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
 
-        // 开始日期默认根据 days 计算
-        LocalDate start = Optional.ofNullable(heavenVolRatioQo.getStartDate()).orElse(end.minusDays(days - 1));
+        // 开始日期根据 days 计算
+        LocalDate start = end.minusDays(days - 1);
 
         return Flux.fromIterable(analysisMapper.heavenVolumeRatio(start, end, minVolRatio, codes));
     }
