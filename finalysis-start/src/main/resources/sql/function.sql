@@ -131,12 +131,12 @@ $$ language plpgsql;
 -- 2021-06-06
 -- 创建【删除推荐表多余数据】函数
 -- 保留每日量额前 500 的数据
-drop function if exists create_recommend_500();
-create function create_recommend_500() returns int as $$
+drop function if exists create_retain_recommend_500();
+create function create_retain_recommend_500() returns int as $$
 begin
     -- 保留每日量额前 500 的数据
-    drop function if exists recommend_500(date);
-    create function recommend_500(day date) returns integer as $f$
+    drop function if exists retain_recommend_500(date);
+    create function retain_recommend_500(day date) returns integer as $f$
     declare
         sum integer := 0;
     begin
@@ -156,14 +156,14 @@ begin
     $f$ language plpgsql;
 
     -- 保留当日量额前 500 的数据
-    drop function if exists recommend_500();
-    create function recommend_500() returns int as $f$
+    drop function if exists retain_recommend_500();
+    create function retain_recommend_500() returns int as $f$
     declare
         day date := now();
         sum int := 0;
     begin
         select into day date from recommend order by date desc limit 1;
-        select into sum recommend_500(day);
+        select into sum retain_recommend_500(day);
         return sum;
     end
     $f$ language plpgsql;
@@ -172,4 +172,4 @@ begin
 end
 $$ language plpgsql;
 
-select create_recommend_500();
+select create_retain_recommend_500();

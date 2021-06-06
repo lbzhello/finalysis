@@ -3,6 +3,8 @@ package xyz.liujin.finalysis.analysis.service;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,8 @@ import java.util.Objects;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
 public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> implements IService<Recommend> {
+    private static final Logger logger = LoggerFactory.getLogger(RecommendService.class);
+
     @Autowired
     private RecommendMapper recommendMapper;
 
@@ -36,13 +40,18 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
 
 
     /**
-     * 保存或更新
+     * 异步保存
      */
     public void saveAsync(LocalDate date, @Nullable List<String> codes) {
+        logger.debug("begin save date to table recommend, date {}", date);
         selectRecommend(date, codes)
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                .subscribe(recommend -> {
-                    recommendMapper.insertOrUpdate(recommend);
+                // 入库
+                .doOnNext(recommend -> recommendMapper.insertOrUpdate(recommend))
+                .count()
+                .subscribe(count -> {
+                    logger.debug("saved to recommend table, count {}", count);
+                    recommendMapper.retainRecommend500(date);
                 });
     }
 
