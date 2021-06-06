@@ -131,6 +131,7 @@ public class AnalysisService {
                         .codes(codes)
                         .minAmount(recommendQo.getMinAmount())
                         .page(PageQo.builder()
+                                .limit(limit)
                                 .orderBy(orderBy)
                                 .build())
                         .build()))

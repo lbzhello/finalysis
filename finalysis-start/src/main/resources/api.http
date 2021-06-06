@@ -13,11 +13,9 @@ Content-Type: application/json
     "minVolRatio": 2
   },
   "page": {
-    "limit": 2000,
+    "limit": 500,
     "offset": 0,
-    "orderBy": "amount desc",
-    "pageNo": 1,
-    "pageSize": 1000
+    "orderBy": "amount desc"
   }
 }
 
