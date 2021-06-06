@@ -15,10 +15,12 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.entity.Recommend;
+import xyz.liujin.finalysis.analysis.event.RecommendChangeEvent;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.mapper.RecommendMapper;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DecimalUtils;
+import xyz.liujin.finalysis.base.util.SpringUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
 import java.math.BigDecimal;
@@ -43,9 +45,9 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
 
 
     /**
-     * 异步保存
+     * 推荐表数据入库
      */
-    public void saveAsync(LocalDate date, @Nullable List<String> codes) {
+    public void refreshRecommend(LocalDate date, @Nullable List<String> codes) {
         logger.debug("begin save date to table recommend, date {}", date);
         selectRecommend(date, codes)
                 .collectList()
@@ -62,8 +64,12 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
                 .count()
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(count -> {
-                    logger.debug("saved to recommend table, count {}", count);
-                    // recommendMapper.retainRecommend500(date);
+                    logger.debug("refreshed recommend table, count {}", count);
+                    // 发布推荐表更新事件
+                    SpringUtils.getApplicationContext().publishEvent(RecommendChangeEvent.builder()
+                            .date(date)
+                            .codes(codes)
+                            .build());
                 });
     }
 

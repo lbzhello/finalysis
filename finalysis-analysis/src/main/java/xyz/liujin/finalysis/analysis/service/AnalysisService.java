@@ -123,7 +123,7 @@ public class AnalysisService {
                 .doOnNext(codes -> {
                     // 是否将推荐股票入库，方便以后统计
                     if (recommendQo.isStore()) {
-                        recommendService.saveAsync(date, codes);
+                        recommendService.refreshRecommend(date, codes);
                     }
                 })
                 .flatMap(codes -> dailyData(DailyDataQo.builder()

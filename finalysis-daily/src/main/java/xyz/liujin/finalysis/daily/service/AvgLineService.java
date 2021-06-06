@@ -18,8 +18,10 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
+import xyz.liujin.finalysis.base.util.SpringUtils;
 import xyz.liujin.finalysis.daily.entity.AvgLine;
 import xyz.liujin.finalysis.daily.entity.DayAvgLine;
+import xyz.liujin.finalysis.daily.event.AvgLineChangeEvent;
 import xyz.liujin.finalysis.daily.mapper.AvgLineMapper;
 import xyz.liujin.finalysis.daily.qo.AvgLineQo;
 import xyz.liujin.finalysis.stock.entity.Stock;
@@ -156,14 +158,24 @@ public class AvgLineService extends ServiceImpl<AvgLineMapper, AvgLine> implemen
                 // 包括 start 天
                 .filter(avgLine -> avgLine.getDate().isAfter(start.minusDays(1)))
                 .window(100)
-                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                .subscribe(avgFlux -> {
+                .doOnNext(avgFlux -> {
                     // 保存到各个均线表
                     saveBatchByCodeDate(avgFlux);
 //                    // 保存到 avg_line 表
 //                    avgFlux.flatMap(AvgLineConverter::toAvgLine)
 //                            .collectList()
 //                            .subscribe(this::saveBatchByCodeDateStatistic);
+                })
+                .count()
+                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                .subscribe(avgFlux -> {
+                    logger.debug("refresh avg line success");
+                    // 发布均线更新完成时间
+                    SpringUtils.getApplicationContext().publishEvent(AvgLineChangeEvent.builder()
+                            .start(start)
+                            .end(end)
+                            .codes(codes)
+                            .build());
                 }, e -> logger.error("failed to refreshAvgLine", e));
     }
 
