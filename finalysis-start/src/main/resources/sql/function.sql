@@ -173,3 +173,26 @@ end
 $$ language plpgsql;
 
 select create_retain_recommend_500();
+
+-- 最近 days 天，量额排名前 head 的股票出现频次排行
+drop function if exists hot_recommend(int, int);
+create function hot_recommend(days int, head int) returns table (stock_code varchar(6), stock_name varchar(32), count bigint, max_vol_amount decimal(24, 2)) as $$
+declare
+    end_date date := now(); -- 统计日期，默认数据库最新
+    start_date date := now(); -- 统计开始日期 end_date - days
+begin
+    select date into end_date from recommend order by date desc limit 1;
+    start_date := end_date - (days - 1  || ' day')::interval;
+
+    -- 最近 5 日热门股票，量额前 100 出现频次
+    return query select v.stock_code, v.stock_name, count(*) as ct, max(v.vol_amount) as max_vol_amount
+    from (
+             select dense_rank() over (partition by date order by vol_amount desc) as rk, * from v_recommend
+         ) as v
+    where v.rk <= head
+      and v.date >= start_date
+    group by v.stock_code, v.stock_name
+    order by ct desc, max_vol_amount desc;
+
+end
+$$ language plpgsql;
