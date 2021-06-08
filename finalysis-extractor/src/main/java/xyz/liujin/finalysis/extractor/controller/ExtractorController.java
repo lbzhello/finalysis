@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.extractor.tushare.manager.TushareManager;
 
 import java.time.LocalDate;
@@ -35,7 +37,14 @@ public class ExtractorController {
     @ApiOperation("更新股票数据")
     @GetMapping("stock")
     public Flux<String> extractStock() {
-        return tushareManager.refreshStock();
+        return Flux.create(sink -> {
+            tushareManager.refreshStock()
+                    // 异步执行
+                    .publishOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                    .subscribe();
+            sink.next("start to extract stock...");
+            sink.complete();
+        });
     }
 
 
@@ -50,7 +59,15 @@ public class ExtractorController {
 
             @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
             @RequestParam(name = "codes", required = false) List<String> codes) {
-        return tushareManager.refreshKLine(start, end, codes);
+        return Flux.create(sink -> {
+            tushareManager.refreshKLine(start, end, codes)
+                    // 异步执行
+                    .publishOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                    .subscribe();
+            sink.next("start to extract k line...");
+            sink.complete();
+        });
+
     }
 
     @ApiOperation("更新股票每日指标")
@@ -64,7 +81,14 @@ public class ExtractorController {
 
             @ApiParam(value = "股票列表，默认所有股票", example = "000001,600001")
             @RequestParam(name = "codes", required = false) List<String> codes) {
-        return tushareManager.refreshDailyIndicator(start, end, codes);
+        return Flux.create(sink -> {
+            tushareManager.refreshDailyIndicator(start, end, codes)
+                    // 异步执行
+                    .publishOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                    .subscribe();
+            sink.next("start to extract daily indicator...");
+            sink.complete();
+        });
     }
 
 }
