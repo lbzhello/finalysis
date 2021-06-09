@@ -8,8 +8,16 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.FluxSink;
 import reactor.core.scheduler.Schedulers;
+import reactor.util.function.Tuple3;
+import reactor.util.function.Tuples;
+import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
+import xyz.liujin.finalysis.analysis.dto.RecommendQo;
+import xyz.liujin.finalysis.analysis.service.AnalysisService;
 import xyz.liujin.finalysis.base.executor.TaskPool;
+import xyz.liujin.finalysis.base.page.PageQo;
+import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.base.util.SpringUtils;
 import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.event.DailyIndicatorChangeEvent;
@@ -23,11 +31,13 @@ import xyz.liujin.finalysis.stock.entity.Stock;
 import xyz.liujin.finalysis.stock.event.StockChangeEvent;
 import xyz.liujin.finalysis.stock.service.StockService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 /**
@@ -58,11 +68,15 @@ public class TushareManager {
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
 
+    @Autowired
+    private AnalysisService analysisService;
+
     /**
      * 自动更新股票数据
      * 1. 更新股票数据
      * 2. 更新 K 线数据
      * 3. 更新每日指标数据
+     * 4. 推荐股票自动入库
      * @param start 开始日期；默认数据库最新
      * @param end   结束日期；默认当日
      * @param codes 股票代码列表；默认所有
@@ -76,11 +90,25 @@ public class TushareManager {
                             refreshKLine(start, end, codes).map(kLineCount -> "refreshed k line " + kLineCount),
                             refreshDailyIndicator(start, end, codes).map(dailyIndicatorCount -> "refreshed daily indicator " + dailyIndicatorCount)))
                     .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .doFinally(it -> {
-
-                    })
                     .subscribe(it -> {
                         logger.debug(it);
+                    }, e -> {
+                        logger.error("failed to refresh all", e);
+                    }, () -> {
+                        // 完成后自动计算推荐股票
+                        LocalDate date = ObjectUtils.firstNonNull(dailyIndicatorService.getLatestDate(), LocalDate.now());
+                        analysisService.recommend(RecommendQo.builder()
+                                .store(true)
+                                .date(date)
+                                .heavenVolRatio(HeavenVolRatioQo.builder()
+                                        .days(6)
+                                        .minVolRatio(BigDecimal.valueOf(2))
+                                        .build())
+                                .page(PageQo.builder()
+                                        .limit(1000)
+                                        .orderBy("amount desc")
+                                        .build())
+                                .build()).subscribe();
                     });
 
             sink.next("start to refresh all tasks..");
@@ -94,39 +122,31 @@ public class TushareManager {
      * @return
      */
     public Flux<Integer> refreshStock() {
-        return Flux.create(sink -> {
-            logger.debug("start extract stock {}", tushareKLineExtractor.getClass());
+        logger.debug("start extract stock {}", tushareKLineExtractor.getClass());
 
-//            sink.next("start to extract stock. ");
-            List<String> addCodes = new ArrayList<>();
-            tushareStockExtractor.extractStock()
-                    // 获取新增的股票
-                    .map(stock -> {
-                        Stock exist = stockService.getById(stock.getStockCode());
-                        // 存在更新
-                        if (Objects.nonNull(exist)) {
-                            stockService.updateById(stock);
-                        } else {
-                            stockService.save(stock);
-                            addCodes.add(stock.getStockCode());
-                        }
-                        return 1;
-                    })
-                    // 发布股票变更事件
-                    .doFinally(it -> SpringUtils.getApplicationContext().publishEvent(StockChangeEvent.builder()
+        List<String> addCodes = new ArrayList<>();
+        return tushareStockExtractor.extractStock()
+                // 获取新增的股票
+                .map(stock -> {
+                    Stock exist = stockService.getById(stock.getStockCode());
+                    // 存在更新
+                    if (Objects.nonNull(exist)) {
+                        stockService.updateById(stock);
+                    } else {
+                        stockService.save(stock);
+                        addCodes.add(stock.getStockCode());
+                    }
+                    return 1;
+                })
+                .reduce(Integer::sum)
+                .flux()
+                // 发布股票变更事件
+                .doOnNext(count -> {
+                    logger.debug("refresh stock success, count {}", count);
+                    SpringUtils.getApplicationContext().publishEvent(StockChangeEvent.builder()
                             .addCodes(addCodes)
-                            .build()))
-                    .reduce(Integer::sum)
-                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .subscribe(count -> {
-                        logger.debug("refresh stock success, count {}", count);
-                        sink.next(count);
-                        sink.complete();
-                    }, e -> logger.error("failed to extract stock", e));
-
-//            sink.next("<refreshStock> job running... ");
-//            sink.complete();
-        });
+                            .build());
+                });
     }
 
     /**
@@ -137,15 +157,11 @@ public class TushareManager {
      * @return
      */
     public Flux<Integer> refreshKLine(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> stockCodes) {
-        return Flux.create(sink -> {
+        return Flux.create((Consumer<FluxSink<Tuple3<LocalDate, LocalDate, List<String>>>>) sink -> {
             logger.debug("start refreshKLine. class: {}", tushareKLineExtractor.getClass());
 
-            // yyyy-MM-dd
-            LocalDate startDate = Optional.ofNullable(start).orElseGet(() -> {
-                // 需要更新的日期，数据库最新
-                LocalDate latestDate = Optional.ofNullable(kLineService.getNextDate()).orElse(LocalDate.now());
-                return latestDate;
-            });
+            // 需要更新的日期，数据库最新
+            LocalDate startDate = ObjectUtils.firstNonNull(start, kLineService.getNextDate(), LocalDate.now());
             // 默认当前日期
             LocalDate endDate = Optional.ofNullable(end).orElse(LocalDate.now());
             // 股票代码，默认所有股票
@@ -153,35 +169,38 @@ public class TushareManager {
                             .map(Stock::getStockCode)
                             .collect(Collectors.toList());
 
-//            sink.next("start to extract k line. ");
-            logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
+            sink.next(Tuples.of(startDate, endDate, codes));
+            sink.complete();
+        })
+                .flatMap(tuple -> {
+                    LocalDate startDate = tuple.getT1();
+                    LocalDate endDate = tuple.getT2();
+                    List<String> codes = tuple.getT3();
 
-            tushareKLineExtractor.extractKLine(startDate, endDate, codes)
-                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .parallel(TaskPool.availableProcessors())
-                    .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    // 入库
-                    .map(KLineConverter::toKLine)
-                    .map(kLine -> {
-                        kLineService.insertOrUpdate(kLine);
-                        return 1;
-                    })
-                    // 统计更新条目；到这里任务已经执行完毕
-                    .reduce(Integer::sum)
-                    .doFinally(it -> applicationContext.publishEvent(KLineChangeEvent.builder()
-                            .start(startDate)
-                            .end(endDate)
-                            .codes(codes)
-                            .build()))
-                    .subscribe(count -> {
-                        logger.debug("refresh k line success, refreshed {}", count);
-                        sink.next(count);
-                        sink.complete();
-                        }, e -> logger.error("failed to extract k line", e));
+                    logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
-//            sink.next("<refreshKLine> job running... ");
-//            sink.complete();
-        });
+                    return tushareKLineExtractor.extractKLine(startDate, endDate, codes)
+//                            .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                            .parallel(TaskPool.availableProcessors())
+                            .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                            // 入库
+                            .map(KLineConverter::toKLine)
+                            .map(kLine -> {
+                                kLineService.insertOrUpdate(kLine);
+                                return 1;
+                            })
+                            // 统计更新条目；到这里任务已经执行完毕
+                            .reduce(Integer::sum)
+                            // 发布 k 线变更事件
+                            .doOnNext(count -> {
+                                logger.debug("refresh k line success, refreshed {}", count);
+                                SpringUtils.getApplicationContext().publishEvent(KLineChangeEvent.builder()
+                                        .start(startDate)
+                                        .end(endDate)
+                                        .codes(codes)
+                                        .build());
+                            });
+                });
     }
 
     /**
@@ -192,11 +211,11 @@ public class TushareManager {
      * @return
      */
     public Flux<Integer> refreshDailyIndicator(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
-        return Flux.create(sink -> {
+        return Flux.create((Consumer<FluxSink<Tuple3<LocalDate, LocalDate, List<String>>>>) sink -> {
             logger.debug("start refresh daily indicator {}", tushareKLineExtractor.getClass());
-//            sink.next("start to extract daily indicator");
+
             // 默认从数据库获取最新日期的下一个日期
-            LocalDate startDate = Optional.ofNullable(start).orElse(dailyIndicatorService.getNextDate());
+            LocalDate startDate = ObjectUtils.firstNonNull(start, dailyIndicatorService.getNextDate(), LocalDate.now());
             // 默认当天
             LocalDate endDate = Optional.ofNullable(end).orElse(LocalDate.now());
             // 默认数据库所有股票
@@ -204,28 +223,30 @@ public class TushareManager {
                     .map(Stock::getStockCode)
                     .collect(Collectors.toList());
 
-            tushareDailyIndicatorExtractor.extractDailyIndicator(startDate, endDate, stockCodes)
-                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .parallel(TaskPool.availableProcessors())
-                    .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    // 入库
-                    .map(dailyIndicator -> {
-                        dailyIndicatorService.saveByCodeDate(dailyIndicator);
-                        return 1;
-                    })
-                    .reduce(Integer::sum)
-                    // 发布股票日指标变更事件
-                    .doFinally(it -> SpringUtils.getApplicationContext().publishEvent(DailyIndicatorChangeEvent.builder()
-                            .build()))
-                    .subscribe(count -> {
-                        logger.debug("refresh daily indicator success, refreshed {}", count);
-                        sink.next(count);
-                        sink.complete();
-                    }, e -> {
-                        logger.error("failed to refresh daily indicator", e);
-                    });
-//            sink.next("<refreshDailyIndicator> job running...");
-//            sink.complete();
-        });
+            sink.next(Tuples.of(startDate, endDate, stockCodes));
+            sink.complete();
+        })
+                .flatMap(tuple -> {
+                    LocalDate startDate = tuple.getT1();
+                    LocalDate endDate = tuple.getT2();
+                    List<String> stockCodes = tuple.getT3();
+
+                    return tushareDailyIndicatorExtractor.extractDailyIndicator(startDate, endDate, stockCodes)
+//                            .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                            .parallel(TaskPool.availableProcessors())
+                            .runOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                            // 入库
+                            .map(dailyIndicator -> {
+                                dailyIndicatorService.saveByCodeDate(dailyIndicator);
+                                return 1;
+                            })
+                            .reduce(Integer::sum)
+                            // 发布股票日指标变更事件
+                            .doOnNext(count -> {
+                                logger.debug("refresh daily indicator success, refreshed {}", count);
+                                SpringUtils.getApplicationContext().publishEvent(DailyIndicatorChangeEvent.builder()
+                                        .build());
+                            });
+                });
     }
 }
