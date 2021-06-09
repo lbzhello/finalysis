@@ -83,37 +83,37 @@ public class TushareManager {
      * @return
      */
     public Flux<String> refreshAll(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
-        return Flux.create(sink -> {
-            refreshStock()
-                    // 先更新股票数据，再更新 K 线和日指标表
-                    .flatMap(stockCount -> Flux.merge(Flux.just("refreshed stock " + stockCount),
-                            refreshKLine(start, end, codes).map(kLineCount -> "refreshed k line " + kLineCount),
-                            refreshDailyIndicator(start, end, codes).map(dailyIndicatorCount -> "refreshed daily indicator " + dailyIndicatorCount)))
-                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                    .subscribe(it -> {
-                        logger.debug(it);
-                    }, e -> {
-                        logger.error("failed to refresh all", e);
-                    }, () -> {
-                        // 完成后自动计算推荐股票
-                        LocalDate date = ObjectUtils.firstNonNull(dailyIndicatorService.getLatestDate(), LocalDate.now());
-                        analysisService.recommend(RecommendQo.builder()
-                                .store(true)
-                                .date(date)
-                                .heavenVolRatio(HeavenVolRatioQo.builder()
-                                        .days(6)
-                                        .minVolRatio(BigDecimal.valueOf(2))
-                                        .build())
-                                .page(PageQo.builder()
-                                        .limit(1000)
-                                        .orderBy("amount desc")
-                                        .build())
-                                .build()).subscribe();
-                    });
+        logger.debug("start to refresh all tasks...");
 
-            sink.next("start to refresh all tasks..");
-            sink.complete();
-        });
+        refreshStock()
+                // 先更新股票数据，再更新 K 线和日指标表
+                .flatMap(stockCount -> Flux.merge(Flux.just(stockCount),
+                        refreshKLine(start, end, codes),
+                        refreshDailyIndicator(start, end, codes)))
+                // 统计任务个数
+                .map(it -> 1)
+                .reduce(Integer::sum)
+                .flux()
+                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                .subscribe(it -> {
+                    logger.debug("refresh all tasks success, tasks {}", it);
+                    // 完成后自动计算推荐股票
+                    LocalDate date = ObjectUtils.firstNonNull(dailyIndicatorService.getLatestDate(), LocalDate.now());
+                    analysisService.recommend(RecommendQo.builder()
+                            .store(true)
+                            .date(date)
+                            .heavenVolRatio(HeavenVolRatioQo.builder()
+                                    .days(6)
+                                    .minVolRatio(BigDecimal.valueOf(2))
+                                    .build())
+                            .page(PageQo.builder()
+                                    .limit(1000)
+                                    .orderBy("amount desc")
+                                    .build())
+                            .build()).subscribe();
+                }, e -> logger.error("failed to refresh all", e));
+
+        return Flux.just("start to refresh all tasks...");
 
     }
 
