@@ -4,9 +4,11 @@ import cn.hutool.core.collection.CollectionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.*;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.strategy.AnalysisStrategy;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -123,7 +125,9 @@ public class AnalysisService {
                 .doOnNext(codes -> {
                     // 是否将推荐股票入库，方便以后统计
                     if (recommendQo.isStore()) {
-                        recommendService.refreshRecommend(date, codes);
+                        recommendService.refreshRecommend(date, codes)
+                                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                                .subscribe();
                     }
                 })
                 .flatMap(codes -> dailyData(DailyDataQo.builder()

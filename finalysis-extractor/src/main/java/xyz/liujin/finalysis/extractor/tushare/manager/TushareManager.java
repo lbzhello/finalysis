@@ -110,7 +110,8 @@ public class TushareManager {
                                     .limit(1000)
                                     .orderBy("amount desc")
                                     .build())
-                            .build()).subscribe();
+                            .build())
+                            .subscribe();
                 }, e -> logger.error("failed to refresh all", e));
 
         return Flux.just("start to refresh all tasks...");

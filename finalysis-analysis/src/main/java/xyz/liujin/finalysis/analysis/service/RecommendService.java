@@ -12,13 +12,12 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
+import reactor.core.publisher.Mono;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.entity.Recommend;
 import xyz.liujin.finalysis.analysis.event.RecommendChangeEvent;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.mapper.RecommendMapper;
-import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.DecimalUtils;
 import xyz.liujin.finalysis.base.util.SpringUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -47,9 +46,9 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
     /**
      * 推荐表数据入库
      */
-    public void refreshRecommend(LocalDate date, @Nullable List<String> codes) {
+    public Mono<Long> refreshRecommend(LocalDate date, @Nullable List<String> codes) {
         logger.debug("begin save date to table recommend, date {}", date);
-        selectRecommend(date, codes)
+        return selectRecommend(date, codes)
                 .collectList()
                 .flux()
                 // 量额从大到小排序
@@ -62,8 +61,7 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
                 // 入库
                 .doOnNext(recommend -> recommendMapper.insertOrUpdate(recommend))
                 .count()
-                .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
-                .subscribe(count -> {
+                .doOnNext(count -> {
                     logger.debug("refreshed recommend table, count {}", count);
                     // 发布推荐表更新事件
                     SpringUtils.getApplicationContext().publishEvent(RecommendChangeEvent.builder()
