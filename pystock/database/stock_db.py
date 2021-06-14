@@ -2,9 +2,8 @@
 # To add a new markdown cell, type '# %% [markdown]'
 # %%
 import psycopg2 as pg
-import pandas as pd
-from datetime import datetime
-from pystock.database.model.kline import KLine
+
+from pystock.database.entity.kline import KLine
 
 # %%
 __host = '127.0.0.1'
@@ -44,26 +43,15 @@ def insert(kline: KLine):
     # 提交才会生效
     conn.commit()
 
-    
-
-# %%
-k = KLine(stock_code='600602')
-insert(k)
-
 # %%
 # 执行SQL SELECT命令
-cursor.execute("select * from k_line")
+cursor.execute("select * from k_line order by date desc limit 10")
 # 获取SELECT返回的元组
 rows = cursor.fetchall()
 rows
 
 # %%
-cursor.execute("delete from k_line where stock_code = 1")
-
-
-# %%
 cursor.fetchall()
-
 
 # %%
 # 关闭游标
