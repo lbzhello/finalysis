@@ -57,7 +57,7 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
                         .sorted(Comparator.comparing((Recommend recommend) ->
                                 Optional.ofNullable(recommend.getVolAmount()).orElse(BigDecimal.ZERO)).reversed())
                         .collect(Collectors.toList())))
-                .limitRequest(500)
+                .take(500)
                 // 入库
                 .doOnNext(recommend -> recommendMapper.insertOrUpdate(recommend))
                 .count()
