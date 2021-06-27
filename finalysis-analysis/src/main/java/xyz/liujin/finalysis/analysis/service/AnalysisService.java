@@ -115,7 +115,7 @@ public class AnalysisService {
                 .orElse(1000);
 
         return Flux.fromIterable(recommends)
-                .flatMap(codeFlux -> codeFlux.collectList())
+                .flatMap(Flux::collectList)
                 // 取交集，即满足所有指标的股票
                 .reduce((left, right) -> {
                     left.retainAll(right);

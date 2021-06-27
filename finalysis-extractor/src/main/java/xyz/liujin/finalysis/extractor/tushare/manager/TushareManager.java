@@ -15,6 +15,7 @@ import reactor.util.function.Tuples;
 import xyz.liujin.finalysis.analysis.dto.HeavenVolRatioQo;
 import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
+import xyz.liujin.finalysis.analysis.service.RecommendService;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -71,6 +72,9 @@ public class TushareManager {
     @Autowired
     private AnalysisService analysisService;
 
+    @Autowired
+    private RecommendService recommendService;
+
     /**
      * 自动更新股票数据
      * 1. 更新股票数据
@@ -98,20 +102,24 @@ public class TushareManager {
                 .subscribe(it -> {
                     logger.debug("refresh all tasks success, tasks {}", it);
                     // 完成后自动计算推荐股票
-                    LocalDate date = ObjectUtils.firstNonNull(dailyIndicatorService.getLatestDate(), LocalDate.now());
-                    analysisService.recommend(RecommendQo.builder()
-                            .store(true)
-                            .date(date)
-                            .heavenVolRatio(HeavenVolRatioQo.builder()
-                                    .days(6)
-                                    .minVolRatio(BigDecimal.valueOf(2))
-                                    .build())
-                            .page(PageQo.builder()
-                                    .limit(1000)
-                                    .orderBy("amount desc")
-                                    .build())
-                            .build())
-                            .subscribe();
+                    LocalDate date = ObjectUtils.firstNonNull(start, recommendService.getNextDate(), LocalDate.now());
+                    while (!date.isAfter(LocalDate.now())) {
+                        analysisService.recommend(RecommendQo.builder()
+                                .store(true)
+                                .date(date)
+                                .heavenVolRatio(HeavenVolRatioQo.builder()
+                                        .days(6)
+                                        .minVolRatio(BigDecimal.valueOf(2))
+                                        .build())
+                                .page(PageQo.builder()
+                                        .limit(1000)
+                                        .orderBy("amount desc")
+                                        .build())
+                                .build())
+                                .subscribe();
+
+                        date = date.plusDays(1);
+                    }
                 }, e -> logger.error("failed to refresh all", e));
 
         return Flux.just("start to refresh all tasks...");

@@ -3,6 +3,7 @@ package xyz.liujin.finalysis.analysis.service;
 import cn.hutool.core.collection.CollectionUtil;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -109,5 +110,25 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
         }
 
         return dailyData.getVolumeRatio().multiply(dailyData.getAmount()).setScale(2, RoundingMode.HALF_UP);
+    }
+
+    /**
+     * 获取最新日期的下一个日期
+     * @return
+     */
+    public LocalDate getNextDate() {
+        return getLatestDate().plusDays(1);
+    }
+
+    /**
+     * 获取数据库最新日期
+     * @return
+     */
+    public LocalDate getLatestDate() {
+        return ChainWrappers.lambdaQueryChain(getBaseMapper())
+                .orderByDesc(Recommend::getDate)
+                .oneOpt()
+                .map(Recommend::getDate)
+                .orElse(LocalDate.now());
     }
 }
