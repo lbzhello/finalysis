@@ -127,6 +127,7 @@ public class RecommendService extends ServiceImpl<RecommendMapper, Recommend> im
     public LocalDate getLatestDate() {
         return ChainWrappers.lambdaQueryChain(getBaseMapper())
                 .orderByDesc(Recommend::getDate)
+                .last("limit 1")
                 .oneOpt()
                 .map(Recommend::getDate)
                 .orElse(LocalDate.now());

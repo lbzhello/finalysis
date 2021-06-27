@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.analysis.service;
 
 import cn.hutool.core.collection.CollectionUtil;
+import cn.hutool.core.util.ArrayUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -33,21 +34,26 @@ public class AnalysisService {
     @Autowired
     private RecommendService recommendService;
 
+    @Autowired
+    private DailyIndicatorService dailyIndicatorService;
+
     /**
      * 股票日指标详情信息
      * @param dailyDataQo
      * @return
      */
     public Flux<DailyData> dailyData(DailyDataQo dailyDataQo) {
+        // 默认只返回当天数据
+        if (ArrayUtil.isAllNull(dailyDataQo.getDate(), dailyDataQo.getStartDate(), dailyDataQo.getEndDate())) {
+            dailyDataQo.setDate(dailyIndicatorService.getLatestDate());
+        }
+
         List<DailyData> dailyData = analysisMapper.dailyData(dailyDataQo);
         if (CollectionUtil.isEmpty(dailyData)) {
             return Flux.empty();
         }
         return Flux.fromIterable(dailyData);
     }
-
-    @Autowired
-    private DailyIndicatorService dailyIndicatorService;
 
     /**
      * 推荐股票
