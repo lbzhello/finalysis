@@ -40,6 +40,9 @@ public class DailyData {
     // 成交额
     private BigDecimal amount;
 
+    // 量额 成交量*成交额
+    private BigDecimal volAmount;
+
     // 市盈率
     private BigDecimal pe;
     // 市盈率 TTM
