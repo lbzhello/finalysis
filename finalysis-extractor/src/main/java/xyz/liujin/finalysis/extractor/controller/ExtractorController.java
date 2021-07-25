@@ -84,7 +84,7 @@ public class ExtractorController {
         return Flux.create(sink -> {
             tushareManager.refreshDailyIndicator(start, end, codes)
                     // 异步执行
-                    .publishOn(Schedulers.fromExecutor(TaskPool.getInstance()))
+                    .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                     .subscribe();
             sink.next("start to extract daily indicator...");
             sink.complete();
