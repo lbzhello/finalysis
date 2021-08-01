@@ -410,3 +410,27 @@ from recommend r
          on r.date = d.date and r.stock_code = d.stock_code
     join stock s
          on r.stock_code = s.stock_code;
+
+-- 2021-07-25
+-- 行业表
+create table if not exists industry
+(
+    id bigserial,
+    industry_code varchar(6) not null default '',
+    industry_name varchar(32) not null default '',
+    constraint pk_industry primary key (id)
+);
+
+comment on table industry is '行业表';
+comment on column industry.id is '主键';
+comment on column industry.industry_code is '行业代码';
+comment on column industry.industry_name is '行业名字';
+
+create unique index uk_industry_code on industry (industry_code);
+
+alter table industry add column url varchar(256) not null default '';
+alter table industry alter column url type varchar(128);
+
+comment on column industry.url is '行业地址';
+
+create index uk_industry_code on industry (industry_code);
