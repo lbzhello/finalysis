@@ -9,6 +9,7 @@ import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.*;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.strategy.AnalysisStrategy;
+import xyz.liujin.finalysis.analysis.strategy.SustainHighVolStrategy;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -36,6 +37,30 @@ public class AnalysisService {
 
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
+
+    @Autowired
+    private SustainHighVolStrategy sustainHighVolStrategy;
+
+    /**
+     * 持续放量指标
+     * @param req
+     * @return
+     */
+    public Flux<DailyData> sustainHighVol(SustainHighVolReq req) {
+        // 推荐日期，默认数据库最新或当天
+        LocalDate date = ObjectUtils.firstNonNull(req.getDate(), dailyIndicatorService.getLatestDate(), LocalDate.now());
+
+        return sustainHighVolStrategy.findCodes(req)
+                .collectList()
+                .flux()
+                .flatMap(codes -> dailyData(DailyDataQo.builder()
+                        .date(date)
+                        .codes(codes)
+                        .page(PageQo.builder()
+                                .orderBy("volume_ratio desc")
+                                .build())
+                        .build()));
+    }
 
     /**
      * 股票日指标详情信息

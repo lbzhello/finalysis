@@ -6,9 +6,12 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.dto.RecommendQo;
+import xyz.liujin.finalysis.analysis.dto.SustainHighVolReq;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
+import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
@@ -33,6 +36,12 @@ public class AnalysisController {
     @PostMapping("daily")
     public Flux<DailyData> dailyData(@RequestBody DailyDataQo req) {
         return analysisService.dailyData(req);
+    }
+
+    @ApiOperation("获取持续放量的股票")
+    @PostMapping("sustain-high-vol")
+    public Flux<DailyData> sustainHighVolume(@RequestBody SustainHighVolReq req) {
+        return analysisService.sustainHighVol(req).subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()));
     }
 
     @ApiOperation("获取最近放量的股票")

@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.daily.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import org.apache.ibatis.annotations.Param;
 import xyz.liujin.finalysis.daily.entity.KLine;
 import xyz.liujin.finalysis.daily.qo.KLineQo;
 
@@ -8,6 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface KLineMapper extends BaseMapper<KLine> {
+    List<LocalDate> tradingCalendar(@Param("endDate") LocalDate endDate,
+                                    @Param("limit") Integer limit);
+
     List<KLine> findOne();
 
     /**

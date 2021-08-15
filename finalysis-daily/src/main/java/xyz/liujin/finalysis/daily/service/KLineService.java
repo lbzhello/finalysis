@@ -35,6 +35,17 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(isolation = Isolation.DEFAULT, propagation = Propagation.REQUIRED, timeout = 3*60, rollbackFor = Exception.class)
 public class KLineService extends ServiceImpl<KLineMapper, KLine> implements IService<KLine> {
+
+    /**
+     * 获取最近 limit 天交易日历
+     * @param endDate 日历结束日期
+     * @param limit 最多返回记录数
+     * @return
+     */
+    public List<LocalDate> tradingCalendar(@Nullable LocalDate endDate, int limit) {
+        return getBaseMapper().tradingCalendar(endDate, limit);
+    }
+
     /**
      * 分页查询
      * @return

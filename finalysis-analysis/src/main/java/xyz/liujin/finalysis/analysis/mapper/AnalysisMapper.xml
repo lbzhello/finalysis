@@ -1,6 +1,51 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xyz.liujin.finalysis.analysis.mapper.AnalysisMapper">
+    <select id="sustainHighVol" resultType="xyz.liujin.finalysis.analysis.resp.SustainHighVolDto">
+        with rec as (
+            select stock_code, sum(amount) as amount
+            from k_line_2020_2039
+            <where>
+                <if test="recentStartDate != null">
+                    and date >= #{recentStartDate}
+                </if>
+                <if test="recentEndDate != null">
+                    and date &lt;= #{recentEndDate}
+                </if>
+            </where>
+            group by stock_code
+        ), his as (
+            select stock_code, sum(amount) as amount
+            from k_line_2020_2039
+            <where>
+                <if test="historyStartDate != null">
+                    and date >= #{historyStartDate}
+                </if>
+                <if test="historyEndDate != null">
+                    and date &lt;= #{historyEndDate}
+                </if>
+            </where>
+            group by stock_code
+        )
+        select rec.stock_code,
+               round(rec.amount/his.amount::numeric, 4) as ratio
+        from rec join his on rec.stock_code = his.stock_code
+        <where>
+            <if test="minRatio != null">
+                and round(rec.amount/his.amount::numeric, 4) >= #{minRatio}
+            </if>
+            <if test="maxRatio != null">
+                and round(rec.amount/his.amount::numeric, 4) &lt;= #{maxRatio}
+            </if>
+            <if test="codes != null and codes.size() > 0">
+                and stock_code in
+                <foreach collection="codes" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        <include refid="page"/>
+    </select>
     <select id="heavenVolumeRatio" resultType="java.lang.String">
         select distinct stock_code from daily_indicator
         <where>
