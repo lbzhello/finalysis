@@ -76,6 +76,8 @@ public class SustainHighVolStrategy {
                         .build())
                 .build());
 
+        logger.debug("sustainHighVol total {}", sustainHighVolDtos.size());
+
         return Flux.fromIterable(sustainHighVolDtos)
                 .filter(sustainHighVolDto -> {
                     BigDecimal minRatio = ObjectUtils.firstNonNull(req.getMinRatio(), BigDecimal.ZERO);
