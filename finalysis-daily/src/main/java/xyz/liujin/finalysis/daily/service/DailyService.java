@@ -3,6 +3,7 @@ package xyz.liujin.finalysis.daily.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
@@ -12,7 +13,6 @@ import xyz.liujin.finalysis.daily.entity.KLine;
 import xyz.liujin.finalysis.stock.service.StockService;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -33,7 +33,14 @@ public class DailyService {
      * 检验数据完整性
      * @return 数据不正确的日期
      */
-    public Flux<LocalDate> checkDataIntegrity(LocalDate start, LocalDate end) {
+    public Flux<LocalDate> checkDataIntegrity(@Nullable LocalDate start, @Nullable LocalDate end) {
+        // 默认当天
+        if (Objects.isNull(start)) {
+            start = LocalDate.now();
+        }
+        if (Objects.isNull(end)) {
+            end = LocalDate.now();
+        }
         return DateUtils.iterateDays(start, end)
                 .flatMap(date -> Flux.create((Consumer<FluxSink<LocalDate>>) fluxSink -> {
                     Integer kCount = kLineService.lambdaQuery().eq(KLine::getDate, date).count();

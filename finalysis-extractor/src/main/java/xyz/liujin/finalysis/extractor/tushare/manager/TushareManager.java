@@ -24,6 +24,7 @@ import xyz.liujin.finalysis.daily.converter.KLineConverter;
 import xyz.liujin.finalysis.daily.event.DailyIndicatorChangeEvent;
 import xyz.liujin.finalysis.daily.event.KLineChangeEvent;
 import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
+import xyz.liujin.finalysis.daily.service.DailyService;
 import xyz.liujin.finalysis.daily.service.KLineService;
 import xyz.liujin.finalysis.extractor.tushare.TushareDailyIndicatorExtractor;
 import xyz.liujin.finalysis.extractor.tushare.TushareKLineExtractor;
@@ -75,6 +76,9 @@ public class TushareManager {
     @Autowired
     private RecommendService recommendService;
 
+    @Autowired
+    private DailyService dailyService;
+
     /**
      * 自动更新股票数据
      * 1. 更新股票数据
@@ -103,6 +107,13 @@ public class TushareManager {
                     logger.debug("refresh all tasks success, tasks {}", it);
 
                     // 检查数据是否正确，是否爬取失败
+                    dailyService.checkDataIntegrity(start, end)
+                            // 对应日期的数据不正确，在执行一遍
+                            .subscribe(date -> {
+                                logger.info("daily data incorrect, run again");
+                                refreshKLine(date, date, null).subscribe();
+                                refreshDailyIndicator(date, date, null).subscribe();
+                            });
 
                     // 完成后自动计算推荐股票
                     LocalDate date = ObjectUtils.firstNonNull(start, recommendService.getNextDate(), LocalDate.now());
