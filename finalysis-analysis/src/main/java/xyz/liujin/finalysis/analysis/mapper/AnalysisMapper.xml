@@ -5,10 +5,10 @@
         select * from sustain_high_vol(#{recentStartDate}, #{recentEndDate}, #{historyStartDate}, #{historyEndDate})
         <where>
             <if test="minRatio != null">
-                and round(rec.amount/his.amount::numeric, 4) >= #{minRatio}
+                and ratio >= #{minRatio}
             </if>
             <if test="maxRatio != null">
-                and round(rec.amount/his.amount::numeric, 4) &lt;= #{maxRatio}
+                and ratio &lt;= #{maxRatio}
             </if>
             <if test="codes != null and codes.size() > 0">
                 and stock_code in
