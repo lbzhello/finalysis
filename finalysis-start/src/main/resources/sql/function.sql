@@ -196,3 +196,38 @@ begin
 
 end
 $$ language plpgsql;
+
+-- 2021-08-16
+-- 持续放量股票查询
+create or replace function sustain_high_vol(recStart date, recEnd date, hisStart date, hisEnd date)
+returns table
+(
+    stock_code     varchar(6),
+    recent_amount  decimal(15, 2), -- 最近成交额
+    history_amount decimal(15, 2), -- 历史成交额
+    ratio          decimal(8, 4)   -- 最近成交额与历史成交额的比值
+)
+as
+$$
+declare
+
+begin
+    return query with rec as (
+        select k.stock_code, sum(amount) as amount
+        from k_line_2020_2039 as k
+        where date >= recStart and date <= recEnd
+        group by k.stock_code
+    ), his as (
+        select k.stock_code, sum(amount) as amount
+        from k_line_2020_2039 as k
+        where date >= hisStart and date <= hisEnd
+        group by k.stock_code
+    )
+    select rec.stock_code,
+           rec.amount as recent_amount,
+           his.amount as history_amount,
+           round(rec.amount / his.amount::numeric, 4) as ratio
+    from rec
+    join his on rec.stock_code = his.stock_code;
+end;
+$$ language plpgsql;

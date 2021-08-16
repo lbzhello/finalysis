@@ -101,6 +101,9 @@ public class TushareManager {
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(it -> {
                     logger.debug("refresh all tasks success, tasks {}", it);
+
+                    // 检查数据是否正确，是否爬取失败
+
                     // 完成后自动计算推荐股票
                     LocalDate date = ObjectUtils.firstNonNull(start, recommendService.getNextDate(), LocalDate.now());
                     while (!date.isAfter(LocalDate.now())) {

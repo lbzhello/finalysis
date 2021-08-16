@@ -1,18 +1,47 @@
 package xyz.liujin.finalysis.base.util;
 
 import cn.hutool.core.text.CharSequenceUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import reactor.core.publisher.Flux;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public final class DateUtils {
+    private static final Logger logger = LoggerFactory.getLogger(DateUtils.class);
+
     public static final String DATE = "yyyy-MM-dd";
     public static final String ISO_DATE = "yyyy-MM-ddXXX";
 
     public static final String DATE_TIME = "yyyy-MM-dd";
     public static final String ISO_DATE_TIME = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
+    /**
+     * 返回 start - end 之前每天的日期
+     * @param start
+     * @param end
+     * @return
+     */
+    public static Flux<LocalDate> iterateDays(LocalDate start, LocalDate end) {
+        if (Objects.isNull(start) || Objects.isNull(end) || start.isAfter(end)) {
+            logger.info("start or end date illegal, start {}, end {}", start, end);
+            return Flux.empty();
+        }
+
+        List<LocalDate> items = new ArrayList<>();
+        do {
+            items.add(start);
+            start = start.plusDays(1);
+        } while (!start.isAfter(end));
+
+        return Flux.fromIterable(items);
+    }
 
     public static final OffsetDateTime now() {
         return OffsetDateTime.now();
