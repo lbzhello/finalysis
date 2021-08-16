@@ -203,9 +203,9 @@ create or replace function sustain_high_vol(recStart date, recEnd date, hisStart
 returns table
 (
     stock_code     varchar(6),
-    recent_amount  decimal(15, 2), -- 最近成交额
-    history_amount decimal(15, 2), -- 历史成交额
-    ratio          decimal(8, 4)   -- 最近成交额与历史成交额的比值
+    recent_amount  decimal(15, 2), -- 最近日均成交额
+    history_amount decimal(15, 2), -- 历史日均成交额
+    ratio          decimal(8, 4)   -- 最近均成交额与历史均成交额的比值
 )
 as
 $$
@@ -213,20 +213,20 @@ declare
 
 begin
     return query with rec as (
-        select k.stock_code, sum(amount) as amount
+        select k.stock_code, sum(amount) as amount, count(*) as total
         from k_line_2020_2039 as k
         where date >= recStart and date <= recEnd
         group by k.stock_code
     ), his as (
-        select k.stock_code, sum(amount) as amount
+        select k.stock_code, sum(amount) as amount, count(*) as total
         from k_line_2020_2039 as k
         where date >= hisStart and date <= hisEnd
         group by k.stock_code
     )
     select rec.stock_code,
-           rec.amount as recent_amount,
-           his.amount as history_amount,
-           round(rec.amount / his.amount::numeric, 4) as ratio
+           round(rec.amount/rec.total::numeric, 4) as recent_amount,
+           round(his.amount/his.total::numeric, 4) as history_amount,
+           round(rec.amount/his.amount::numeric, 4) * round(his.total/rec.total::numeric, 4) as ratio
     from rec
     join his on rec.stock_code = his.stock_code;
 end;

@@ -16,6 +16,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class SustainHighVolDto {
     private String stockCode;
+    // 最近成交额
+    private BigDecimal recentAmount;
+    // 过去成交额
+    private BigDecimal historyAmount;
     // 最近成交额与过去成交额比值
     private BigDecimal ratio;
 }

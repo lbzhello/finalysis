@@ -15,7 +15,6 @@ import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.service.KLineService;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -79,11 +78,6 @@ public class SustainHighVolStrategy {
         logger.debug("sustainHighVol total {}", sustainHighVolDtos.size());
 
         return Flux.fromIterable(sustainHighVolDtos)
-                .filter(sustainHighVolDto -> {
-                    BigDecimal minRatio = ObjectUtils.firstNonNull(req.getMinRatio(), BigDecimal.ZERO);
-                    BigDecimal ratio = ObjectUtils.firstNonNull(sustainHighVolDto.getRatio(), BigDecimal.ZERO);
-                    return ratio.compareTo(minRatio) >= 0;
-                })
                 .map(SustainHighVolDto::getStockCode);
     }
 }
