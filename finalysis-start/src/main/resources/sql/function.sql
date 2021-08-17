@@ -199,6 +199,8 @@ $$ language plpgsql;
 
 -- 2021-08-16
 -- 持续放量股票查询
+-- 最近 recStart ~ recEnd 天内的平均成交额与历史 hisStart ~ hisEnd 天内的平均成交额比值数据
+drop function if exists sustain_high_vol(recStart date, recEnd date, hisStart date, hisEnd date);
 create or replace function sustain_high_vol(recStart date, recEnd date, hisStart date, hisEnd date)
 returns table
 (
@@ -231,3 +233,43 @@ begin
     join his on rec.stock_code = his.stock_code;
 end;
 $$ language plpgsql;
+
+-- 持续放量股票查询
+-- 最近 recDays 天内的平均成交额与历史 hisDays 天内的平均成交额比值数据
+drop function if exists sustain_high_vol(recDays int, hisDays int);
+create or replace function sustain_high_vol(recDays int, hisDays int) returns
+table
+(
+    stock_code     varchar(6),
+    recent_amount  decimal(15, 2), -- 最近日均成交额
+    history_amount decimal(15, 2), -- 历史日均成交额
+    ratio          decimal(8, 4)   -- 最近均成交额与历史均成交额的比值
+)
+as
+$$
+declare
+    dateArr date[];
+    total int := recDays + hisDays;
+    recStart date;
+    recEnd date;
+    hisStart date;
+    hisEnd date;
+begin
+    -- 获取需要统计的日期
+    select array_agg(date) into dateArr
+    from (
+        select date from k_line_2020_2039 group by date order by date desc limit total
+    ) tmp;
+
+    recEnd := dateArr[1];
+    recStart := dateArr[recDays];
+
+    hisEnd := dateArr[recDays + 1];
+    hisStart := dateArr[total];
+
+    return query select * from sustain_high_vol(recStart, recEnd, hisStart, hisEnd);
+
+end;
+$$ language plpgsql;
+
+-- select * from sustain_high_vol(3, 5) order by ratio desc;
