@@ -57,7 +57,7 @@ public class AnalysisService {
                         .date(date)
                         .codes(codes)
                         .page(PageQo.builder()
-                                .orderBy("volume_ratio desc")
+                                .orderBy("vol_amount desc")
                                 .build())
                         .build()));
     }
@@ -138,7 +138,7 @@ public class AnalysisService {
         // 默认根据量比排序
         String orderBy = Optional.ofNullable(recommendQo.getPage())
                 .map(PageQo::getOrderBy)
-                .orElse("volume_ratio desc");
+                .orElse("vol_amount desc");
 
         // 返回条目限制，默认 1000
         Integer limit = Optional.ofNullable(recommendQo.getPage())
@@ -190,7 +190,7 @@ public class AnalysisService {
                             .date(dailyIndicatorService.getLatestDate())
                             .codes(codes)
                             .page(PageQo.builder()
-                                    .orderBy("volume_ratio desc")
+                                    .orderBy("vol_amount desc")
                                     .build())
                             .build());
                 });
