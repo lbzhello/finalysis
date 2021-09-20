@@ -273,3 +273,140 @@ end;
 $$ language plpgsql;
 
 -- select * from sustain_high_vol(3, 5) order by ratio desc;
+
+-- 2021-09-11
+-- 股票历史数据统计表
+drop function if exists data_statistic(recdays integer, hisdays integer);
+drop function if exists data_statistic(recDays int, hisDays int, curDay date);
+drop table if exists data_statistic;
+create table data_statistic (
+    stock_code   varchar(6)  not null default '',
+    stock_name   varchar(32) not null default '',
+
+    rec_days int not null default 0,
+    his_days int not null default 0,
+
+    rec_pct_change decimal(7, 2) not null default 0,
+    his_pct_change decimal(7, 2) not null default 0,
+
+    rec_avg_turn_f decimal(5, 2) not null default 0,
+    his_avg_turn_f decimal(5, 2) not null default 0,
+
+    rec_avg_amount decimal(17, 2) not null default 0,
+    his_avg_amount decimal(17, 2) not null default 0,
+
+    rec_avg_vol_ratio decimal(7, 2) not null default 0,
+    his_avg_vol_ratio decimal(7, 2) not null default 0,
+
+    rec_turn_f decimal(7, 2) not null default 0,
+    his_turn_f decimal(7, 2) not null default 0,
+
+    rec_amount decimal(17, 2) not null default 0,
+    his_amount decimal(17, 2) not null default 0,
+
+    rec_vol_ratio decimal(7, 2) not null default 0,
+    his_vol_ratio decimal(7, 2) not null default 0
+);
+
+comment on table data_statistic is '股票历史数据统计';
+comment on column data_statistic.stock_code is '股票代码';
+comment on column data_statistic.stock_name is '股票名称';
+comment on column data_statistic.rec_days is '最近统计天数';
+comment on column data_statistic.his_days is '过去统计天数';
+comment on column data_statistic.rec_pct_change is '最近几日涨幅';
+comment on column data_statistic.his_pct_change is '过去几日涨幅';
+comment on column data_statistic.rec_amount is '最近几日成交额';
+comment on column data_statistic.his_amount is '过去几日成交额';
+comment on column data_statistic.rec_vol_ratio is '最近几日量比';
+comment on column data_statistic.his_vol_ratio is '过去几日量比';
+comment on column data_statistic.rec_turn_f is '最近几日自由换手';
+comment on column data_statistic.his_turn_f is '过去几日自由换手';
+
+-- 股票历史数据统计
+-- recDays 最近天数
+-- hisDays 过去天数（不包括最近天数）
+-- curDay 统计日期
+create or replace function data_statistic(recDays int, hisDays int, curDay date) returns setof data_statistic as $$
+declare
+
+begin
+    return query
+        -- 龙抬头，最近三日涨幅,量比
+        with rec_dt as ( -- 最近日期
+            select date
+            from k_line_2020_2039
+            where date <= curDay
+            group by date
+            order by date desc
+            limit recDays
+        ), his_dt as ( -- 过去日期
+            select date
+            from k_line_2020_2039
+            where date <= curDay
+            group by date
+            order by date desc
+            limit hisDays offset recDays
+        ), his as ( -- 过去成交数据
+            select k.stock_code,
+                   sum(k.pct_change) as his_pct_change,
+                   sum(k.amount) as his_amount,
+                   sum(di.volume_ratio) as his_vol_ratio,
+                   sum(di.turnover_rate_f) as his_turn_f
+            from his_dt
+                 join k_line_2020_2039 k on k.date = his_dt.date
+                 join daily_indicator di on di.date = k.date and di.stock_code = k.stock_code
+            group by k.stock_code
+        ), rec as ( -- 最近成交数据
+            select k.stock_code,
+                   sum(k.pct_change) as rec_pct_change,
+                   sum(k.amount) as rec_amount,
+                   sum(di.volume_ratio) as rec_vol_ratio,
+                   sum(di.turnover_rate_f) as rec_turn_f
+            from rec_dt
+                 join k_line_2020_2039 k on k.date = rec_dt.date
+                 join daily_indicator di on di.date = k.date and di.stock_code = k.stock_code
+            group by k.stock_code
+        )
+        select s.stock_code,
+               s.stock_name,
+
+               recDays rec_days,
+               hisDays his_days,
+
+               rec_pct_change::decimal(7, 2),
+               his_pct_change::decimal(7, 2),
+
+               round(rec_turn_f/recDays, 2)::decimal(5, 2) rec_avg_turn_f,
+               round(his_turn_f/hisDays, 2)::decimal(5, 2) his_avg_turn_f,
+
+               round(rec_amount/recDays, 2)::decimal(17, 2) rec_avg_amount,
+               round(his_amount/hisDays, 2)::decimal(17, 2) his_avg_amount,
+
+               round(rec_vol_ratio/recDays, 2)::decimal(7, 2) rec_avg_vol_ratio,
+               round(his_vol_ratio/hisDays, 2)::decimal(7, 2) his_avg_vol_ratio,
+
+               rec_turn_f::decimal(7, 2),
+               his_turn_f::decimal(7, 2),
+
+               rec_amount::decimal(17, 2),
+               his_amount::decimal(17, 2),
+
+               rec_vol_ratio::decimal(7, 2),
+               his_vol_ratio::decimal(7, 2)
+        from stock s
+             join rec on s.stock_code = rec.stock_code
+             join his on s.stock_code = his.stock_code;
+end
+$$ language plpgsql;
+
+-- 股票历史数据统计
+-- recDays 最近天数
+-- hisDays 过去天数（不包括最近天数）
+create or replace function data_statistic(recDays int, hisDays int) returns setof data_statistic as $$
+declare
+    curDay date := now();
+begin
+    select date into curDay from k_line_2020_2039 order by date desc limit 1;
+    return query select * from data_statistic(recDays, hisDays, curDay);
+end;
+$$ language plpgsql;
