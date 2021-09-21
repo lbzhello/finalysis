@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.analysis.mapper.IncreaseRatioMapper">
+    <select id="findCodes" resultType="java.lang.String">
+        select stock_code from data_statistic(#{recDays}, #{hisDays}, #{date})
+        <where>
+            <if test="minIncRatio != null">
+                and pct_change_ratio >= #{minIncRatio}
+            </if>
+            <if test="maxIncRatio != null">
+                and pct_change_ratio &lt;= #{maxIncRatio}
+            </if>
+            <if test="minRecInc != null">
+                and rec_pct_change >= #{minRecInc}
+            </if>
+            <if test="maxRecInc != null">
+                and rec_pct_change &lt;= #{maxRecInc}
+            </if>
+            <if test="codes != null and codes.size() > 0">
+                and stock_code in
+                <foreach collection="codes" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        <include refid="page"/>
+    </select>
+    <!-- 分页查询 -->
+    <sql id="page">
+        <if test="page != null">
+            <if test="page.orderBy != null">
+                order by ${page.orderBy}
+            </if>
+            <if test="page.limit != null">
+                limit #{page.limit}
+            </if>
+            <if test="page.offset != null">
+                offset #{page.offset}
+            </if>
+        </if>
+    </sql>
+</mapper>

@@ -29,6 +29,7 @@ public interface AvgLineMapper extends BaseMapper<AvgLine> {
      * @param avgLines
      * @deprecated {@link #saveBatchByCodeDate(List)}
      */
+    @Deprecated
     void saveBatchByCodeDateStatistic(@Param("avgLines") List<AvgLine> avgLines);
 
     /**

@@ -119,7 +119,8 @@ public class TushareManager {
                     LocalDate date = ObjectUtils.firstNonNull(start, recommendService.getNextDate(), LocalDate.now());
                     while (!date.isAfter(LocalDate.now())) {
                         analysisService.recommend(RecommendQo.builder()
-                                .store(true)
+                                // todo 推荐表结构修改，暂时不保存 2021-09-12
+                                .store(false)
                                 .date(date)
                                 .heavenVolRatio(HeavenVolRatioQo.builder()
                                         .days(6)

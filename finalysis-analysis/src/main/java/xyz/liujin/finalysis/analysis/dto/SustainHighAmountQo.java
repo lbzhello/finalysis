@@ -17,7 +17,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SustainHighVolQo {
+public class SustainHighAmountQo {
     // 股票代码
     private List<String> codes;
     // 最小比值，最近日期内成交额，与历史日期内成交额的比值

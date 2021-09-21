@@ -6,8 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.SustainHighVolQo;
-import xyz.liujin.finalysis.analysis.dto.SustainHighVolReq;
+import xyz.liujin.finalysis.analysis.dto.SustainHighAmountQo;
+import xyz.liujin.finalysis.analysis.dto.SustainHighAmountReq;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
 import xyz.liujin.finalysis.analysis.resp.SustainHighVolDto;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
@@ -19,11 +19,14 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * 持续放量指标
+ * 成交额策略
+ * 最近 n 天成交额与过去 m 天成交额比值
+ * 最近几天平均成交额远远大于过去几天平均成交额
+ * 说明股票开始异动，往往是启动（向上或向下）的标识
  */
 @Service
-public class SustainHighVolStrategy {
-    private static final Logger logger = LoggerFactory.getLogger(SustainHighVolStrategy.class);
+public class SustainHighAmountStrategy implements Strategy<SustainHighAmountReq> {
+    private static final Logger logger = LoggerFactory.getLogger(SustainHighAmountStrategy.class);
 
     @Autowired
     private AnalysisService analysisService;
@@ -36,14 +39,15 @@ public class SustainHighVolStrategy {
 
     /**
      * 获取持续放量的股票
-     * @param sustainHighVolReq
+     * @param sustainHighAmountReq
      * @return
      */
-    public Flux<String> findCodes(SustainHighVolReq sustainHighVolReq) {
+    @Override
+    public Flux<String> findCodes(SustainHighAmountReq sustainHighAmountReq) {
 
-        SustainHighVolReq req = SustainHighVolReq.builder()
+        SustainHighAmountReq req = SustainHighAmountReq.builder()
                 // 默认数据库最新日期
-                .date(ObjectUtils.firstNonNull(sustainHighVolReq.getDate(), kLineService.getLatestDate(), LocalDate.now()))
+                .date(ObjectUtils.firstNonNull(sustainHighAmountReq.getDate(), kLineService.getLatestDate(), LocalDate.now()))
                 .build();
 
         // 总共需要统计的天数
@@ -63,7 +67,7 @@ public class SustainHighVolStrategy {
         LocalDate hisEnd = calendars.get(req.getRecentDays());
         LocalDate hisStart = calendars.get(days -1);
 
-        List<SustainHighVolDto> sustainHighVolDtos = analysisMapper.sustainHighVol(SustainHighVolQo.builder()
+        List<SustainHighVolDto> sustainHighVolDtos = analysisMapper.sustainHighVol(SustainHighAmountQo.builder()
                 .codes(req.getCodes())
                 .minRatio(req.getMinRatio())
                 .recentStartDate(recStart)

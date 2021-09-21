@@ -14,13 +14,14 @@ import java.util.List;
 
 /**
  * 选股策略-持续放量
+ * 最近 recentDays 天成交额与过去 historyDays 天成交额比值
  */
 @ApiModel(description = "放量且持续的股票")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SustainHighVolReq {
+public class SustainHighAmountReq {
     @ApiModelProperty(value = "当前日期；")
     private LocalDate date;
     @ApiModelProperty(value = "股票代码", hidden = true)

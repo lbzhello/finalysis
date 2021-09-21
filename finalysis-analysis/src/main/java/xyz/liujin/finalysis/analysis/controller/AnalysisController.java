@@ -6,11 +6,14 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.dto.RecommendQo;
-import xyz.liujin.finalysis.analysis.dto.SustainHighVolReq;
+import xyz.liujin.finalysis.analysis.dto.ScoreQo;
+import xyz.liujin.finalysis.analysis.dto.SustainHighAmountReq;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
+import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -26,6 +29,16 @@ public class AnalysisController {
     @Autowired
     private AnalysisService analysisService;
 
+    @Autowired
+    private ScoreService scoreService;
+
+
+    @ApiOperation("股票计分")
+    @PostMapping("score")
+    public Mono<Integer> score(@RequestBody ScoreQo scoreQo) {
+        return scoreService.score(scoreQo);
+    }
+
     @ApiOperation("推荐股票")
     @PostMapping("recommend")
     public Flux<DailyData> recommend(@RequestBody RecommendQo req) {
@@ -40,7 +53,7 @@ public class AnalysisController {
 
     @ApiOperation("获取持续放量的股票")
     @PostMapping("sustain-high-vol")
-    public Flux<DailyData> sustainHighVolume(@RequestBody SustainHighVolReq req) {
+    public Flux<DailyData> sustainHighVolume(@RequestBody SustainHighAmountReq req) {
         return analysisService.sustainHighVol(req).subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()));
     }
 

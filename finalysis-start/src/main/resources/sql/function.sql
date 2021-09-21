@@ -305,7 +305,9 @@ create table data_statistic (
     his_amount decimal(17, 2) not null default 0,
 
     rec_vol_ratio decimal(7, 2) not null default 0,
-    his_vol_ratio decimal(7, 2) not null default 0
+    his_vol_ratio decimal(7, 2) not null default 0,
+
+    pct_change_ratio decimal(7, 2) not null default 0
 );
 
 comment on table data_statistic is '股票历史数据统计';
@@ -315,12 +317,19 @@ comment on column data_statistic.rec_days is '最近统计天数';
 comment on column data_statistic.his_days is '过去统计天数';
 comment on column data_statistic.rec_pct_change is '最近几日涨幅';
 comment on column data_statistic.his_pct_change is '过去几日涨幅';
+comment on column data_statistic.rec_avg_turn_f is '最近几日平均自由换手';
+comment on column data_statistic.his_avg_turn_f is '过去几日平均自由换手';
+comment on column data_statistic.rec_avg_amount is '最近几日平均成交额';
+comment on column data_statistic.his_avg_amount is '过去几日平均成交额';
+comment on column data_statistic.rec_avg_vol_ratio is '最近几日平均量比';
+comment on column data_statistic.his_avg_vol_ratio is '过去几日平均量比';
+comment on column data_statistic.rec_turn_f is '最近几日自由换手';
+comment on column data_statistic.his_turn_f is '过去几日自由换手';
 comment on column data_statistic.rec_amount is '最近几日成交额';
 comment on column data_statistic.his_amount is '过去几日成交额';
 comment on column data_statistic.rec_vol_ratio is '最近几日量比';
 comment on column data_statistic.his_vol_ratio is '过去几日量比';
-comment on column data_statistic.rec_turn_f is '最近几日自由换手';
-comment on column data_statistic.his_turn_f is '过去几日自由换手';
+comment on column data_statistic.pct_change_ratio is '最近与过去增幅比值';
 
 -- 股票历史数据统计
 -- recDays 最近天数
@@ -392,7 +401,8 @@ begin
                his_amount::decimal(17, 2),
 
                rec_vol_ratio::decimal(7, 2),
-               his_vol_ratio::decimal(7, 2)
+               his_vol_ratio::decimal(7, 2),
+               (rec_pct_change/(case when abs(his_pct_change) < 1 then 1 else abs(his_pct_change) end))::decimal(7, 2) pct_change_ratio
         from stock s
              join rec on s.stock_code = rec.stock_code
              join his on s.stock_code = his.stock_code;

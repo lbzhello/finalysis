@@ -3,7 +3,7 @@ package xyz.liujin.finalysis.analysis.mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
-import xyz.liujin.finalysis.analysis.dto.SustainHighVolQo;
+import xyz.liujin.finalysis.analysis.dto.SustainHighAmountQo;
 import xyz.liujin.finalysis.analysis.resp.SustainHighVolDto;
 import xyz.liujin.finalysis.daily.dto.DailyData;
 
@@ -28,5 +28,5 @@ public interface AnalysisMapper {
                                    @Param("minVolRatio") BigDecimal minVolRatio,
                                    @Nullable @Param("codes") List<String> codes);
 
-    List<SustainHighVolDto> sustainHighVol(SustainHighVolQo qo);
+    List<SustainHighVolDto> sustainHighVol(SustainHighAmountQo qo);
 }

@@ -1,14 +1,13 @@
-package finalysis;
+package xyz.liujin.finalysis.base.json;
 
 import cn.hutool.core.lang.Dict;
 import org.junit.jupiter.api.Test;
-import xyz.liujin.finalysis.base.json.JsonMapper;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CommonTest {
+public class JsonTest {
     @Test
     public void csvMapperTest() {
         Map<String, Object> map = Dict.of(

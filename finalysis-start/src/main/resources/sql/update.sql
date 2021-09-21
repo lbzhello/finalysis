@@ -362,7 +362,6 @@ select setval('k_line_id_seq', max(id)) from k_line_2020_2039;
 
 -- 2021-06-05
 -- 每日推荐股票
-drop table if exists recommend;
 create table if not exists recommend
 (
     id              bigserial,
@@ -434,3 +433,41 @@ alter table industry alter column url type varchar(128);
 comment on column industry.url is '行业地址';
 
 create index uk_industry_code on industry (industry_code);
+
+-- 2021-09-21
+-- 标签分数表
+drop table if exists tag_score;
+create table tag_score
+(
+    tag         varchar(256) primary key,
+    score       smallint not null default 0,
+    tag_desc    text,
+    create_time timestamp(3) with time zone not null default now(),
+    update_time timestamp(3) with time zone not null default now()
+);
+
+comment on table tag_score is '标签分数表，用来说明标签的得分';
+comment on column tag_score.tag is '标签';
+comment on column tag_score.score is '分数';
+comment on column tag_score.tag_desc is '标签说明';
+comment on column tag_score.create_time is '创建时间';
+comment on column tag_score.update_time is '更新时间';
+
+-- 股票标签表
+drop table if exists stock_tag;
+create table stock_tag
+(
+    id   bigserial,
+    date date not null default now(),
+    stock_code varchar(6)  not null,
+    tag varchar(256) not null default '',
+    constraint pk_stock_tag primary key (id)
+);
+
+comment on table stock_tag is '股票标签表，股票带有某个标签，用于根据标签统计分数';
+comment on column stock_tag.id is '主键';
+comment on column stock_tag.date is '日期';
+comment on column stock_tag.stock_code is '股票代码';
+comment on column stock_tag.tag is '标签';
+
+create unique index uk_stock_tag_date_tag_stock_code on stock_tag (date, tag, stock_code);
