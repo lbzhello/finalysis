@@ -6,8 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.constant.ScoreType;
 import xyz.liujin.finalysis.analysis.entity.Score;
+import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.base.page.PageQo;
 
@@ -55,56 +55,56 @@ public class IncreaseRatioQo implements Scoreable {
     @ApiModelProperty("分页信息")
     private PageQo page;
 
-    private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO.getType() + "(";
+    private static final String TAG_PREFIX = ScoreTypeEnum.INCREASE_RATIO.getType() + "(";
     @Override
     public Score getScore() {
         // 格式：increase_ratio(recDays=3, hisDays=5)
-        StringBuilder tag = new StringBuilder(TAG_PREFIX);
+        StringBuilder scoreCode = new StringBuilder(TAG_PREFIX);
 
         // 格式：最近 3 天，过去 5 天
-        StringBuilder tagDesc = new StringBuilder("增幅比指标,");
+        StringBuilder desc = new StringBuilder("增幅比指标,");
 
         if (Objects.nonNull(recDays)) {
-            tag.append("recDays=").append(recDays).append(",");
-            tagDesc.append("最近").append(recDays).append("天,");
+            scoreCode.append("recDays=").append(recDays).append(",");
+            desc.append("最近").append(recDays).append("天,");
         }
 
         if (Objects.nonNull(hisDays)) {
-            tag.append("hisDays=").append(hisDays).append(",");
-            tagDesc.append("过去").append(hisDays).append("天,");
+            scoreCode.append("hisDays=").append(hisDays).append(",");
+            desc.append("过去").append(hisDays).append("天,");
         }
 
         if (Objects.nonNull(page)) {
             if (Objects.nonNull(page.getOrderBy())) {
-                tag.append("orderBy=").append(page.getOrderBy()).append(",");
-                tagDesc.append("根据").append(page.getOrderBy()).append("排序,");
+                scoreCode.append("orderBy=").append(page.getOrderBy()).append(",");
+                desc.append("根据").append(page.getOrderBy()).append("排序,");
             }
 
             if (Objects.nonNull(page.getLimit())) {
-                tag.append("limit=").append(page.getLimit()).append(",");
-                tagDesc.append("前").append(page.getLimit()).append("条数据,");
+                scoreCode.append("limit=").append(page.getLimit()).append(",");
+                desc.append("前").append(page.getLimit()).append("条数据,");
             }
         }
 
-        String tagStr = tag.toString();
+        String scoreCodeStr = scoreCode.toString();
         // 去掉结尾 ,
-        if (tagStr.endsWith(",")) {
-            tagStr = tagStr.substring(0, tag.length() - 1);
+        if (scoreCodeStr.endsWith(",")) {
+            scoreCodeStr = scoreCodeStr.substring(0, scoreCode.length() - 1);
         }
 
-        tagStr += ")";
+        scoreCodeStr += ")";
 
-        String tagDescStr = tagDesc.toString();
+        String descStr = desc.toString();
         // 去掉结尾 ,
-        if (tagDescStr.endsWith(",")) {
-            tagDescStr = tagDescStr.substring(0, tagDesc.length() - 1);
+        if (descStr.endsWith(",")) {
+            descStr = descStr.substring(0, desc.length() - 1);
         }
 
         return Score.builder()
-                .type(ScoreType.INCREASE_RATIO.getType())
-                .scoreCode(tagStr)
+                .type(ScoreTypeEnum.INCREASE_RATIO.getType())
+                .scoreCode(scoreCodeStr)
                 .score(1)
-                .description(tagDescStr)
+                .description(descStr)
                 .build();
     }
 

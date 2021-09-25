@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.analysis.constant;
+package xyz.liujin.finalysis.analysis.score;
 
 /**
  * 分数类型表
@@ -7,13 +7,15 @@ package xyz.liujin.finalysis.analysis.constant;
  * @see xyz.liujin.finalysis.analysis.entity.Score
  * @see xyz.liujin.finalysis.analysis.score.Scoreable
  */
-public enum ScoreType {
+public enum ScoreTypeEnum {
     // 增幅比指标
     INCREASE_RATIO("increase_ratio"),
+    // 换手比指标
+    TURN_RATIO("turn_ratio"),
     ;
     private String name;
 
-    ScoreType(String name) {
+    ScoreTypeEnum(String name) {
         this.name = name;
     }
 
