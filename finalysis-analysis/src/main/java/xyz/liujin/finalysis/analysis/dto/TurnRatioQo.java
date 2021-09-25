@@ -51,6 +51,4 @@ public class TurnRatioQo {
     @ScorePage
     private PageQo page;
 
-    private static final String TAG_PREFIX = ScoreTypeEnum.INCREASE_RATIO.getType() + "(";
-
 }

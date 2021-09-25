@@ -42,7 +42,6 @@ public class ScoreUtil {
             }
         }
 
-
         List<String> scoreCodes = new ArrayList<>();
         List<String> scoreDescs = new ArrayList<>();
 
