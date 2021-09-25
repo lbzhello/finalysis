@@ -18,6 +18,8 @@ import java.util.Objects;
 
 /**
  * 图片计分
+ * @author liubaozhu lbzhello@qq.com
+ * @since 2021-09-21
  */
 @Service
 @Transactional

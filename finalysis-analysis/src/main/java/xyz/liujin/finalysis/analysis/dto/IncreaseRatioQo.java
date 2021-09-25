@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import xyz.liujin.finalysis.analysis.constant.TagType;
 import xyz.liujin.finalysis.analysis.entity.TagScore;
 import xyz.liujin.finalysis.analysis.tag.Tagable;
 import xyz.liujin.finalysis.base.page.PageQo;
@@ -54,10 +55,13 @@ public class IncreaseRatioQo implements Tagable {
     @ApiModelProperty("分页信息")
     private PageQo page;
 
-    private static final String TAG_PREFIX = "increase_ratio@";
+    private static final String TAG_PREFIX = TagType.INCREASE_RATIO.getName() + "(";
     @Override
     public TagScore getTag() {
+        // 格式：increase_ratio(recDays=3, hisDays=5)
         StringBuilder tag = new StringBuilder(TAG_PREFIX);
+
+        // 格式：最近 3 天，过去 5 天
         StringBuilder tagDesc = new StringBuilder("增幅比指标,");
 
         if (Objects.nonNull(recDays)) {
@@ -82,11 +86,25 @@ public class IncreaseRatioQo implements Tagable {
             }
         }
 
+        String tagStr = tag.toString();
+        // 去掉结尾 ,
+        if (tagStr.endsWith(",")) {
+            tagStr = tagStr.substring(0, tag.length() - 1);
+        }
+
+        tagStr += ")";
+
+        String tagDescStr = tagDesc.toString();
+        // 去掉结尾 ,
+        if (tagDescStr.endsWith(",")) {
+            tagDescStr = tagDescStr.substring(0, tagDesc.length() - 1);
+        }
 
         return TagScore.builder()
-                .tag(tag.toString().substring(0, tag.length() - 1)) // 去掉结尾 ,
+                .type(TagType.INCREASE_RATIO.getName())
+                .tag(tagStr)
                 .score(1)
-                .tagDesc(tagDesc.toString().substring(0, tagDesc.length() - 1)) // 去掉结尾 ,
+                .tagDesc(tagDescStr)
                 .build();
     }
 

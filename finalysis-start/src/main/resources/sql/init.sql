@@ -364,7 +364,8 @@ create table tag_score
 (
     tag         varchar(256) primary key,
     score       smallint not null default 0,
-    tag_desc    text,
+    tag_desc    text not null default '',
+    type        varchar(32) not null default '',
     create_time timestamp(3) with time zone not null default now(),
     update_time timestamp(3) with time zone not null default now()
 );
@@ -373,6 +374,7 @@ comment on table tag_score is '标签分数表，用来说明标签的得分';
 comment on column tag_score.tag is '标签';
 comment on column tag_score.score is '分数';
 comment on column tag_score.tag_desc is '标签说明';
+comment on column tag_score.type is '标签类型';
 comment on column tag_score.create_time is '创建时间';
 comment on column tag_score.update_time is '更新时间';
 

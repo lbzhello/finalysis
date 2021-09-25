@@ -289,7 +289,6 @@ comment on column v_avg_line.avg30 is '30 日均线';
 
 -- 2021-05-04
 -- 股票日指标数据
-drop table if exists daily_indicator;
 create table if not exists daily_indicator
 (
     id              bigserial,
@@ -436,12 +435,12 @@ create index uk_industry_code on industry (industry_code);
 
 -- 2021-09-21
 -- 标签分数表
-drop table if exists tag_score;
-create table tag_score
+create table if not exists tag_score
 (
     tag         varchar(256) primary key,
     score       smallint not null default 0,
-    tag_desc    text,
+    tag_desc    text not null default '',
+    type        varchar(32) not null default '',
     create_time timestamp(3) with time zone not null default now(),
     update_time timestamp(3) with time zone not null default now()
 );
@@ -450,12 +449,12 @@ comment on table tag_score is '标签分数表，用来说明标签的得分';
 comment on column tag_score.tag is '标签';
 comment on column tag_score.score is '分数';
 comment on column tag_score.tag_desc is '标签说明';
+comment on column tag_score.type is '标签类型';
 comment on column tag_score.create_time is '创建时间';
 comment on column tag_score.update_time is '更新时间';
 
 -- 股票标签表
-drop table if exists stock_tag;
-create table stock_tag
+create table if not exists stock_tag
 (
     id   bigserial,
     date date not null default now(),

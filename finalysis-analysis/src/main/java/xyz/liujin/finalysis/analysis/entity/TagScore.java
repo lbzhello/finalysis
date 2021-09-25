@@ -28,6 +28,8 @@ public class TagScore {
     private int score;
     // 标签描述
     private String tagDesc;
+    // 标签类型
+    private String type;
 
     private OffsetDateTime createTime;
 
