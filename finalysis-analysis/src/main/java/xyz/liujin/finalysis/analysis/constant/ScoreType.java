@@ -1,21 +1,23 @@
 package xyz.liujin.finalysis.analysis.constant;
 
 /**
- * 标签类型表
+ * 分数类型表
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/25
+ * @see xyz.liujin.finalysis.analysis.entity.Score
+ * @see xyz.liujin.finalysis.analysis.score.Scoreable
  */
-public enum TagType {
+public enum ScoreType {
     // 增幅比指标
     INCREASE_RATIO("increase_ratio"),
     ;
     private String name;
 
-    TagType(String name) {
+    ScoreType(String name) {
         this.name = name;
     }
 
-    public String getName() {
+    public String getType() {
         return name;
     }
 }

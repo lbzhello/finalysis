@@ -1,87 +1,59 @@
 package xyz.liujin.finalysis.analysis.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import reactor.core.publisher.Mono;
-import xyz.liujin.finalysis.analysis.dto.IncreaseRatioQo;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
-import xyz.liujin.finalysis.analysis.entity.StockTag;
-import xyz.liujin.finalysis.analysis.entity.TagScore;
-import xyz.liujin.finalysis.analysis.strategy.IncreaseRatioStrategy;
+import xyz.liujin.finalysis.analysis.entity.Score;
+import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
+import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.base.util.MyLogger;
-import xyz.liujin.finalysis.base.util.ObjectUtils;
-import xyz.liujin.finalysis.daily.service.KLineService;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
-/**
- * 图片计分
- * @author liubaozhu lbzhello@qq.com
- * @since 2021-09-21
- */
 @Service
-@Transactional
-public class ScoreService {
+public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements IService<Score> {
     private static final MyLogger logger = MyLogger.getLogger(ScoreService.class);
 
-    @Autowired
-    private KLineService kLineService;
-
-    @Autowired
-    private IncreaseRatioStrategy increaseRatioStrategy;
-
-    @Autowired
-    private StockTagService stockTagService;
-
-    @Autowired
-    private TagScoreService tagScoreService;
+    private Cache<String, Score> cache = Caffeine.newBuilder()
+            .expireAfterWrite(12, TimeUnit.HOURS)
+            .build();
 
     /**
-     * 股票统计分数
-     * @return
+     * 获取分数
+     * 入库或更新，具有缓存功能
+     * @param scoreable 需要入库或更新的分数对象
+     * @return 分数
      */
-    public Mono<Integer> score(ScoreQo scoreQo) {
-        logger.debug("start to score", "scoreQO", scoreQo);
-        // 推荐日期，默认数据库最新或当天
-        LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), kLineService.getLatestDate(), LocalDate.now());
+    public Score getScore(Scoreable scoreable) {
+        Score score = scoreable.getScore();
+        return cache.get(score.getScoreCode(), k -> {
+            logger.debug("get score from db", "score", score);
+            Score exist = getById(k);
+            if (Objects.isNull(exist)) {
+                logger.debug("insert into db");
+                save(score);
+                return score;
+            }
 
-        // 增幅比指标
-        IncreaseRatioQo increaseRatio = scoreQo.getIncreaseRatio();
-        if (Objects.nonNull(increaseRatio) && Objects.isNull(increaseRatio.getDate())) {
-            increaseRatio.setDate(date);
-        }
-        // 默认全局分页信息
-        if (Objects.isNull(increaseRatio.getPage()) && Objects.nonNull(scoreQo.getPage())) {
-            increaseRatio.setPage(scoreQo.getPage());
-        }
-
-        // 计分入库
-        logger.debug("score increase ratio strategy", "increaseRatio", increaseRatio);
-
-        // 标签分数入库
-        TagScore tag = tagScoreService.getTag(increaseRatio);
-
-        // 删除当日，具有该标签的股票，因为每次计分输出的股票是不一样的
-        stockTagService.deleteByDateAndTag(date, tag.getTag());
-
-        increaseRatioStrategy.findCodes(increaseRatio)
-                .map(stockCode -> {
-                    return StockTag.builder()
-                            .date(date)
-                            .stockCode(stockCode)
-                            .tag(tag.getTag())
-                            .build();
-                })
-                .map(stockTags -> {
-                    stockTagService.save(stockTags);
-                    return 1;
-                })
-                .reduce(Integer::sum)
-                .subscribe(count -> logger.debug("increaseRatioStrategy", "count", count),
-                        e -> logger.error("failed to score increaseRatio", e));
-        return Mono.empty();
+            // 字段值有变动，需要更新
+            if (!Objects.equals(score.getScore(), exist.getScore())) {
+                score.setUpdateTime(OffsetDateTime.now());
+                logger.debug("update score", "old", exist, "new", score);
+                updateById(score);
+            }
+            return score;
+        });
     }
 
+    public void saveIfNotExist(Score score) {
+        Score exist = getById(score.getScoreCode());
+        // 新增
+        if (Objects.isNull(exist)) {
+            save(score);
+        }
+    }
 }

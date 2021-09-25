@@ -6,9 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.constant.TagType;
-import xyz.liujin.finalysis.analysis.entity.TagScore;
-import xyz.liujin.finalysis.analysis.tag.Tagable;
+import xyz.liujin.finalysis.analysis.constant.ScoreType;
+import xyz.liujin.finalysis.analysis.entity.Score;
+import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.math.BigDecimal;
@@ -27,7 +27,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IncreaseRatioQo implements Tagable {
+public class IncreaseRatioQo implements Scoreable {
     @ApiModelProperty
     private LocalDate date;
 
@@ -55,9 +55,9 @@ public class IncreaseRatioQo implements Tagable {
     @ApiModelProperty("分页信息")
     private PageQo page;
 
-    private static final String TAG_PREFIX = TagType.INCREASE_RATIO.getName() + "(";
+    private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO.getType() + "(";
     @Override
-    public TagScore getTag() {
+    public Score getScore() {
         // 格式：increase_ratio(recDays=3, hisDays=5)
         StringBuilder tag = new StringBuilder(TAG_PREFIX);
 
@@ -100,11 +100,11 @@ public class IncreaseRatioQo implements Tagable {
             tagDescStr = tagDescStr.substring(0, tagDesc.length() - 1);
         }
 
-        return TagScore.builder()
-                .type(TagType.INCREASE_RATIO.getName())
-                .tag(tagStr)
+        return Score.builder()
+                .type(ScoreType.INCREASE_RATIO.getType())
+                .scoreCode(tagStr)
                 .score(1)
-                .tagDesc(tagDescStr)
+                .description(tagDescStr)
                 .build();
     }
 

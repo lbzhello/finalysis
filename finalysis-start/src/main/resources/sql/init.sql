@@ -357,42 +357,43 @@ comment on column industry.url is '行业地址';
 
 create index uk_industry_code on industry (industry_code);
 
--- 2021-09-21
--- 标签分数表
-drop table if exists tag_score;
-create table tag_score
+-- 2021-09-25
+-- 分数定义表
+drop table if exists score;
+create table score
 (
-    tag         varchar(256) primary key,
+    score_code  varchar(256),
     score       smallint not null default 0,
-    tag_desc    text not null default '',
+    description    text not null default '',
     type        varchar(32) not null default '',
     create_time timestamp(3) with time zone not null default now(),
-    update_time timestamp(3) with time zone not null default now()
+    update_time timestamp(3) with time zone not null default now(),
+    constraint pk_score primary key (score_code)
 );
 
-comment on table tag_score is '标签分数表，用来说明标签的得分';
-comment on column tag_score.tag is '标签';
-comment on column tag_score.score is '分数';
-comment on column tag_score.tag_desc is '标签说明';
-comment on column tag_score.type is '标签类型';
-comment on column tag_score.create_time is '创建时间';
-comment on column tag_score.update_time is '更新时间';
+comment on table score is '分数定义表';
+comment on column score.score_code is '分数代码，具有分数代码的股票，将具有相应的分数';
+comment on column score.score is '具有分数码的股票得分';
+comment on column score.description is '分数码说明';
+comment on column score.type is '分数码类型';
+comment on column score.create_time is '创建时间';
+comment on column score.update_time is '更新时间';
 
--- 股票标签表
-drop table if exists stock_tag;
-create table stock_tag
+-- 股票得分表
+drop table if exists stock_score;
+create table stock_score
 (
     id   bigserial,
     date date not null default now(),
     stock_code varchar(6)  not null,
-    tag varchar(256) not null default '',
-    constraint pk_stock_tag primary key (id)
+    score_code varchar(256) not null default '',
+    constraint pk_stock_score primary key (id)
 );
 
-comment on table stock_tag is '股票标签表，股票带有某个标签，用于根据标签统计分数';
-comment on column stock_tag.id is '主键';
-comment on column stock_tag.date is '日期';
-comment on column stock_tag.stock_code is '股票代码';
-comment on column stock_tag.tag is '标签';
+comment on table stock_score is '股票得分表，用于股票根据分数代码统计分数';
+comment on column stock_score.id is '主键';
+comment on column stock_score.date is '日期';
+comment on column stock_score.stock_code is '股票代码';
+comment on column stock_score.score_code is '分数代码';
 
-create unique index uk_stock_tag_date_tag_stock_code on stock_tag (date, tag, stock_code);
+create unique index uk_stock_score_date_tag_stock_code on stock_score (date, score_code, stock_code);

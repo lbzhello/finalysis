@@ -13,7 +13,7 @@ import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.SustainHighAmountReq;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
-import xyz.liujin.finalysis.analysis.service.ScoreService;
+import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.dto.DailyData;
@@ -30,13 +30,13 @@ public class AnalysisController {
     private AnalysisService analysisService;
 
     @Autowired
-    private ScoreService scoreService;
+    private StockScoreService stockScoreService;
 
 
     @ApiOperation("股票计分")
     @PostMapping("score")
     public Mono<Integer> score(@RequestBody ScoreQo scoreQo) {
-        return scoreService.score(scoreQo);
+        return stockScoreService.score(scoreQo);
     }
 
     @ApiOperation("推荐股票")
