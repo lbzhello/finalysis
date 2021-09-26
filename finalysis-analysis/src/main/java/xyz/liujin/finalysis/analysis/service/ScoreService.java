@@ -8,6 +8,7 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.springframework.stereotype.Service;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
+import xyz.liujin.finalysis.analysis.score.ScoreUtil;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
@@ -30,7 +31,7 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
      * @return 分数
      */
     public Score getScore(Scoreable scoreable) {
-        Score score = scoreable.getScore();
+        Score score = ScoreUtil.getScore(scoreable);
         @PolyNull Score cacheScore = cache.get(score.getScoreCode(), k -> {
             logger.debug("get score from db", "score", score);
             Score exist = getById(k);
