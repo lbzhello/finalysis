@@ -45,7 +45,7 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
 
         updateIfChange(score, cacheScore);
 
-        return cacheScore;
+        return score;
     }
 
     // 字段值有变动，需要更新
