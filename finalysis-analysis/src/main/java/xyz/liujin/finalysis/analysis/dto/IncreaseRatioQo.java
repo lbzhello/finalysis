@@ -91,7 +91,6 @@ public class IncreaseRatioQo implements Scoreable {
         if (scoreCodeStr.endsWith(",")) {
             scoreCodeStr = scoreCodeStr.substring(0, scoreCode.length() - 1);
         }
-
         scoreCodeStr += ")";
 
         String descStr = desc.toString();
@@ -99,11 +98,12 @@ public class IncreaseRatioQo implements Scoreable {
         if (descStr.endsWith(",")) {
             descStr = descStr.substring(0, desc.length() - 1);
         }
+        descStr += ";";
 
         return Score.builder()
                 .type(ScoreTypeEnum.INCREASE_RATIO.getType())
                 .scoreCode(scoreCodeStr)
-                .score(1)
+                .score(10)
                 .description(descStr)
                 .build();
     }

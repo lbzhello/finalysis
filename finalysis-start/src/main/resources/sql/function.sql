@@ -274,6 +274,12 @@ $$ language plpgsql;
 
 -- select * from sustain_high_vol(3, 5) order by ratio desc;
 
+-- 2021-09-26
+-- 增加 data_statistic 创建函数，方便统一管理
+drop function if exists create_data_statistic();
+create or replace function create_data_statistic() returns text as $c$
+begin
+
 -- 2021-09-11
 -- 股票历史数据统计表
 drop function if exists data_statistic(recdays integer, hisdays integer);
@@ -307,7 +313,8 @@ create table data_statistic (
     rec_vol_ratio decimal(7, 2) not null default 0,
     his_vol_ratio decimal(7, 2) not null default 0,
 
-    pct_change_ratio decimal(7, 2) not null default 0
+    pct_change_ratio decimal(7, 2) not null default 0,
+    turn_ratio decimal(7, 2) not null default 0
 );
 
 comment on table data_statistic is '股票历史数据统计';
@@ -330,6 +337,7 @@ comment on column data_statistic.his_amount is '过去几日成交额';
 comment on column data_statistic.rec_vol_ratio is '最近几日量比';
 comment on column data_statistic.his_vol_ratio is '过去几日量比';
 comment on column data_statistic.pct_change_ratio is '最近与过去增幅比值';
+comment on column data_statistic.turn_ratio is '最近与过去平均自由换手比值';
 
 -- 股票历史数据统计
 -- recDays 最近天数
@@ -402,7 +410,8 @@ begin
 
                rec_vol_ratio::decimal(7, 2),
                his_vol_ratio::decimal(7, 2),
-               (rec_pct_change/(case when abs(his_pct_change) < 1 then 1 else abs(his_pct_change) end))::decimal(7, 2) pct_change_ratio
+               (rec_pct_change/(case when abs(his_pct_change) < 1 then 1 else abs(his_pct_change) end))::decimal(7, 2) pct_change_ratio,
+               (round(rec_turn_f/recDays, 2)/round(his_turn_f/hisDays, 2))::decimal(7, 2) turn_ratio
         from stock s
              join rec on s.stock_code = rec.stock_code
              join his on s.stock_code = his.stock_code;
@@ -420,3 +429,9 @@ begin
     return query select * from data_statistic(recDays, hisDays, curDay);
 end;
 $$ language plpgsql;
+
+return 'success';
+end;
+$c$ language plpgsql;
+
+select create_data_statistic();

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.springframework.stereotype.Service;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
@@ -30,7 +31,7 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
      */
     public Score getScore(Scoreable scoreable) {
         Score score = scoreable.getScore();
-        return cache.get(score.getScoreCode(), k -> {
+        @PolyNull Score cacheScore = cache.get(score.getScoreCode(), k -> {
             logger.debug("get score from db", "score", score);
             Score exist = getById(k);
             if (Objects.isNull(exist)) {
@@ -39,14 +40,23 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
                 return score;
             }
 
-            // 字段值有变动，需要更新
-            if (!Objects.equals(score.getScore(), exist.getScore())) {
-                score.setUpdateTime(OffsetDateTime.now());
-                logger.debug("update score", "old", exist, "new", score);
-                updateById(score);
-            }
-            return score;
+            return exist;
         });
+
+        updateIfChange(score, cacheScore);
+
+        return cacheScore;
+    }
+
+    // 字段值有变动，需要更新
+    private void updateIfChange(Score score, Score exist) {
+        if (!Objects.equals(score.getScore(), exist.getScore())) {
+            score.setUpdateTime(OffsetDateTime.now());
+            logger.debug("update score", "old", exist, "new", score);
+            updateById(score);
+            // 清除缓存，下次查询时自动缓存
+            cache.invalidate(score.getScoreCode());
+        }
     }
 
     public void saveIfNotExist(Score score) {
