@@ -17,7 +17,7 @@ public class IncreaseRatioQoTest {
         IncreaseRatioQo increaseRatioQo = IncreaseRatioQo.builder()
                 .recDays(3)
                 .hisDays(5)
-                .minIncRatio(BigDecimal.valueOf(2))
+                .minRatio(BigDecimal.valueOf(2))
                 .page(PageQo.builder()
                         .limit(100)
                         .orderBy("pct_change_ratio desc")

@@ -7,8 +7,8 @@
             <if test="minIncRatio != null">
                 and pct_change_ratio >= #{minIncRatio}
             </if>
-            <if test="maxIncRatio != null">
-                and pct_change_ratio &lt;= #{maxIncRatio}
+            <if test="minRatio != null">
+                and pct_change_ratio &lt;= #{minRatio}
             </if>
             <if test="minRecInc != null">
                 and rec_pct_change >= #{minRecInc}

@@ -4,8 +4,8 @@
     <select id="findCodes" resultType="java.lang.String">
         select stock_code from data_statistic(#{recDays}, #{hisDays}, #{date})
         <where>
-            <if test="minTurnRatio != null">
-                and turn_ratio >= #{minTurnRatio}
+            <if test="minRatio != null">
+                and turn_ratio >= #{minRatio}
             </if>
             <if test="minAvgAmount != null">
                 and rec_avg_amount &lt;= #{minAvgAmount}

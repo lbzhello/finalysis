@@ -43,7 +43,7 @@ public class TurnRatioQo implements ScoreStrategyQo {
 
     @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
     @ScoreField("换手率比值大于 %s")
-    private Integer minTurnRatio;
+    private Integer minRatio;
 
     @ApiModelProperty(value = "最近最小平均成交额，一般应该大于 1 亿，过小的成交额没有太多意义", example = "1e9")
     @ScoreField("最近平均成交额大于 %s")

@@ -39,10 +39,7 @@ public class IncreaseRatioQo implements Scoreable, ScoreStrategyQo {
     private Integer hisDays;
 
     @ApiModelProperty(value = "过去天数与最近天数增幅比值最小值", example = "2")
-    private BigDecimal minIncRatio;
-
-    @ApiModelProperty(value = "过去天数与最近天数增幅比值最大值", example = "5")
-    private BigDecimal maxIncRatio;
+    private BigDecimal minRatio;
 
     @ApiModelProperty(value = "最近最小增幅", example = "10")
     private BigDecimal minRecInc;
