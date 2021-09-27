@@ -9,10 +9,12 @@ import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
 import xyz.liujin.finalysis.analysis.strategy.IncreaseRatioStrategy;
+import xyz.liujin.finalysis.analysis.strategy.QueryStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.daily.service.KLineService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore> implements IService<StockScore> {
@@ -26,6 +28,9 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
 
     @Autowired
     private ScoreService scoreService;
+
+    @Autowired
+    private List<QueryStrategy<?>> st;
 
     /**
      * 根据条件计算股票得分

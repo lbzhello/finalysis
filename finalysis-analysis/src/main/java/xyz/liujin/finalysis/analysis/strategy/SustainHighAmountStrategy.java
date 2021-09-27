@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.SustainHighAmountQo;
 import xyz.liujin.finalysis.analysis.dto.SustainHighAmountReq;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
@@ -25,7 +26,7 @@ import java.util.List;
  * 说明股票开始异动，往往是启动（向上或向下）的标识
  */
 @Service
-public class SustainHighAmountStrategy implements Strategy<SustainHighAmountReq> {
+public class SustainHighAmountStrategy extends QueryStrategy<SustainHighAmountReq> {
     private static final Logger logger = LoggerFactory.getLogger(SustainHighAmountStrategy.class);
 
     @Autowired
@@ -36,6 +37,11 @@ public class SustainHighAmountStrategy implements Strategy<SustainHighAmountReq>
 
     @Autowired
     private AnalysisMapper analysisMapper;
+
+    @Override
+    public SustainHighAmountReq getQueryStrategy(ScoreQo scoreQo) {
+        return scoreQo.getSustainHighAmount();
+    }
 
     /**
      * 获取持续放量的股票

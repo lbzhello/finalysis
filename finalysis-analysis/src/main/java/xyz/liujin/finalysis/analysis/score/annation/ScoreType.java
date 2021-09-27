@@ -32,7 +32,7 @@ public @interface ScoreType {
     int score() default 10;
 
     /**
-     * 分数码前缀
+     * 分数码分隔符
      */
     String codeSeparator() default ",";
 
@@ -47,17 +47,17 @@ public @interface ScoreType {
     String codeSuffix() default ")";
 
     /**
-     * 分数描述信息分隔符
+     * 说明信息分隔符
      */
     String descriptionSeparator() default ",";
 
     /**
-     * 分数说明信息拼接前缀
+     * 说明信息拼接前缀
      */
     String descriptionPrefix() default "";
 
     /**
-     * 分数说明信息拼接后缀
+     * 说明信息拼接后缀
      */
     String descriptionSuffix() default ";";
 }

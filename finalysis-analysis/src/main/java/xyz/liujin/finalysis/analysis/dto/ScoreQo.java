@@ -22,6 +22,10 @@ public class ScoreQo {
     private LocalDate date;
     @ApiModelProperty("增幅比指标")
     private IncreaseRatioQo increaseRatio;
+    @ApiModelProperty("换手比指标")
+    private TurnRatioQo turnRatio;
+    @ApiModelProperty("成交额持续放量指标")
+    private SustainHighAmountReq sustainHighAmount;
     @ApiModelProperty("量比放量指标")
     private HeavenVolRatioQo heavenVolRatio;
     @ApiModelProperty("日线突破指标，5 X 10")

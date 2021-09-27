@@ -10,6 +10,7 @@ import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreField;
 import xyz.liujin.finalysis.analysis.score.annation.ScorePage;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreType;
+import xyz.liujin.finalysis.analysis.strategy.QueryStrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.math.BigDecimal;
@@ -28,7 +29,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ScoreType(ScoreTypeEnum.TURN_RATIO)
-public class TurnRatioQo {
+public class TurnRatioQo implements QueryStrategyQo {
     @ApiModelProperty
     private LocalDate date;
 
@@ -39,6 +40,10 @@ public class TurnRatioQo {
     @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
     @ScoreField("过去 %s 天")
     private Integer hisDays;
+
+    @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
+    @ScoreField("换手率比值大于 %s")
+    private Integer minTurnRatio;
 
     @ApiModelProperty(value = "最近最小平均成交额，一般应该大于 1 亿，过小的成交额没有太多意义", example = "1e9")
     @ScoreField("最近平均成交额大于 %s")
