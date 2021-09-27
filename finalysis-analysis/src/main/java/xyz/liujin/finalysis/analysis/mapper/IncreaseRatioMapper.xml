@@ -4,9 +4,6 @@
     <select id="findCodes" resultType="java.lang.String">
         select stock_code from data_statistic(#{recDays}, #{hisDays}, #{date})
         <where>
-            <if test="minIncRatio != null">
-                and pct_change_ratio >= #{minIncRatio}
-            </if>
             <if test="minRatio != null">
                 and pct_change_ratio &lt;= #{minRatio}
             </if>
