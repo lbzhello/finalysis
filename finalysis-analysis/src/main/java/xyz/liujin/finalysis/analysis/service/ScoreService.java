@@ -8,7 +8,6 @@ import org.checkerframework.checker.nullness.qual.PolyNull;
 import org.springframework.stereotype.Service;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
-import xyz.liujin.finalysis.analysis.score.ScoreUtil;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
@@ -25,13 +24,19 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
             .build();
 
     /**
-     * 获取分数
+     * 更新分数
      * 入库或更新，具有缓存功能
-     * @param scoreable 需要入库或更新的分数对象
+     *
+     * 目标类必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     *
+     * @param score 需要入库或更新的分数对象
      * @return 分数
+     *
+     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreType
+     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreField
+     * @see Scoreable
      */
-    public Score getScore(Scoreable scoreable) {
-        Score score = ScoreUtil.getScore(scoreable);
+    public Score refreshScore(Score score) {
         @PolyNull Score cacheScore = cache.get(score.getScoreCode(), k -> {
             logger.debug("get score from db", "score", score);
             Score exist = getById(k);
@@ -43,7 +48,7 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
 
             return exist;
         });
-
+        // 不能放在 cache lambda 里面更新，会报错：循环更新异常
         updateIfChange(score, cacheScore);
 
         return score;

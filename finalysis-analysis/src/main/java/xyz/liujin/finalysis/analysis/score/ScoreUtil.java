@@ -2,11 +2,14 @@ package xyz.liujin.finalysis.analysis.score;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreField;
 import xyz.liujin.finalysis.analysis.score.annation.ScorePage;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreType;
+import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
 import java.lang.reflect.Field;
@@ -21,15 +24,46 @@ import java.util.Objects;
  * @since 2021/9/25
  * @see Scoreable
  */
+@Configuration
 public class ScoreUtil {
     private static final MyLogger logger = MyLogger.getLogger(ScoreUtil.class);
 
+    private static ScoreService scoreService;
+    @Autowired
+    public void setScoreService(ScoreService scoreService) {
+        ScoreUtil.scoreService = scoreService;
+    }
+
     /**
-     * 获取分数定义
+     * 获取分数
+     *
+     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     *
+     * @param obj 根据 obj 计算分数
+     * @return 分数
+     *
+     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreType
+     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreField
+     * @see Scoreable
+     */
+    public static Score getScore(@Nullable Object obj) {
+        Score score = calculateScore(obj);
+        if (Objects.nonNull(score)) {
+            scoreService.refreshScore(score);
+        }
+
+        return score;
+    }
+
+    /**
+     * 计算分数
+     *
+     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     *
      * @param obj
      * @return
      */
-    public static Score getScore(@Nullable Object obj) {
+    public static Score calculateScore(@Nullable Object obj) {
         if (Objects.isNull(obj)) {
             return null;
         }

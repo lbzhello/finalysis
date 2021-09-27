@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 public class ScoreUtilTest {
     @Test
     public void scoreUtilTest() {
-        Score score = ScoreUtil.getScore(TurnRatioQo.builder()
+        Score score = ScoreUtil.calculateScore(TurnRatioQo.builder()
                 .recDays(3)
                 .hisDays(5)
                 .minAvgAmount(BigDecimal.valueOf(1e9))
