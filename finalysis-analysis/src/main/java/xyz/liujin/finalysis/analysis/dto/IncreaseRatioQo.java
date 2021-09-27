@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
-import xyz.liujin.finalysis.analysis.strategy.QueryStrategyQo;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.math.BigDecimal;
@@ -28,7 +28,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class IncreaseRatioQo implements Scoreable, QueryStrategyQo {
+public class IncreaseRatioQo implements Scoreable, ScoreStrategyQo {
     @ApiModelProperty
     private LocalDate date;
 

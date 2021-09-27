@@ -26,7 +26,7 @@ import java.util.List;
  * 说明股票开始异动，往往是启动（向上或向下）的标识
  */
 @Service
-public class SustainHighAmountStrategy extends QueryStrategy<SustainHighAmountReq> {
+public class SustainHighAmountStrategy extends ScoreStrategy<SustainHighAmountReq> {
     private static final Logger logger = LoggerFactory.getLogger(SustainHighAmountStrategy.class);
 
     @Autowired

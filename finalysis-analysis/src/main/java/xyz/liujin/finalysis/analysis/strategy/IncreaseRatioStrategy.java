@@ -19,7 +19,7 @@ import java.time.LocalDate;
  * 说明股票可能有重大利好消息
  */
 @Service
-public class IncreaseRatioStrategy extends QueryStrategy<IncreaseRatioQo> {
+public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(IncreaseRatioStrategy.class);
 
     @Autowired

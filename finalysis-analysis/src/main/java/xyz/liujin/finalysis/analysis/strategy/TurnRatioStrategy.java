@@ -16,7 +16,7 @@ import java.util.Objects;
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/27
  */
-public class TurnRatioStrategy extends QueryStrategy<TurnRatioQo> {
+public class TurnRatioStrategy extends ScoreStrategy<TurnRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(TurnRatioStrategy.class);
 
     @Autowired

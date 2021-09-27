@@ -16,12 +16,12 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * 股票筛选策略接口，根据条件删选出指定股票
+ * 股票计分策略接口，根据计分条件筛选出指定股票，并计算得分
  * @param <QO> 策略查询对象泛型
  */
 @Configuration
-public abstract class QueryStrategy<QO extends QueryStrategyQo> {
-    private static MyLogger logger = MyLogger.getLogger(QueryStrategy.class);
+public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
+    private static MyLogger logger = MyLogger.getLogger(ScoreStrategy.class);
 
     @Autowired
     private DailyApp dailyApp;
@@ -30,14 +30,14 @@ public abstract class QueryStrategy<QO extends QueryStrategyQo> {
     private StockScoreService stockScoreService;
 
     /**
-     * 获取策略查询对象
+     * 获取计分查询对象
      * @param scoreQo
      * @return
      */
     public abstract QO getQueryStrategy(ScoreQo scoreQo);
 
     /**
-     * 筛选符合策略条件的股票
+     * 筛选符合得分条件的股票
      * @param qo 查询条件
      * @return
      */

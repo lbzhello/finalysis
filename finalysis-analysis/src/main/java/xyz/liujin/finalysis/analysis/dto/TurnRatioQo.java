@@ -10,7 +10,7 @@ import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreField;
 import xyz.liujin.finalysis.analysis.score.annation.ScorePage;
 import xyz.liujin.finalysis.analysis.score.annation.ScoreType;
-import xyz.liujin.finalysis.analysis.strategy.QueryStrategyQo;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.math.BigDecimal;
@@ -29,7 +29,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ScoreType(ScoreTypeEnum.TURN_RATIO)
-public class TurnRatioQo implements QueryStrategyQo {
+public class TurnRatioQo implements ScoreStrategyQo {
     @ApiModelProperty
     private LocalDate date;
 
