@@ -16,6 +16,9 @@ import java.time.LocalDate;
 import java.util.Objects;
 import java.util.function.Consumer;
 
+/**
+ * daily 模块服务接口，对外外观类
+ */
 @Service
 public class DailyService {
     private static final Logger logger = LoggerFactory.getLogger(DailyService.class);
@@ -28,6 +31,14 @@ public class DailyService {
 
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
+
+    /**
+     * 获取最新的数据日期
+     * @return
+     */
+    public LocalDate getLatestDate() {
+        return kLineService.getLatestDate();
+    }
 
     /**
      * 检验数据完整性

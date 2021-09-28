@@ -10,7 +10,7 @@ import xyz.liujin.finalysis.analysis.score.ScoreUtil;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
-import xyz.liujin.finalysis.daily.DailyApp;
+import xyz.liujin.finalysis.daily.service.DailyService;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -24,7 +24,7 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
     private static MyLogger logger = MyLogger.getLogger(ScoreStrategy.class);
 
     @Autowired
-    private DailyApp dailyApp;
+    private DailyService dailyService;
 
     @Autowired
     private StockScoreService stockScoreService;
@@ -59,7 +59,7 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
         logger.debug("score by strategy", "queryStrategy", queryStrategy);
 
         // 查询日期，默认数据库最新或当天
-        LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), dailyApp.getLatestDate(), LocalDate.now());
+        LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), dailyService.getLatestDate(), LocalDate.now());
         if (Objects.isNull(queryStrategy.getDate())) {
             queryStrategy.setDate(date);
         }

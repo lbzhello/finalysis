@@ -8,7 +8,7 @@ import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.mapper.IncreaseRatioMapper;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
-import xyz.liujin.finalysis.daily.DailyApp;
+import xyz.liujin.finalysis.daily.service.DailyService;
 
 import java.time.LocalDate;
 
@@ -26,7 +26,7 @@ public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
     private IncreaseRatioMapper increaseRatioMapper;
 
     @Autowired
-    private DailyApp dailyApp;
+    private DailyService dailyService;
 
     @Override
     public IncreaseRatioQo getQueryStrategy(ScoreQo scoreQo) {
@@ -37,7 +37,7 @@ public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
     public Flux<String> findCodes(IncreaseRatioQo increaseRatioQo) {
         // 日期默认数据库最新
         increaseRatioQo.setDate(ObjectUtils.firstNonNull(increaseRatioQo.getDate(),
-                dailyApp.getLatestDate(),
+                dailyService.getLatestDate(),
                 LocalDate.now()));
 
         return Flux.fromIterable(increaseRatioMapper.findCodes(increaseRatioQo));
