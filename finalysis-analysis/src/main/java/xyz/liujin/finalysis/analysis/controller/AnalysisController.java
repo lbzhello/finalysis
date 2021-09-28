@@ -6,12 +6,12 @@ import io.swagger.annotations.ApiParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.dto.RecommendQo;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.SustainHighAmountReq;
+import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.service.AnalysisService;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.executor.TaskPool;
@@ -35,7 +35,7 @@ public class AnalysisController {
 
     @ApiOperation("股票计分")
     @PostMapping("score")
-    public Mono<Integer> score(@RequestBody ScoreQo scoreQo) {
+    public Flux<StockScore> score(@RequestBody ScoreQo scoreQo) {
         return stockScoreService.score(scoreQo);
     }
 

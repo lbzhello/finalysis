@@ -74,6 +74,11 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
         // 计算得分
         Score score = scoreService.getScore(queryStrategy);
 
+        if (Objects.isNull(score)) {
+            logger.debug("can't get score, stop scoring");
+            return Flux.empty();
+        }
+
         // 删除当日，具有该分数码的股票，因为每次计分输出的股票是不一样的
         stockScoreService.deleteByDateAndScoreCode(date, score.getScoreCode());
 

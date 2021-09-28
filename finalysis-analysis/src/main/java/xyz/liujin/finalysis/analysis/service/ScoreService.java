@@ -39,7 +39,7 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
      * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
      * @see Scoreable
      */
-    public Score getScore(@Nullable Object obj) {
+    public @Nullable Score getScore(@Nullable Object obj) {
         Score score = ScoreUtil.calculateScore(obj);
         if (Objects.isNull(score)) {
             return null;

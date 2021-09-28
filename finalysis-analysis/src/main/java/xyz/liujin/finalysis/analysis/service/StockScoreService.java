@@ -4,14 +4,12 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Mono;
+import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
-import xyz.liujin.finalysis.analysis.strategy.IncreaseRatioStrategy;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
-import xyz.liujin.finalysis.daily.service.KLineService;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,32 +19,24 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     private static final MyLogger logger = MyLogger.getLogger(StockScoreService.class);
 
     @Autowired
-    private KLineService kLineService;
-
-    @Autowired
-    private IncreaseRatioStrategy increaseRatioStrategy;
-
-    @Autowired
-    private ScoreService scoreService;
-
-    @Autowired
-    private List<ScoreStrategy<?>> st;
+    private List<ScoreStrategy<?>> scoreStrategies;
 
     /**
      * 根据条件计算股票得分
      * @return
      */
-    public Mono<Integer> score(ScoreQo scoreQo) {
+    public Flux<StockScore> score(ScoreQo scoreQo) {
         logger.debug("start to score", "scoreQO", scoreQo);
-        increaseRatioStrategy.score(scoreQo)
-                .map(stockScore -> {
-                    save(stockScore);
-                    return 1;
+        return Flux.fromIterable(scoreStrategies)
+                .flatMap(scoreStrategy -> {
+                    logger.info("scoring", "scoreStrategy", scoreStrategy.getClass());
+                    return scoreStrategy.score(scoreQo);
                 })
-                .reduce(Integer::sum)
-                .subscribe(count -> logger.debug("increaseRatioStrategy", "count", count),
-                        e -> logger.error("failed to score increaseRatio", e));
-        return Mono.empty();
+                .map(stockScore -> {
+                    logger.trace("get stock score", "stockScore", stockScore);
+                    save(stockScore);
+                    return stockScore;
+                });
     }
 
     /**

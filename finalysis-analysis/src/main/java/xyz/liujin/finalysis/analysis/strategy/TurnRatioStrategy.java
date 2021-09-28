@@ -1,6 +1,7 @@
 package xyz.liujin.finalysis.analysis.strategy;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.TurnRatioQo;
@@ -16,6 +17,7 @@ import java.util.Objects;
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/27
  */
+@Service
 public class TurnRatioStrategy extends ScoreStrategy<TurnRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(TurnRatioStrategy.class);
 
