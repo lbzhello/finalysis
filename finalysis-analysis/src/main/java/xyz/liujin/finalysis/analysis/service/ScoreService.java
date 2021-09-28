@@ -5,9 +5,11 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.checkerframework.checker.nullness.qual.PolyNull;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
+import xyz.liujin.finalysis.analysis.score.ScoreUtil;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -25,19 +27,24 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
             .build();
 
     /**
-     * 更新分数
+     * 计算并获取分数
      * 入库或更新，具有缓存功能
      *
-     * 目标类必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
+     * 目标类 obj 需要带有 {@link ScoreConfig} 注解
      *
-     * @param score 需要入库或更新的分数对象
+     * @param obj 根据 obj 计算分数
      * @return 分数
      *
      * @see ScoreConfig
      * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
      * @see Scoreable
      */
-    public Score refreshScore(Score score) {
+    public Score getScore(@Nullable Object obj) {
+        Score score = ScoreUtil.calculateScore(obj);
+        if (Objects.isNull(score)) {
+            return null;
+        }
+
         @PolyNull Score cacheScore = cache.get(score.getScoreCode(), k -> {
             logger.debug("get score from db", "score", score);
             Score exist = getById(k);

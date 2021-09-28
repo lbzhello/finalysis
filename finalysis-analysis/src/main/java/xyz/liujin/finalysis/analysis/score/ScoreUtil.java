@@ -2,14 +2,11 @@ package xyz.liujin.finalysis.analysis.score;
 
 import cn.hutool.core.collection.CollectionUtil;
 import cn.hutool.core.text.CharSequenceUtil;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreField;
 import xyz.liujin.finalysis.analysis.score.annotation.ScorePage;
-import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
 import java.lang.reflect.Field;
@@ -24,42 +21,16 @@ import java.util.Objects;
  * @since 2021/9/25
  * @see Scoreable
  */
-@Configuration
 public class ScoreUtil {
     private static final MyLogger logger = MyLogger.getLogger(ScoreUtil.class);
-
-    private static ScoreService scoreService;
-    @Autowired
-    public void setScoreService(ScoreService scoreService) {
-        ScoreUtil.scoreService = scoreService;
-    }
-
-    /**
-     * 获取分数
-     *
-     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
-     *
-     * @param obj 根据 obj 计算分数
-     * @return 分数
-     *
-     * @see ScoreConfig
-     * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
-     * @see Scoreable
-     */
-    public static Score getScore(@Nullable Object obj) {
-        Score score = calculateScore(obj);
-        if (Objects.nonNull(score)) {
-            scoreService.refreshScore(score);
-        }
-
-        return score;
-    }
 
     /**
      * 计算分数
      *
-     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
+     * 目标类 obj 需要加上 {@link ScoreConfig} 注解
      *
+     * @see ScoreConfig
+     * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
      * @param obj
      * @return
      */

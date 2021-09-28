@@ -6,7 +6,7 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
-import xyz.liujin.finalysis.analysis.score.ScoreUtil;
+import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -28,6 +28,9 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
 
     @Autowired
     private StockScoreService stockScoreService;
+
+    @Autowired
+    private ScoreService scoreService;
 
     /**
      * 获取计分查询对象
@@ -69,7 +72,7 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
         }
 
         // 计算得分
-        Score score = ScoreUtil.getScore(queryStrategy);
+        Score score = scoreService.getScore(queryStrategy);
 
         // 删除当日，具有该分数码的股票，因为每次计分输出的股票是不一样的
         stockScoreService.deleteByDateAndScoreCode(date, score.getScoreCode());
