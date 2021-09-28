@@ -7,7 +7,7 @@ package xyz.liujin.finalysis.analysis.score;
  * @see xyz.liujin.finalysis.analysis.entity.Score
  * @see xyz.liujin.finalysis.analysis.score.Scoreable
  */
-public enum ScoreTypeEnum {
+public enum ScoreType {
     // 增幅比指标
     INCREASE_RATIO("increase_ratio"),
     // 换手比指标
@@ -15,7 +15,7 @@ public enum ScoreTypeEnum {
     ;
     private String name;
 
-    ScoreTypeEnum(String name) {
+    ScoreType(String name) {
         this.name = name;
     }
 

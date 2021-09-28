@@ -6,10 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
-import xyz.liujin.finalysis.analysis.score.annation.ScoreField;
-import xyz.liujin.finalysis.analysis.score.annation.ScorePage;
-import xyz.liujin.finalysis.analysis.score.annation.ScoreType;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreField;
+import xyz.liujin.finalysis.analysis.score.annotation.ScorePage;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
@@ -28,7 +28,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ScoreType(ScoreTypeEnum.TURN_RATIO)
+@ScoreConfig(ScoreType.TURN_RATIO)
 public class TurnRatioQo implements ScoreStrategyQo {
     @ApiModelProperty
     private LocalDate date;

@@ -7,7 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import xyz.liujin.finalysis.analysis.entity.Score;
-import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
@@ -53,7 +53,7 @@ public class IncreaseRatioQo implements Scoreable, ScoreStrategyQo {
     @ApiModelProperty("分页信息")
     private PageQo page;
 
-    private static final String TAG_PREFIX = ScoreTypeEnum.INCREASE_RATIO.getType() + "(";
+    private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO.getType() + "(";
     @Override
     public Score getScore() {
         // 格式：increase_ratio(recDays=3, hisDays=5)
@@ -70,6 +70,11 @@ public class IncreaseRatioQo implements Scoreable, ScoreStrategyQo {
         if (Objects.nonNull(hisDays)) {
             scoreCode.append("hisDays=").append(hisDays).append(",");
             desc.append("过去").append(hisDays).append("天,");
+        }
+
+        if (Objects.nonNull(minRatio)) {
+            scoreCode.append("minRatio=").append(minRatio).append(",");
+            desc.append("增幅比大于").append(minRatio).append(",");
         }
 
         if (Objects.nonNull(page)) {
@@ -99,7 +104,7 @@ public class IncreaseRatioQo implements Scoreable, ScoreStrategyQo {
         descStr += ";";
 
         return Score.builder()
-                .type(ScoreTypeEnum.INCREASE_RATIO.getType())
+                .type(ScoreType.INCREASE_RATIO.getType())
                 .scoreCode(scoreCodeStr)
                 .score(10)
                 .description(descStr)

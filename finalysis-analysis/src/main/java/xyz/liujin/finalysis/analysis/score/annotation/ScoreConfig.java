@@ -1,6 +1,6 @@
-package xyz.liujin.finalysis.analysis.score.annation;
+package xyz.liujin.finalysis.analysis.score.annotation;
 
-import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
 
 import java.lang.annotation.*;
 
@@ -19,12 +19,12 @@ import java.lang.annotation.*;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-public @interface ScoreType {
+public @interface ScoreConfig {
     /**
      * 分数类型
      * @return
      */
-    ScoreTypeEnum value();
+    ScoreType value();
 
     /**
      * 得分

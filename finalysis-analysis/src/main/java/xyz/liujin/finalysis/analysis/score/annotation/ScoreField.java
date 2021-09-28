@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.analysis.score.annation;
+package xyz.liujin.finalysis.analysis.score.annotation;
 
 import java.lang.annotation.*;
 

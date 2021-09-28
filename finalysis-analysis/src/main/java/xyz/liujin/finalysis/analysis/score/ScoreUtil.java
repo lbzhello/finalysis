@@ -6,9 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.lang.Nullable;
 import xyz.liujin.finalysis.analysis.entity.Score;
-import xyz.liujin.finalysis.analysis.score.annation.ScoreField;
-import xyz.liujin.finalysis.analysis.score.annation.ScorePage;
-import xyz.liujin.finalysis.analysis.score.annation.ScoreType;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreField;
+import xyz.liujin.finalysis.analysis.score.annotation.ScorePage;
 import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
@@ -37,13 +37,13 @@ public class ScoreUtil {
     /**
      * 获取分数
      *
-     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
      *
      * @param obj 根据 obj 计算分数
      * @return 分数
      *
-     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreType
-     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreField
+     * @see ScoreConfig
+     * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
      * @see Scoreable
      */
     public static Score getScore(@Nullable Object obj) {
@@ -58,7 +58,7 @@ public class ScoreUtil {
     /**
      * 计算分数
      *
-     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     * 目标类 obj 必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
      *
      * @param obj
      * @return
@@ -81,7 +81,7 @@ public class ScoreUtil {
 
         // 根据注解解析
         Class<?> objClass = obj.getClass();
-        ScoreType st = objClass.getAnnotation(ScoreType.class);
+        ScoreConfig st = objClass.getAnnotation(ScoreConfig.class);
         if (Objects.isNull(st)) {
             return null;
         }
@@ -142,10 +142,10 @@ public class ScoreUtil {
                 });
 
 
-        ScoreTypeEnum scoreTypeEnum  = st.value();
+        ScoreType scoreType = st.value();
         String scoreCode = "";
         if (CollectionUtil.isNotEmpty(scoreCodes)) {
-            scoreCode = scoreTypeEnum.getType() + st.codePrefix() +
+            scoreCode = scoreType.getType() + st.codePrefix() +
                     CollectionUtil.join(scoreCodes, st.codeSeparator()) +
                     st.codeSuffix();
         }
@@ -159,7 +159,7 @@ public class ScoreUtil {
         return Score.builder()
                 .scoreCode(scoreCode)
                 .score(st.score())
-                .type(scoreTypeEnum.getType())
+                .type(scoreType.getType())
                 .description(description)
                 .build();
     }

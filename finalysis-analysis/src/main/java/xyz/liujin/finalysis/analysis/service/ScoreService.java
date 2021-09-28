@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.mapper.ScoreMapper;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
 import java.time.OffsetDateTime;
@@ -27,13 +28,13 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
      * 更新分数
      * 入库或更新，具有缓存功能
      *
-     * 目标类必须实现 {@link Scoreable} 接口或者加上 {@link xyz.liujin.finalysis.analysis.score.annation.ScoreType} 注解
+     * 目标类必须实现 {@link Scoreable} 接口或者加上 {@link ScoreConfig} 注解
      *
      * @param score 需要入库或更新的分数对象
      * @return 分数
      *
-     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreType
-     * @see xyz.liujin.finalysis.analysis.score.annation.ScoreField
+     * @see ScoreConfig
+     * @see xyz.liujin.finalysis.analysis.score.annotation.ScoreField
      * @see Scoreable
      */
     public Score refreshScore(Score score) {

@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.score.ScoreTypeEnum;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
 
 import java.time.OffsetDateTime;
@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
  * 分数定义表
  * 用于股票行情计分
  * @see Scoreable
- * @see ScoreTypeEnum
+ * @see ScoreType
  */
 @Data
 @Builder
