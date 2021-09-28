@@ -8,7 +8,7 @@
                 and turn_ratio >= #{minRatio}
             </if>
             <if test="minAvgAmount != null">
-                and rec_avg_amount &lt;= #{minAvgAmount}
+                and rec_avg_amount >= #{minAvgAmount}
             </if>
             <if test="codes != null and codes.size() > 0">
                 and stock_code in

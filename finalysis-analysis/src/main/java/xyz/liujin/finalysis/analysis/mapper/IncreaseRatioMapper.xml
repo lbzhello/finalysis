@@ -5,7 +5,7 @@
         select stock_code from data_statistic(#{recDays}, #{hisDays}, #{date})
         <where>
             <if test="minRatio != null">
-                and pct_change_ratio &lt;= #{minRatio}
+                and pct_change_ratio >= #{minRatio}
             </if>
             <if test="minRecInc != null">
                 and rec_pct_change >= #{minRecInc}
