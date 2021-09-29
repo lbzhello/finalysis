@@ -38,7 +38,7 @@ public class KLineService extends ServiceImpl<KLineMapper, KLine> implements ISe
 
     /**
      * 获取最近 limit 天交易日历
-     * @param endDate 日历结束日期
+     * @param endDate 日历结束日期，默认最新
      * @param limit 最多返回记录数
      * @return
      */

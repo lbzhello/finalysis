@@ -1,4 +1,4 @@
-package xyz.liujin.finalysis.analysis.strategy;
+package xyz.liujin.finalysis.analysis.strategy.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -6,6 +6,7 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.IncreaseRatioQo;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.mapper.IncreaseRatioMapper;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.service.DailyService;

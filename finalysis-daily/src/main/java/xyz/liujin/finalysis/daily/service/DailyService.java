@@ -10,9 +10,9 @@ import reactor.core.publisher.FluxSink;
 import xyz.liujin.finalysis.base.util.DateUtils;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.daily.entity.KLine;
-import xyz.liujin.finalysis.stock.service.StockService;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -24,13 +24,20 @@ public class DailyService {
     private static final Logger logger = LoggerFactory.getLogger(DailyService.class);
 
     @Autowired
-    private StockService stockService;
-
-    @Autowired
     private KLineService kLineService;
 
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
+
+    /**
+     * 获取最近 limit 天交易日历
+     * @param endDate 日历结束日期，默认最新
+     * @param limit 最多返回记录数
+     * @return
+     */
+    public List<LocalDate> tradingCalendar(@Nullable LocalDate endDate, int limit) {
+        return kLineService.tradingCalendar(endDate, limit);
+    }
 
     /**
      * 获取最新的数据日期
