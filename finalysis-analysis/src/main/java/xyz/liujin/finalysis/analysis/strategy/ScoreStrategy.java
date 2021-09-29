@@ -20,7 +20,7 @@ import java.util.Objects;
  * @param <QO> 策略查询对象泛型
  */
 @Configuration
-public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
+public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<QO> {
     private static MyLogger logger = MyLogger.getLogger(ScoreStrategy.class);
 
     @Autowired
@@ -37,14 +37,7 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
      * @param scoreQo
      * @return
      */
-    public abstract QO getQueryStrategy(ScoreQo scoreQo);
-
-    /**
-     * 筛选符合得分条件的股票
-     * @param qo 查询条件
-     * @return
-     */
-    public abstract Flux<String> findCodes(QO qo);
+    public abstract QO getScoreable(ScoreQo scoreQo);
 
     /**
      * 股票计分
@@ -53,26 +46,26 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
      */
     public Flux<StockScore> score(ScoreQo scoreQo) {
         // 获取策略查询对象
-        QO queryStrategy = getQueryStrategy(scoreQo);
-        if (Objects.isNull(queryStrategy)) {
+        QO scoreable = getScoreable(scoreQo);
+        if (Objects.isNull(scoreable)) {
             logger.debug("condition is null or empty, skip");
             return Flux.empty();
         }
 
-        logger.debug("score by strategy", "queryStrategy", queryStrategy);
+        logger.debug("score on condition", "condition", scoreable);
 
         // 查询日期，默认数据库最新或当天
         LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), dailyService.getLatestDate(), LocalDate.now());
-        if (Objects.isNull(queryStrategy.getDate())) {
-            queryStrategy.setDate(date);
+        if (Objects.isNull(scoreable.getDate())) {
+            scoreable.setDate(date);
         }
         // 默认全局分页信息
-        if (Objects.isNull(queryStrategy.getPage()) && Objects.nonNull(scoreQo.getPage())) {
-            queryStrategy.setPage(scoreQo.getPage());
+        if (Objects.isNull(scoreable.getPage()) && Objects.nonNull(scoreQo.getPage())) {
+            scoreable.setPage(scoreQo.getPage());
         }
 
         // 计算得分
-        Score score = scoreService.getScore(queryStrategy);
+        Score score = scoreService.getScore(scoreable);
 
         if (Objects.isNull(score)) {
             logger.debug("can't get score, stop scoring");
@@ -82,7 +75,7 @@ public abstract class ScoreStrategy<QO extends ScoreStrategyQo> {
         // 删除当日，具有该分数码的股票，因为每次计分输出的股票是不一样的
         stockScoreService.deleteByDateAndScoreCode(date, score.getScoreCode());
 
-        return this.findCodes(queryStrategy)
+        return this.findCodes(scoreable)
                 .map(stockCode -> StockScore.builder()
                         .date(date)
                         .stockCode(stockCode)

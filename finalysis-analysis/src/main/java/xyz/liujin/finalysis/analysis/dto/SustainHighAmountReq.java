@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyQo;
+import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
 import java.math.BigDecimal;
@@ -22,7 +22,7 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SustainHighAmountReq implements ScoreStrategyQo {
+public class SustainHighAmountReq implements StrategyQo {
     @ApiModelProperty(value = "当前日期；")
     private LocalDate date;
     @ApiModelProperty(value = "股票代码", hidden = true)

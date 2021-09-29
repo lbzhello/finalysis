@@ -29,7 +29,7 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
         logger.debug("start to score", "scoreQO", scoreQo);
         return Flux.fromIterable(scoreStrategies)
                 .flatMap(scoreStrategy -> {
-                    logger.info("scoring", "scoreStrategy", scoreStrategy.getClass());
+                    logger.info("score by strategy", "scoreStrategy", scoreStrategy.getClass());
                     return scoreStrategy.score(scoreQo);
                 })
                 .map(stockScore -> {

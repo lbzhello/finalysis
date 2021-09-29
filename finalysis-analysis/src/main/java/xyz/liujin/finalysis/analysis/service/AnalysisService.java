@@ -8,7 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.*;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
-import xyz.liujin.finalysis.analysis.strategy.AnalysisStrategy;
+import xyz.liujin.finalysis.analysis.strategy.StrategyService;
 import xyz.liujin.finalysis.analysis.strategy.SustainHighAmountStrategy;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
@@ -30,7 +30,7 @@ public class AnalysisService {
     private AvgLineService avgLineService;
 
     @Autowired
-    private AnalysisStrategy analysisStrategy;
+    private StrategyService strategyService;
 
     @Autowired
     private RecommendService recommendService;
@@ -115,24 +115,24 @@ public class AnalysisService {
 
         // 放量指标
         if (Objects.nonNull(heavenVolRatio)) {
-            recommends.add(analysisStrategy.heavenVolumeRatio(heavenVolRatio));
+            recommends.add(strategyService.heavenVolumeRatio(heavenVolRatio));
         }
 
         // 日线突破指标、上升趋势指标取并集
         if (Objects.nonNull(fiveCrossTen) && Objects.nonNull(fiveAboveTen)) {
-            recommends.add(analysisStrategy.fiveCrossTen(fiveCrossTen)
-                    .concatWith(analysisStrategy.fiveAboveTen(fiveAboveTen))
+            recommends.add(strategyService.fiveCrossTen(fiveCrossTen)
+                    .concatWith(strategyService.fiveAboveTen(fiveAboveTen))
                     .collectList()
                     .flux()
                     .flatMap(codes -> Flux.fromIterable(new HashSet<>(codes))));
         } else {
             // 日线突破
             if (Objects.nonNull(fiveCrossTen)) {
-                recommends.add(analysisStrategy.fiveCrossTen(fiveCrossTen));
+                recommends.add(strategyService.fiveCrossTen(fiveCrossTen));
             }
             // 上升趋势
             if (Objects.nonNull(fiveAboveTen)) {
-                recommends.add(analysisStrategy.fiveAboveTen(fiveAboveTen));
+                recommends.add(strategyService.fiveAboveTen(fiveAboveTen));
             }
         }
 
@@ -180,7 +180,7 @@ public class AnalysisService {
      * @return
      */
     public Flux<DailyData> heavenVolumeRatioDetail(int days, BigDecimal minVolRatio) {
-        return analysisStrategy.heavenVolumeRatio(HeavenVolRatioQo.builder()
+        return strategyService.heavenVolumeRatio(HeavenVolRatioQo.builder()
                 .days(days)
                 .minVolRatio(minVolRatio)
                 .build())

@@ -22,7 +22,7 @@ import java.util.Optional;
  * 用于股票分析时从某个纬度选择股票
  */
 @Component
-public class AnalysisStrategy {
+public class StrategyService {
     public static final String HOT_NEWS = "HOT_NEWS"; // "热点消息面
     public static final String FIVE_CROSS_TEN = "FIVE_CROSS_TEN"; // "5 日线突破 10 日线
     public static final String FIVE_ABOVE_TEN = "FIVE_ABOVE_TEN"; // "5 日线在 10 日线上方

@@ -29,7 +29,7 @@ public class TurnRatioStrategy extends ScoreStrategy<TurnRatioQo> {
     private DailyService dailyService;
 
     @Override
-    public TurnRatioQo getQueryStrategy(ScoreQo scoreQo) {
+    public TurnRatioQo getScoreable(ScoreQo scoreQo) {
         return scoreQo.getTurnRatio();
     }
 

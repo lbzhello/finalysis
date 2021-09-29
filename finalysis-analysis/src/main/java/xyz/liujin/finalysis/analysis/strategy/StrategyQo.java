@@ -5,9 +5,9 @@ import xyz.liujin.finalysis.base.page.PageQo;
 import java.time.LocalDate;
 
 /**
- * 股票计分条件接口
+ * 策略查询对象
  */
-public interface ScoreStrategyQo {
+public interface StrategyQo {
     /**
      * 查询日期
      * @return

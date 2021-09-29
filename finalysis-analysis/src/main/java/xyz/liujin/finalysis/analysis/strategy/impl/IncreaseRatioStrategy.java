@@ -30,7 +30,7 @@ public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
     private DailyService dailyService;
 
     @Override
-    public IncreaseRatioQo getQueryStrategy(ScoreQo scoreQo) {
+    public IncreaseRatioQo getScoreable(ScoreQo scoreQo) {
         return scoreQo.getIncreaseRatio();
     }
 
