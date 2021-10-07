@@ -5,7 +5,7 @@ import xyz.liujin.finalysis.base.page.PageQo;
 import java.time.LocalDate;
 
 /**
- * 策略查询对象
+ * 策略查询对象基类
  */
 public interface StrategyQo {
     /**

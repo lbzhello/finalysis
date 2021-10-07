@@ -4,6 +4,7 @@ import reactor.core.publisher.Flux;
 
 /**
  * 股票查询策略接口
+ * 根据条件查询符合的股票
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/29
  */

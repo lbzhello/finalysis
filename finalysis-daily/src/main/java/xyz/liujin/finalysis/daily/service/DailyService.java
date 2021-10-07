@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.daily.service;
 
+import cn.hutool.core.util.ArrayUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.FluxSink;
 import xyz.liujin.finalysis.base.util.DateUtils;
+import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.daily.entity.KLine;
 
@@ -37,6 +39,19 @@ public class DailyService {
      */
     public List<LocalDate> tradingCalendar(@Nullable LocalDate endDate, int limit) {
         return kLineService.tradingCalendar(endDate, limit);
+    }
+
+    /**
+     * 返回 dates 中第一个非 null 的日期，如果都为 null 则返回最新的日期
+     * @param dates
+     * @return
+     */
+    public LocalDate getLatestDateOrNow(LocalDate... dates) {
+        LocalDate date = ArrayUtil.firstNonNull(dates);
+        if (Objects.isNull(date)) {
+            date = ObjectUtils.firstNonNull(getLatestDate(), LocalDate.now());
+        }
+        return date;
     }
 
     /**

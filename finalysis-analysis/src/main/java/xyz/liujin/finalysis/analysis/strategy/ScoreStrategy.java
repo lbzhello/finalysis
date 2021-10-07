@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 /**
- * 股票计分策略接口，根据计分条件筛选出指定股票，并计算得分
+ * 股票计分策略抽象接口，根据计分条件筛选出指定股票，并计算得分
  * @param <QO> 策略查询对象泛型
  */
 @Configuration
@@ -34,6 +34,9 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
 
     /**
      * 获取计分查询对象
+     * {@code QO} 一般要实现 {@link xyz.liujin.finalysis.analysis.score.Scoreable} 接口
+     * 或者具有 {@link xyz.liujin.finalysis.analysis.score.annotation.ScoreField} 注解
+     * 用于统计分数
      * @param scoreQo
      * @return
      */

@@ -26,7 +26,7 @@ import java.util.List;
  */
 @Deprecated(since = "2021-09-29")
 @Service
-public class SustainHighAmountStrategy {
+public class SustainHighAmountStrategy implements Strategy<SustainHighAmountReq> {
     private static final Logger logger = LoggerFactory.getLogger(SustainHighAmountStrategy.class);
 
     @Autowired
