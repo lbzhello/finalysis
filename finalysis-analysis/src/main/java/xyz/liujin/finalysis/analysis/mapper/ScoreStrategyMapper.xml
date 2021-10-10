@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="xyz.liujin.finalysis.analysis.mapper.ScoreStrategyMapper">
+    <!-- 最低价支撑策略 -->
+    <select id="minimumPriceSupport" resultType="java.lang.String">
+        with rec_dt as ( -- 最近日期
+            select date
+            from k_line_2020_2039
+            where date &lt; #{date}
+            group by date
+            order by date desc
+            limit #{recDays-1}
+        ), min_k as (
+            select stock_code, min(k.low) as min_price
+            from k_line_2020_2039 k
+            join rec_dt d on k.date = d.date
+            group by stock_code
+        )
+        select k.stock_code from k_line_2020_2039 k
+        join min_k on k.stock_code = min_k.stock_code
+        and k.low >= min_k.min_price
+        and date = #{date}
+        <where>
+            <if test="codes != null and codes.size() > 0">
+                and k.stock_code in
+                <foreach collection="codes" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        <include refid="page"/>
+    </select>
+    <!-- 分页查询 -->
+    <sql id="page">
+        <if test="page != null">
+            <if test="page.orderBy != null">
+                order by ${page.orderBy}
+            </if>
+            <if test="page.limit != null">
+                limit #{page.limit}
+            </if>
+            <if test="page.offset != null">
+                offset #{page.offset}
+            </if>
+        </if>
+    </sql>
+</mapper>

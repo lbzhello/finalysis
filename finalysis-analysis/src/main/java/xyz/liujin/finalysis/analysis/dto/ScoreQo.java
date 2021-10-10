@@ -24,6 +24,8 @@ public class ScoreQo {
     private IncreaseRatioQo increaseRatio;
     @ApiModelProperty("换手比指标")
     private TurnRatioQo turnRatio;
+    @ApiModelProperty("最低价支撑指标")
+    private MinimumPriceSupportQo minimumPriceSupport;
     @ApiModelProperty("成交额持续放量指标")
     private SustainHighAmountReq sustainHighAmount;
     @ApiModelProperty("量比放量指标")

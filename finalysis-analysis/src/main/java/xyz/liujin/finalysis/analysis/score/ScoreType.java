@@ -8,10 +8,12 @@ package xyz.liujin.finalysis.analysis.score;
  * @see xyz.liujin.finalysis.analysis.score.Scoreable
  */
 public enum ScoreType {
-    // 增幅比指标
+    // 增幅比指标，最近几日增幅，与过去几日增幅比值；增幅比大，表示股票开始向上突破
     INCREASE_RATIO("increase_ratio"),
-    // 换手比指标
+    // 换手比指标，最近几日换手率，与过去几日换手率比值；换手比大，说明股票开始异动
     TURN_RATIO("turn_ratio"),
+    // 最低价格支撑指标，当前股价没有跌破最近最低价格，说明股票开始企稳，若在突破初期，往往意味着洗盘结束
+    MINIMUM_PRICE_SUPPORT("minimum_price_support"),
     ;
     private String name;
 
