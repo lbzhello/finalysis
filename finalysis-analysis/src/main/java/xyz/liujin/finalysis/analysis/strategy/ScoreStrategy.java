@@ -3,13 +3,11 @@ package xyz.liujin.finalysis.analysis.strategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
-import xyz.liujin.finalysis.base.util.ObjectUtils;
 import xyz.liujin.finalysis.daily.service.DailyService;
 
 import java.time.LocalDate;
@@ -33,43 +31,22 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
     private ScoreService scoreService;
 
     /**
-     * 获取计分查询对象
-     * {@code QO} 一般要实现 {@link xyz.liujin.finalysis.analysis.score.Scoreable} 接口
-     * 或者具有 {@link xyz.liujin.finalysis.analysis.score.annotation.ScoreField} 注解
-     * 用于统计分数
-     * @param scoreQo
-     * @return
-     */
-    public abstract QO getScoreable(ScoreQo scoreQo);
-
-    /**
      * 股票计分
-     * @param scoreQo
+     *
+     * @param strategyQo
      * @return
      */
-    public Flux<StockScore> score(ScoreQo scoreQo) {
-        // 获取策略查询对象
-        QO scoreable = getScoreable(scoreQo);
-        if (Objects.isNull(scoreable)) {
-            logger.debug("condition is null or empty, skip");
-            return Flux.empty();
-        }
-
-        logger.debug("score on condition", "condition", scoreable);
+    public Flux<StockScore> score(QO strategyQo) {
+        logger.debug("score strategy", "strategy", strategyQo);
 
         // 查询日期，默认数据库最新或当天
-        LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), dailyService.getLatestDate(), LocalDate.now());
-        if (Objects.isNull(scoreable.getDate())) {
-            scoreable.setDate(date);
-        }
-        // 默认全局分页信息
-        if (Objects.isNull(scoreable.getPage()) && Objects.nonNull(scoreQo.getPage())) {
-            scoreable.setPage(scoreQo.getPage());
+        LocalDate date = dailyService.getLatestDateOrNow();
+        if (Objects.isNull(strategyQo.getDate())) {
+            strategyQo.setDate(date);
         }
 
         // 计算得分
-        Score score = scoreService.getScore(scoreable);
-
+        Score score = scoreService.getScore(strategyQo);
         if (Objects.isNull(score)) {
             logger.debug("can't get score, stop scoring");
             return Flux.empty();
@@ -78,11 +55,13 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
         // 删除当日，具有该分数码的股票，因为每次计分输出的股票是不一样的
         stockScoreService.deleteByDateAndScoreCode(date, score.getScoreCode());
 
-        return this.findCodes(scoreable)
+        return this.findCodes(strategyQo)
                 .map(stockCode -> StockScore.builder()
                         .date(date)
                         .stockCode(stockCode)
                         .scoreCode(score.getScoreCode())
                         .build());
+
     }
+
 }

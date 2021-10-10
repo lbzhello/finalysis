@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.MinimumPriceSupportQo;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.mapper.ScoreStrategyMapper;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -26,12 +25,6 @@ public class MinimumPriceSupportStrategy extends ScoreStrategy<MinimumPriceSuppo
 
     @Autowired
     private DailyService dailyService;
-
-    @Override
-    public MinimumPriceSupportQo getScoreable(ScoreQo scoreQo) {
-        return scoreQo.getMinimumPriceSupport();
-    }
-
     @Override
     public Flux<String> findCodes(MinimumPriceSupportQo minimumPriceSupportQo) {
         // 默认数据库最新日期

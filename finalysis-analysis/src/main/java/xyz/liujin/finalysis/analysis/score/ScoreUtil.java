@@ -93,6 +93,10 @@ public class ScoreUtil {
                         if (Objects.nonNull(field.getAnnotation(ScorePage.class))) {
                             field.setAccessible(true);
                             Object pageObj = field.get(obj);
+                            if (Objects.isNull(pageObj)) {
+                                return;
+                            }
+
                             Class<?> pageClass = pageObj.getClass();
 
                             Field orderByField = pageClass.getDeclaredField(ScorePage.ORDER_BY);

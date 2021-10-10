@@ -3,7 +3,6 @@ package xyz.liujin.finalysis.analysis.strategy.impl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.TurnRatioQo;
 import xyz.liujin.finalysis.analysis.mapper.TurnRatioMapper;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
@@ -27,11 +26,6 @@ public class TurnRatioStrategy extends ScoreStrategy<TurnRatioQo> {
 
     @Autowired
     private DailyService dailyService;
-
-    @Override
-    public TurnRatioQo getScoreable(ScoreQo scoreQo) {
-        return scoreQo.getTurnRatio();
-    }
 
     @Override
     public Flux<String> findCodes(TurnRatioQo turnRatioQo) {

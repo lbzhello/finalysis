@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.IncreaseRatioQo;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.mapper.IncreaseRatioMapper;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -28,11 +27,6 @@ public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
 
     @Autowired
     private DailyService dailyService;
-
-    @Override
-    public IncreaseRatioQo getScoreable(ScoreQo scoreQo) {
-        return scoreQo.getIncreaseRatio();
-    }
 
     @Override
     public Flux<String> findCodes(IncreaseRatioQo increaseRatioQo) {

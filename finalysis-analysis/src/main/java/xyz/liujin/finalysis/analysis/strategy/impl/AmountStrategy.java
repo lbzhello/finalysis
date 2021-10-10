@@ -2,7 +2,6 @@ package xyz.liujin.finalysis.analysis.strategy.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
-import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.dto.TurnRatioQo;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -18,11 +17,6 @@ public class AmountStrategy extends ScoreStrategy<TurnRatioQo> {
 
     @Autowired
     private DailyService dailyService;
-
-    @Override
-    public TurnRatioQo getScoreable(ScoreQo scoreQo) {
-        return scoreQo.getTurnRatio();
-    }
 
     @Override
     public Flux<String> findCodes(TurnRatioQo turnRatioQo) {

@@ -9,10 +9,14 @@ import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyService;
+import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore> implements IService<StockScore> {
@@ -21,16 +25,46 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     @Autowired
     private List<ScoreStrategy<?>> scoreStrategies;
 
+    @Autowired
+    private ScoreStrategyService scoreStrategyService;
+
     /**
      * 根据条件计算股票得分
      * @return
      */
     public Flux<StockScore> score(ScoreQo scoreQo) {
         logger.debug("start to score", "scoreQO", scoreQo);
-        return Flux.fromIterable(scoreStrategies)
-                .flatMap(scoreStrategy -> {
+
+        // scoreQo 转换成策略查询对象
+        List<StrategyQo> strategies = new ArrayList<>();
+        Class<? extends ScoreQo> scoreQoClass = scoreQo.getClass();
+        Flux.fromArray(scoreQoClass.getDeclaredFields())
+                .subscribe(field -> {
+                    try {
+                        // 如果是策略查询类测加入列表
+                        Class<?> type = field.getType();
+                        if (StrategyQo.class.isAssignableFrom(type)) {
+                            field.setAccessible(true);
+                            StrategyQo strategyQo = (StrategyQo) field.get(scoreQo);
+                            if (Objects.nonNull(strategyQo)) {
+                                strategies.add(strategyQo);
+                            }
+                        }
+                    } catch (IllegalAccessException e) {
+                        logger.error("failed to retrieve strategyQo from scoreQo", e);
+                    }
+                });
+
+        return score(Flux.fromIterable(strategies));
+    }
+
+    public Flux<StockScore> score(Flux<? extends StrategyQo> strategies) {
+        return strategies
+                .flatMap(strategyQo -> {
+                    ScoreStrategy<? super StrategyQo> scoreStrategy = scoreStrategyService.getStrategy(strategyQo.getClass());
                     logger.info("score by strategy", "scoreStrategy", scoreStrategy.getClass());
-                    return scoreStrategy.score(scoreQo);
+
+                    return scoreStrategy.score(strategyQo);
                 })
                 .map(stockScore -> {
                     logger.trace("get stock score", "stockScore", stockScore);
