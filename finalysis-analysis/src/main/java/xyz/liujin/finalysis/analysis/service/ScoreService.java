@@ -27,8 +27,9 @@ public class ScoreService extends ServiceImpl<ScoreMapper, Score> implements ISe
             .build();
 
     /**
-     * 计算并获取分数
-     * 入库或更新，具有缓存功能
+     * 计算并获取分数，具有缓存功能
+     *
+     * 同时更新分数码数据库
      *
      * 目标类 obj 需要带有 {@link ScoreConfig} 注解
      *

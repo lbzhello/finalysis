@@ -32,6 +32,11 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
 
     /**
      * 股票计分
+     * 子类一般不需要重写此方法，直接重写 {@link #findCodes(StrategyQo)} 方法即可
+     *
+     * {@link QO} 对象需要能够计算分数，即加上 {@link xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig} 注解
+     *
+     * @see xyz.liujin.finalysis.analysis.score.ScoreUtil#calculateScore(Object)
      *
      * @param strategyQo
      * @return
