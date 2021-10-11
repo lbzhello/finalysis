@@ -20,10 +20,7 @@ public class AmountStrategy extends ScoreStrategy<TurnRatioQo> {
 
     @Override
     public Flux<String> findCodes(TurnRatioQo turnRatioQo) {
-        // 默认数据库最新日期
-        turnRatioQo.setDate(dailyService.getLatestDateOrNow(turnRatioQo.getDate()));
-
-        return Flux.empty();
+        return Flux.just("helloworld");
     }
 
 }

@@ -118,19 +118,14 @@ public class ScoreUtil {
 
 
         ScoreType scoreType = st.value();
-        String scoreCode = "";
-        if (CollectionUtil.isNotEmpty(scoreCodes)) {
-            scoreCode = scoreType.getType() + st.codePrefix() +
-                    CollectionUtil.join(scoreCodes, st.codeSeparator()) +
-                    st.codeSuffix();
-        }
+        String scoreCode = scoreType.getType() + st.codePrefix() +
+                CollectionUtil.join(scoreCodes, st.codeSeparator()) +
+                st.codeSuffix();
 
-        String description = "";
-        if (CollectionUtil.isNotEmpty(scoreDescs)) {
-            description = st.descriptionPrefix() +
-                    CollectionUtil.join(scoreDescs, st.descriptionSeparator()) +
-                    st.descriptionSuffix();
-        }
+        String description = st.descriptionPrefix() +
+                CollectionUtil.join(scoreDescs, st.descriptionSeparator()) +
+                st.descriptionSuffix();
+
         return Score.builder()
                 .scoreCode(scoreCode)
                 .score(st.score())

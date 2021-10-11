@@ -3,7 +3,6 @@ package xyz.liujin.finalysis.analysis.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.logging.LoggerGroup;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
@@ -66,17 +65,8 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
      */
     public Flux<StockScore> score(Flux<? extends StrategyQo> strategies) {
         return strategies
-                .flatMap(strategyQo -> {
-                    logger.debug("strategy condition", "strategyQo", strategyQo);
-                    ScoreStrategy<? super StrategyQo> scoreStrategy = scoreStrategyService.getStrategy(strategyQo.getClass());
-                    if (Objects.isNull(scoreStrategy)) {
-                        logger.warn("can't find strategy", "strategyQo", strategyQo.getClass());
-                        return Flux.empty();
-                    }
-
-                    logger.info("score by strategy", "scoreStrategy", scoreStrategy.getClass());
-                    return scoreStrategy.score(strategyQo);
-                })
+                // 调用对应的计分策略类
+                .flatMap(strategyQo -> scoreStrategyService.score(strategyQo))
                 .map(stockScore -> {
                     logger.trace("get stock score", "stockScore", stockScore);
                     save(stockScore);

@@ -25,6 +25,9 @@ public class ScoreUtilTest {
                         .limit(100)
                         .build())
                 .build());
+
+        Score emptyScore = ScoreUtil.calculateScore(new TurnRatioQo());
+
         System.out.println();
     }
 
