@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import xyz.liujin.finalysis.analysis.score.ScoreCustomer;
 import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreField;
@@ -29,7 +30,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ScoreConfig(ScoreType.TURN_RATIO)
-public class TurnRatioQo implements StrategyQo {
+public class TurnRatioQo implements StrategyQo, ScoreCustomer {
     @ApiModelProperty
     private LocalDate date;
 
@@ -43,7 +44,7 @@ public class TurnRatioQo implements StrategyQo {
 
     @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
     @ScoreField("换手率比值大于 %s")
-    private Integer minRatio;
+    private BigDecimal minRatio;
 
     @ApiModelProperty(value = "最近最小平均成交额，一般应该大于 1 亿，过小的成交额没有太多意义", example = "1e9")
     @ScoreField("最近平均成交额大于 %s")
@@ -56,4 +57,6 @@ public class TurnRatioQo implements StrategyQo {
     @ScorePage
     private PageQo page;
 
+    @ApiModelProperty("得分")
+    private int score;
 }

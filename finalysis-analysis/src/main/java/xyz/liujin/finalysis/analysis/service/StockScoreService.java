@@ -59,14 +59,12 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     }
 
     /**
-     * 根据不同的策略几分
+     * 根据不同的策略计分并入库
      * @param strategies
      * @return
      */
     public Flux<StockScore> score(Flux<? extends StrategyQo> strategies) {
-        return strategies
-                // 调用对应的计分策略类
-                .flatMap(strategyQo -> scoreStrategyService.score(strategyQo))
+        return scoreStrategyService.score(strategies)
                 .map(stockScore -> {
                     logger.trace("get stock score", "stockScore", stockScore);
                     save(stockScore);

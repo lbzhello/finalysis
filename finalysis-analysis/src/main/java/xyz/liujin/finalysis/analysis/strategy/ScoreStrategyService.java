@@ -55,6 +55,17 @@ public class ScoreStrategyService {
     }
 
     /**
+     * 根据不同的计分策略统计分数
+     * @param strategies
+     * @return
+     */
+    public Flux<StockScore> score(Flux<? extends StrategyQo> strategies) {
+        return strategies
+                // 调用对应的计分策略类
+                .flatMap(this::score);
+    }
+
+    /**
      * 计分策略调用分发接口，根据 {@code StrategyQo} 的实现类调用对应的策略
      * @param strategyQo
      * @return

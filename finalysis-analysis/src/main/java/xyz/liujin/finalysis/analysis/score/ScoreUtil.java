@@ -57,6 +57,14 @@ public class ScoreUtil {
             return null;
         }
 
+        // 得分
+        int score = st.score();
+
+        // 得分自定义配置接口
+        if (obj instanceof ScoreCustomer) {
+            score = ((ScoreCustomer) obj).getScore();
+        }
+
         Field[] fields = objClass.getDeclaredFields();
         Arrays.stream(fields)
                 // Score
@@ -128,7 +136,7 @@ public class ScoreUtil {
 
         return Score.builder()
                 .scoreCode(scoreCode)
-                .score(st.score())
+                .score(score)
                 .type(scoreType.getType())
                 .description(description)
                 .build();
