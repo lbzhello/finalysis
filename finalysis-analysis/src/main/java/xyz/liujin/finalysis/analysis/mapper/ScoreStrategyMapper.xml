@@ -9,7 +9,7 @@
             where date &lt; #{date}
             group by date
             order by date desc
-            limit #{recDays-1}
+            limit #{recDays} - 1
         ), min_k as (
             select stock_code, min(k.low) as min_price
             from k_line_2020_2039 k

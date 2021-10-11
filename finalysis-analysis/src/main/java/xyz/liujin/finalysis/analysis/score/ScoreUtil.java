@@ -62,7 +62,10 @@ public class ScoreUtil {
 
         // 得分自定义配置接口
         if (obj instanceof ScoreCustomer) {
-            score = ((ScoreCustomer) obj).getScore();
+            int s = ((ScoreCustomer) obj).getScore();
+            if (s != 0) {
+                score = s;
+            }
         }
 
         Field[] fields = objClass.getDeclaredFields();
