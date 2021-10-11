@@ -3,7 +3,6 @@ package xyz.liujin.finalysis.analysis.controller;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
@@ -67,7 +66,11 @@ public class ScoreController {
                 .build());
         // 最低价支撑
         strategies.add(MinimumPriceSupportQo.builder()
-                .recDays(3)
+                .recDays(9)
+                .build());
+
+        strategies.add(MinimumPriceSupportQo.builder()
+                .recDays(15)
                 .build());
 
         // 计分入库
