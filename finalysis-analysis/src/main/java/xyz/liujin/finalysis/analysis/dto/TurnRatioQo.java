@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import xyz.liujin.finalysis.analysis.score.ScoreCustomer;
+import xyz.liujin.finalysis.analysis.score.ScoreCustomizer;
 import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreField;
@@ -30,7 +30,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ScoreConfig(ScoreType.TURN_RATIO)
-public class TurnRatioQo implements StrategyQo, ScoreCustomer {
+public class TurnRatioQo implements StrategyQo, ScoreCustomizer {
     @ApiModelProperty
     private LocalDate date;
 

@@ -61,8 +61,8 @@ public class ScoreUtil {
         int score = st.score();
 
         // 得分自定义配置接口
-        if (obj instanceof ScoreCustomer) {
-            int s = ((ScoreCustomer) obj).getScore();
+        if (obj instanceof ScoreCustomizer) {
+            int s = ((ScoreCustomizer) obj).getScore();
             if (s != 0) {
                 score = s;
             }
