@@ -42,7 +42,7 @@ public class ScoreStrategyService {
                     Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
                     Class<? extends StrategyQo> actualClass = (Class<? extends StrategyQo>) actualTypeArguments[0];
                     strategyMap.put(actualClass, (ScoreStrategy<? super StrategyQo>) scoreStrategy);
-                });
+                }, e -> logger.error("init scoreStrategies failed", e));
     }
 
     /**

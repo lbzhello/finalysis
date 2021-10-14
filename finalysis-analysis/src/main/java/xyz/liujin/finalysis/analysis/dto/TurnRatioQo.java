@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.lang.NonNull;
 import xyz.liujin.finalysis.analysis.score.ScoreCustomizer;
 import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
@@ -36,10 +37,12 @@ public class TurnRatioQo implements StrategyQo, ScoreCustomizer {
 
     @ApiModelProperty(value = "需要统计的最近的天数", example = "3")
     @ScoreField("最近 %s 天")
+    @NonNull
     private Integer recDays;
 
     @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
     @ScoreField("过去 %s 天")
+    @NonNull
     private Integer hisDays;
 
     @ApiModelProperty(value = "需要统计的过去的天数", example = "5")

@@ -11,8 +11,8 @@ import xyz.liujin.finalysis.analysis.dto.MinimumPriceSupportQo;
 import xyz.liujin.finalysis.analysis.dto.TurnRatioQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyService;
 import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
-import xyz.liujin.finalysis.analysis.strategy.impl.TurnRatioStrategy;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
 
@@ -82,10 +82,10 @@ public class ScoreController {
     }
 
     @Autowired
-    private TurnRatioStrategy turnRatioStrategy;
+    private ScoreStrategyService scoreStrategyService;
     @PostMapping("turn-ratio")
     public Flux<StockScore> turnRatioStrategy(@RequestBody TurnRatioQo turnRatioQo) {
-        return turnRatioStrategy.score(turnRatioQo);
+        return scoreStrategyService.score(turnRatioQo);
     }
 
 }
