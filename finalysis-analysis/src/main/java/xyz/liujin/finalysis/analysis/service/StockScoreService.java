@@ -8,7 +8,6 @@ import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
-import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyService;
 import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -23,16 +22,13 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     private static final MyLogger logger = MyLogger.getLogger(StockScoreService.class);
 
     @Autowired
-    private List<ScoreStrategy<?>> scoreStrategies;
-
-    @Autowired
     private ScoreStrategyService scoreStrategyService;
 
     /**
-     * 根据条件计算股票得分
+     * 根据条件计算股票得分并入库
      * @return
      */
-    public Flux<StockScore> score(ScoreQo scoreQo) {
+    public Flux<StockScore> scoreAndSave(ScoreQo scoreQo) {
         logger.debug("start to score", "scoreQO", scoreQo);
 
         // scoreQo 转换成策略查询对象
@@ -55,7 +51,7 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
                     }
                 });
 
-        return score(Flux.fromIterable(strategies));
+        return scoreAndSave(Flux.fromIterable(strategies));
     }
 
     /**
@@ -63,7 +59,7 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
      * @param strategies
      * @return
      */
-    public Flux<StockScore> score(Flux<? extends StrategyQo> strategies) {
+    public Flux<StockScore> scoreAndSave(Flux<? extends StrategyQo> strategies) {
         return scoreStrategyService.score(strategies)
                 .map(stockScore -> {
                     logger.trace("get stock score", "stockScore", stockScore);

@@ -74,7 +74,7 @@ public class ScoreController {
                 .build());
 
         // 计分入库
-        stockScoreService.score(Flux.fromIterable(strategies))
+        stockScoreService.scoreAndSave(Flux.fromIterable(strategies))
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe();
 
