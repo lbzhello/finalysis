@@ -14,6 +14,8 @@ public enum ScoreType {
     TURN_RATIO("turn_ratio"),
     // 最低价格支撑指标，当前股价没有跌破最近最低价格，说明股票开始企稳，若在突破初期，往往意味着洗盘结束
     MINIMUM_PRICE_SUPPORT("minimum_price_support"),
+    // 成交额比指标，最近几日平均成交额，与过去几日平均成交额比值；成交额比大，说明股票开始放量
+    AMOUNT_RATIO("amount_ratio"),
     ;
     private String name;
 

@@ -46,12 +46,37 @@ public class ScoreStrategyService {
     }
 
     /**
-     * 根据策略查询类查到对应的策略类
-     * @param strategyQoClass
+     * 根据策略查询类查找对应的策略类
+     * @param strategyQo
      * @return
      */
-    public ScoreStrategy<? super StrategyQo> getStrategy(Class<? extends StrategyQo> strategyQoClass) {
-        return strategyMap.get(strategyQoClass);
+    public @Nullable ScoreStrategy<? super StrategyQo> findStrategy(StrategyQo strategyQo) {
+        if (Objects.isNull(strategyQo)) {
+            return null;
+        }
+
+        ScoreStrategy<? super StrategyQo> scoreStrategy = strategyMap.get(strategyQo.getClass());
+        if (Objects.isNull(scoreStrategy)) {
+            logger.warn("can't find strategy", "strategyQo", strategyQo.getClass());
+            return null;
+        }
+        return scoreStrategy;
+    }
+
+    /**
+     * 策略选股
+     * @param strategyQo
+     * @return
+     */
+    public Flux<String> findCodes(StrategyQo strategyQo) {
+        logger.debug("strategy condition", "strategyQo", strategyQo);
+        ScoreStrategy<? super StrategyQo> strategy = findStrategy(strategyQo);
+        if (Objects.isNull(strategy)) {
+            return Flux.empty();
+        }
+
+        logger.info("score by strategy", "scoreStrategy", strategy.getClass());
+        return strategy.findCodes(strategyQo);
     }
 
     /**
@@ -70,15 +95,10 @@ public class ScoreStrategyService {
      * @param strategyQo
      * @return
      */
-    public Flux<StockScore> score(@Nullable StrategyQo strategyQo) {
-        if (Objects.isNull(strategyQo)) {
-            return Flux.empty();
-        }
-
+    public Flux<StockScore> score(StrategyQo strategyQo) {
         logger.debug("strategy condition", "strategyQo", strategyQo);
-        ScoreStrategy<? super StrategyQo> scoreStrategy = getStrategy(strategyQo.getClass());
+        ScoreStrategy<? super StrategyQo> scoreStrategy = findStrategy(strategyQo);
         if (Objects.isNull(scoreStrategy)) {
-            logger.warn("can't find strategy", "strategyQo", strategyQo.getClass());
             return Flux.empty();
         }
 

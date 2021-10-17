@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.analysis.mapper;
 
+import xyz.liujin.finalysis.analysis.dto.AmountRatioQo;
 import xyz.liujin.finalysis.analysis.dto.MinimumPriceSupportQo;
 
 import java.util.List;
@@ -10,5 +11,8 @@ import java.util.List;
  * @since 2021/10/7
  */
 public interface ScoreStrategyMapper {
+
+    List<String> amountRatio(AmountRatioQo amountRatioQo);
+
     List<String> minimumPriceSupport(MinimumPriceSupportQo qo);
 }

@@ -414,7 +414,7 @@ begin
                (round(rec_turn_f/recDays, 2)/round(his_turn_f/hisDays, 2))::decimal(7, 2) turn_ratio
         from stock s
              join rec on s.stock_code = rec.stock_code
-             join his on s.stock_code = his.stock_code;
+             left join his on s.stock_code = his.stock_code;
 end
 $$ language plpgsql;
 

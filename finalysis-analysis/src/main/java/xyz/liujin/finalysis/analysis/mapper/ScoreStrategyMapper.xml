@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="xyz.liujin.finalysis.analysis.mapper.ScoreStrategyMapper">
+    <!-- 成交额放量，最近成交额，与过去成交额比值 -->
+    <select id="amountRatio" resultType="java.lang.String">
+        select * from data_statistic(3, 5, #{date})
+        <where>
+            <if test="minRatio != null">
+                and rec_avg_amount/his_avg_amount >= #{minRatio}
+            </if>
+            <if test="codes != null and codes.size() > 0">
+                and k.stock_code in
+                <foreach collection="codes" item="code" open="(" separator="," close=")">
+                    #{code}
+                </foreach>
+            </if>
+        </where>
+        <include refid="page"/>
+    </select>
     <!-- 最低价支撑策略 -->
     <select id="minimumPriceSupport" resultType="java.lang.String">
         with rec_dt as ( -- 最近日期

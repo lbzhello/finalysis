@@ -22,7 +22,7 @@ import java.util.List;
  * 最近 n 天成交额与过去 m 天成交额比值
  * 最近几天平均成交额远远大于过去几天平均成交额
  * 说明股票开始异动，往往是启动（向上或向下）的标识
- * @deprecated 使用 {@link xyz.liujin.finalysis.analysis.strategy.impl.AmountStrategy} 替代
+ * @deprecated 使用 {@link xyz.liujin.finalysis.analysis.strategy.impl.AmountRatioStrategy} 替代
  */
 @Deprecated(since = "2021-09-29")
 @Service
