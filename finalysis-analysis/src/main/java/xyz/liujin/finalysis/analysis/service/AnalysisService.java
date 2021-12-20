@@ -8,6 +8,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 import xyz.liujin.finalysis.analysis.dto.*;
 import xyz.liujin.finalysis.analysis.mapper.AnalysisMapper;
+import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyService;
 import xyz.liujin.finalysis.analysis.strategy.StrategyService;
 import xyz.liujin.finalysis.analysis.strategy.SustainHighAmountStrategy;
 import xyz.liujin.finalysis.base.executor.TaskPool;
@@ -40,6 +41,9 @@ public class AnalysisService {
 
     @Autowired
     private SustainHighAmountStrategy sustainHighAmountStrategy;
+
+    @Autowired
+    private ScoreStrategyService scoreStrategyService;
 
 
     /**

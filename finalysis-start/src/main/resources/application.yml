@@ -28,7 +28,7 @@ spring:
 logging:
   level:
     root: info
-    xyz.liujin.finalysis.analysis.mapper.AnalysisMapper: debug
+    xyz.liujin.finalysis.analysis.mapper.AnalysisMapper: info
 
 ##mybatis的相关配置
 #mybatis:
