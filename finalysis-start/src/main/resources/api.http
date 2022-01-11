@@ -7,8 +7,8 @@ POST http://localhost:8080/analysis/recommend
 Content-Type: application/json
 
 {
-  "store": true,
-  "date": "2021-06-01",
+  "store": false,
+  "date": "2021-06-15",
   "heavenVolRatio": {
     "days": 6,
     "minVolRatio": 2

@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
-import xyz.liujin.finalysis.analysis.dto.IncreaseRatioQo;
 import xyz.liujin.finalysis.analysis.dto.MinimumPriceSupportQo;
 import xyz.liujin.finalysis.analysis.dto.TurnRatioQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
@@ -16,7 +15,6 @@ import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.executor.TaskPool;
 import xyz.liujin.finalysis.base.page.PageQo;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,40 +35,36 @@ public class ScoreController {
         strategies.add(TurnRatioQo.builder()
                 .recDays(3)
                 .hisDays(5)
-                .minRatio(BigDecimal.valueOf(2))
-                .minAvgAmount(BigDecimal.valueOf(1e8))
+//                .minRatio(BigDecimal.valueOf(2))
+//                .minAvgAmount(BigDecimal.valueOf(1e8))
                 .page(PageQo.builder()
                         .orderBy("turn_ratio desc")
                         .limit(100)
                         .build())
                 .build());
-        // 换手比 9 9
-        strategies.add(TurnRatioQo.builder()
-                .recDays(9)
-                .hisDays(9)
-                .minAvgAmount(BigDecimal.valueOf(1e8))
-                .page(PageQo.builder()
-                        .orderBy("turn_ratio desc")
-                        .limit(100)
-                        .build())
-                .build());
-        // 增幅比
-        strategies.add(IncreaseRatioQo.builder()
-                .recDays(3)
-                .hisDays(5)
-                .minRatio(BigDecimal.valueOf(2))
-                .page(PageQo.builder()
-                        .orderBy("pct_change_ratio desc")
-                        .limit(100)
-                        .build())
-                .build());
+//        // 换手比 9 9
+//        strategies.add(TurnRatioQo.builder()
+//                .recDays(9)
+//                .hisDays(9)
+//                .minAvgAmount(BigDecimal.valueOf(1e8))
+//                .page(PageQo.builder()
+//                        .orderBy("turn_ratio desc")
+//                        .limit(100)
+//                        .build())
+//                .build());
+//        // 增幅比
+//        strategies.add(IncreaseRatioQo.builder()
+//                .recDays(3)
+//                .hisDays(5)
+//                .minRatio(BigDecimal.valueOf(2))
+//                .page(PageQo.builder()
+//                        .orderBy("pct_change_ratio desc")
+//                        .limit(100)
+//                        .build())
+//                .build());
         // 最低价支撑
         strategies.add(MinimumPriceSupportQo.builder()
-                .recDays(9)
-                .build());
-
-        strategies.add(MinimumPriceSupportQo.builder()
-                .recDays(15)
+                .recDays(2)
                 .build());
 
         // 计分入库
