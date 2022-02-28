@@ -411,7 +411,7 @@ begin
                rec_vol_ratio::decimal(7, 2),
                his_vol_ratio::decimal(7, 2),
                (rec_pct_change/(case when abs(his_pct_change) < 1 then 1 else abs(his_pct_change) end))::decimal(7, 2) pct_change_ratio,
-               (round(rec_turn_f/recDays, 2)/round(his_turn_f/hisDays, 2))::decimal(7, 2) turn_ratio
+               (round(rec_turn_f/recDays, 2)/(case round(his_turn_f/hisDays, 2) when 0 then 0.01 else round(his_turn_f/hisDays, 2) end))::decimal(7, 2) turn_ratio
         from stock s
              join rec on s.stock_code = rec.stock_code
              left join his on s.stock_code = his.stock_code;
