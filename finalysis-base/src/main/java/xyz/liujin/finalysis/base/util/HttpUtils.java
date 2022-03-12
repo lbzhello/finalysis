@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.time.Duration;
 import java.util.HashMap;
@@ -32,17 +33,83 @@ public class HttpUtils {
             .build();
 
     public static final RequestSpec get(String url) {
-        return new RequestSpec(GET, url);
+        return new GetRequestSpec(url);
     }
 
     public static final RequestSpec post(String url) {
-        return new RequestSpec(POST, url);
+        return new PostRequestSpec(url);
     }
 
     public static final RequestSpec postJSON(String url) {
-        return new RequestSpec(POST, url).contentType("application/json");
+        return new PostRequestSpec(url).contentType("application/json");
     }
 
+    public static class GetRequestSpec extends RequestSpec {
+        public GetRequestSpec(String uri) {
+            super(uri);
+        }
+
+        @Override
+        public Request create() {
+            return super.builder()
+                    .get()
+                    .build();
+        }
+    }
+
+    public static class PostRequestSpec extends RequestSpec {
+        public PostRequestSpec(String uri) {
+            super(uri);
+        }
+
+        @Override
+        public Request create() {
+            return super.builder()
+                    .post(getBody())
+                    .build();
+        }
+    }
+
+    public static class PutRequestSpec extends RequestSpec {
+        public PutRequestSpec(String uri) {
+            super(uri);
+        }
+
+        @Override
+        public Request create() {
+            return super.builder()
+                    .put(getBody())
+                    .build();
+        }
+    }
+
+    public static class DeleteRequestSpec extends RequestSpec {
+        public DeleteRequestSpec(String uri) {
+            super(uri);
+        }
+
+        @Override
+        public Request create() {
+            return super.builder()
+                    .delete(getBody())
+                    .build();
+        }
+    }
+
+    public static class PatchRequestSpec extends RequestSpec {
+        public PatchRequestSpec(String uri) {
+            super(uri);
+        }
+
+        @Override
+        public Request create() {
+            return super.builder()
+                    .patch(getBody())
+                    .build();
+        }
+    }
+
+    // 请求规格，用来限定接口方法
     public static class RequestSpec {
         private Consumer<IOException> onFailure = e -> System.out.println(e);
         private Consumer<Response> onResponse;
@@ -58,9 +125,41 @@ public class HttpUtils {
 
         private String body;
 
-        public RequestSpec(String httpMethod, String uri) {
-            this.httpMethod= httpMethod;
+        public RequestSpec(String uri) {
             this.uri = uri;
+        }
+
+        /**
+         * 模板方法，创建 okhttp 请求对象, 子类一般重写此方法创建请求对象
+         * @see #builder()
+         * @return
+         */
+        public Request create() {
+            return builder()
+                    .build();
+        }
+
+        /**
+         * builder 暴露给子类，可以根据需要添加自定义配置
+         * 子类一般不要重写此方法，通过重写 {@link #create()} 实现
+         * @see #create()
+         * @return
+         */
+        protected Request.Builder builder() {
+            Request.Builder builder = new Request.Builder()
+                    .url(getFullUrl());
+
+            // 配置请求头
+            if (CharSequenceUtil.isNotBlank(contentType)) {
+                builder.header("Content-Type", contentType);
+            }
+            if (MapUtil.isNotEmpty(headers)) {
+                Flux.fromIterable(headers.entrySet())
+                        .subscribe(entry -> {
+                            builder.header(entry.getKey(), String.valueOf(entry.getValue()));
+                        });
+            }
+            return builder;
         }
 
         /**
@@ -120,50 +219,7 @@ public class HttpUtils {
          * @return
          */
         public Flux<Response> req() {
-            return Flux.just(new Request.Builder())
-                    // 请求方法, 请求体
-                    .map(builder -> {
-                        RequestBody body0 = null;
-                        if (this.body != null) {
-                            body0 = RequestBody.create(MediaType.parse(this.contentType), this.body);
-                        }
-                        return switch (this.httpMethod) {
-                            case GET -> builder.get();
-                            case POST -> builder.post(body0);
-                            case PUT -> builder.put(body0);
-                            case DELETE -> builder.delete(body0);
-                            case PATCH -> builder.patch(body0);
-                            default -> builder;
-                        };
-                    })
-                    // 构建 url
-                    .map(builder -> {
-                        String url = this.uri == null ? "" : this.uri;
-                        if (CharSequenceUtil.isNotBlank(this.path)) {
-                            // 拼接路径
-                            url = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
-
-                            String p = this.path;
-                            p = p.startsWith("/") ? p : "/" + p;
-
-                            url = url + p;
-                        }
-                        return builder.url(url);
-                    })
-                    // 构建 headers
-                    .map(builder -> {
-                        if (CharSequenceUtil.isNotBlank(contentType)) {
-                            builder.header("Content-Type", contentType);
-                        }
-                        if (MapUtil.isNotEmpty(headers)) {
-                            Flux.fromIterable(headers.entrySet())
-                                    .subscribe(entry -> {
-                                        builder.header(entry.getKey(), String.valueOf(entry.getValue()));
-                                    });
-                        }
-                        return builder;
-                    })
-                    .map(Request.Builder::build)
+            return Flux.just(create())
                     .map(httpClient::newCall)
                     .flatMap(call -> Flux.create(fluxSink -> {
                         call.enqueue(new Callback() {
@@ -180,6 +236,34 @@ public class HttpUtils {
                             }
                         });
                     }));
+        }
+
+        // 获取完整请求路径
+        protected String getFullUrl() {
+            String url = this.uri == null ? "" : this.uri;
+            if (CharSequenceUtil.isNotBlank(this.path)) {
+                // 拼接路径
+                url = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+
+                String p = this.path;
+                p = p.startsWith("/") ? p : "/" + p;
+
+                url = url + p;
+            }
+            return url;
+        }
+
+        // 构建请求体
+        protected @Nullable RequestBody getBody() {
+            RequestBody body0 = null;
+            if (this.body != null) {
+                body0 = RequestBody.create(MediaType.parse(this.contentType), this.body);
+            }
+            return body0;
+        }
+
+        protected Headers getHeaders() {
+            return null;
         }
     }
 }
