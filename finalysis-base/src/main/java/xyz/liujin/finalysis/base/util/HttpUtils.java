@@ -29,6 +29,11 @@ public class HttpUtils {
             .callTimeout(Duration.ofSeconds(20))//调用超时，也是整个请求过程的超时
             .build();
 
+    /**
+     * 发起 GET 请求
+     * @param url
+     * @return
+     */
     public static final RequestSpec get(String url) {
         return new GetRequestSpec(url);
     }
@@ -37,6 +42,11 @@ public class HttpUtils {
         return new PostRequestSpec(url);
     }
 
+    /**
+     * 发起 JSON 类型的 POST 请求
+     * @param url
+     * @return
+     */
     public static final RequestSpec postJSON(String url) {
         return new PostRequestSpec(url).contentType("application/json");
     }
