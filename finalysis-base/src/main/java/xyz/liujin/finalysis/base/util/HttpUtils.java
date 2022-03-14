@@ -13,16 +13,13 @@ import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.function.Consumer;
 
+/**
+ * http 请求反应式客户端
+ * 基于 okhttp
+ */
 public class HttpUtils {
     private static final Logger logger = LoggerFactory.getLogger(HttpUtils.class);
-
-    public static final String GET = "get";
-    public static final String POST = "post";
-    public static final String PUT = "put";
-    public static final String DELETE = "delete";
-    public static final String PATCH = "patch";
 
     // http client 可以多个共享，共享线程池
     private static OkHttpClient httpClient = new OkHttpClient.Builder()
@@ -44,6 +41,9 @@ public class HttpUtils {
         return new PostRequestSpec(url).contentType("application/json");
     }
 
+    /**
+     * 策略模式，不同请求方法（GET, POST, PUT, DELETE, PATCH）对应不同实现类
+     */
     public static class GetRequestSpec extends RequestSpec {
         public GetRequestSpec(String uri) {
             super(uri);
@@ -51,7 +51,7 @@ public class HttpUtils {
 
         @Override
         public Request create() {
-            return super.builder()
+            return builder()
                     .get()
                     .build();
         }
@@ -64,8 +64,8 @@ public class HttpUtils {
 
         @Override
         public Request create() {
-            return super.builder()
-                    .post(getBody())
+            return builder()
+                    .post(buildBody())
                     .build();
         }
     }
@@ -77,8 +77,8 @@ public class HttpUtils {
 
         @Override
         public Request create() {
-            return super.builder()
-                    .put(getBody())
+            return builder()
+                    .put(buildBody())
                     .build();
         }
     }
@@ -90,8 +90,8 @@ public class HttpUtils {
 
         @Override
         public Request create() {
-            return super.builder()
-                    .delete(getBody())
+            return builder()
+                    .delete(buildBody())
                     .build();
         }
     }
@@ -103,22 +103,16 @@ public class HttpUtils {
 
         @Override
         public Request create() {
-            return super.builder()
-                    .patch(getBody())
+            return builder()
+                    .patch(buildBody())
                     .build();
         }
     }
 
     // 请求规格，用来限定接口方法
     public static class RequestSpec {
-        private Consumer<IOException> onFailure = e -> System.out.println(e);
-        private Consumer<Response> onResponse;
-
-        private Request.Builder requestBuilder;
-
-        private String httpMethod;
-
         private String uri = "";
+        // 请求路径，和 uri 拼接组成完整的 url
         private String path = "";
         private String contentType = "*/*";
         private Map<String, Object> headers = new HashMap<>();
@@ -130,91 +124,71 @@ public class HttpUtils {
         }
 
         /**
-         * 模板方法，创建 okhttp 请求对象, 子类一般重写此方法创建请求对象
+         * 模板方法，创建 okhttp 请求对象
          * @see #builder()
          * @return
          */
         public Request create() {
             return builder()
+                    .get() // 默认 GET 请求
                     .build();
         }
 
         /**
-         * builder 暴露给子类，可以根据需要添加自定义配置
-         * 子类一般不要重写此方法，通过重写 {@link #create()} 实现
+         * 提供给子类调用，可以根据需要添加自定义配置
+         * 一般情况下不要重写此方法
          * @see #create()
          * @return
          */
         protected Request.Builder builder() {
-            Request.Builder builder = new Request.Builder()
-                    .url(getFullUrl());
+            return new Request.Builder()
+                    .url(buildUrl())
+                    .headers(buildHeaders());
+        }
 
+        // 构建完整请求路径
+        protected String buildUrl() {
+            String url = this.uri == null ? "" : this.uri;
+            if (CharSequenceUtil.isNotBlank(this.path)) {
+                // 拼接路径
+                url = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
+
+                String p = this.path;
+                p = p.startsWith("/") ? p : "/" + p;
+
+                url = url + p;
+            }
+            return url;
+        }
+
+        // 构建请求头
+        protected Headers buildHeaders() {
+            Headers.Builder builder = new Headers.Builder();
             // 配置请求头
             if (CharSequenceUtil.isNotBlank(contentType)) {
-                builder.header("Content-Type", contentType);
+                builder.set("Content-Type", contentType);
             }
             if (MapUtil.isNotEmpty(headers)) {
                 Flux.fromIterable(headers.entrySet())
                         .subscribe(entry -> {
-                            builder.header(entry.getKey(), String.valueOf(entry.getValue()));
+                            builder.set(entry.getKey(), String.valueOf(entry.getValue()));
                         });
             }
-            return builder;
+
+            return builder.build();
+        }
+
+        // 构建请求体
+        protected @Nullable RequestBody buildBody() {
+            RequestBody body0 = null;
+            if (this.body != null) {
+                body0 = RequestBody.create(MediaType.parse(this.contentType), this.body);
+            }
+            return body0;
         }
 
         /**
-         * 请求路径，和 uri 拼接组成完整的 url
-         *
-         * @param path
-         * @return
-         */
-        public RequestSpec path(String path) {
-            this.path = path;
-            return this;
-        }
-
-        /**
-         * http 文本类型
-         *
-         * @param contentType
-         * @return
-         */
-        public RequestSpec contentType(String contentType) {
-            this.contentType = contentType;
-            return this;
-        }
-
-        public RequestSpec header(String name, Object value) {
-            this.headers.put(name, String.valueOf(value));
-            return this;
-        }
-
-        public RequestSpec body(String body) {
-            this.body = body;
-            return this;
-        }
-
-        /**
-         * 获取请求体
-         * @return
-         */
-        public Flux<String> reqBody() {
-           return req().map(response -> {
-               try {
-                   try (ResponseBody responseBody = response.body()) {
-                       if (Objects.nonNull(responseBody)) {
-                           return responseBody.string();
-                       }
-                   }
-               } catch (Exception e) {
-                   logger.error("failed to get body str {}", response.toString());
-               }
-               return "";
-           });
-        }
-
-        /**
-         * 转成 flux 异步流
+         * 发起异步请求
          * 注意使用后 ResponseBody 需要关闭
          * @return
          */
@@ -238,32 +212,43 @@ public class HttpUtils {
                     }));
         }
 
-        // 获取完整请求路径
-        protected String getFullUrl() {
-            String url = this.uri == null ? "" : this.uri;
-            if (CharSequenceUtil.isNotBlank(this.path)) {
-                // 拼接路径
-                url = url.endsWith("/") ? url.substring(0, url.length() - 1) : url;
-
-                String p = this.path;
-                p = p.startsWith("/") ? p : "/" + p;
-
-                url = url + p;
-            }
-            return url;
+        /**
+         * 获取请求体
+         * @return
+         */
+        public Flux<String> reqBody() {
+            return req().map(response -> {
+                try {
+                    try (ResponseBody responseBody = response.body()) {
+                        if (Objects.nonNull(responseBody)) {
+                            return responseBody.string();
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.error("failed to get body str {}", response.toString());
+                }
+                return "";
+            });
         }
 
-        // 构建请求体
-        protected @Nullable RequestBody getBody() {
-            RequestBody body0 = null;
-            if (this.body != null) {
-                body0 = RequestBody.create(MediaType.parse(this.contentType), this.body);
-            }
-            return body0;
+        public RequestSpec path(String path) {
+            this.path = path;
+            return this;
         }
 
-        protected Headers getHeaders() {
-            return null;
+        public RequestSpec contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public RequestSpec header(String name, Object value) {
+            this.headers.put(name, String.valueOf(value));
+            return this;
+        }
+
+        public RequestSpec body(String body) {
+            this.body = body;
+            return this;
         }
     }
 }
