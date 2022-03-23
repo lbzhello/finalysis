@@ -1,8 +1,7 @@
 package xyz.liujin.finalysis.base.executor;
 
-import cn.hutool.core.thread.ThreadFactoryBuilder;
-
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 项目通用线程池
@@ -20,9 +19,22 @@ public class TaskPool implements Executor {
                 maxPoolSize,
                 1, TimeUnit.MINUTES,
                 new ArrayBlockingQueue<>(5000),
-                ThreadFactoryBuilder.create()
-                        .setNamePrefix("finalysis-pool-")
-                        .build()
+                new ThreadFactory() {
+                    private final AtomicInteger threadNumber = new AtomicInteger(1);
+                    @Override
+                    public Thread newThread(Runnable r) {
+                        Thread t = new Thread(r, "finalysis-thread-pool-" + threadNumber.getAndIncrement());
+
+                        if (t.isDaemon()) {
+                            t.setDaemon(false);
+                        }
+
+                        if (t.getPriority() != Thread.NORM_PRIORITY) {
+                            t.setPriority(Thread.NORM_PRIORITY);
+                        }
+                        return t;
+                    }
+                }
         );
     }
 
