@@ -3,9 +3,9 @@ plugins {
 }
 
 dependencies {
-    compile project(":finalysis-base")
+    implementation project(":finalysis-base")
 
-    compile project(":finalysis-daily")
+    implementation project(":finalysis-daily")
 
-    compile project(":finalysis-stock")
+    implementation project(":finalysis-stock")
 }

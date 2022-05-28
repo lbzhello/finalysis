@@ -5,10 +5,11 @@ select date from daily_indicator group by date order by date desc limit 10;
 select count(*) from daily_indicator where date = now()::date;
 
 -- 1. 最近换手与历史换手比值， 说明股价开始异动
-select * from data_statistic(3, 5)
+select * from data_statistic(5, 10)
 where rec_avg_turn_f >= 1
-  and turn_ratio >= 2
---   and rec_avg_amount >= 1e8
+  and turn_ratio >= 1.5
+  and rec_avg_amount >= 1e8
+--   and rec_avg_turn_f >= 10 and rec_avg_turn_f <=30
 order by turn_ratio desc;
 -- order by rec_avg_amount desc
 

@@ -1,15 +1,15 @@
 apply plugin: 'java'
 
 dependencies {
-    compile project(":finalysis-base")
+    implementation project(":finalysis-base")
 
-    compile project(":finalysis-daily")
+    implementation project(":finalysis-daily")
 
-    compile project(":finalysis-stock")
+    implementation project(":finalysis-stock")
 
-    compile project(":finalysis-analysis")
+    implementation project(":finalysis-analysis")
 
 
 
-    compile group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
+    implementation group: 'org.jsoup', name: 'jsoup', version: '1.13.1'
 }

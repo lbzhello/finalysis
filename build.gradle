@@ -86,30 +86,32 @@ allprojects {
 
 subprojects {
 	dependencies {
+		implementation group: 'com.squareup.okhttp3', name: 'okhttp'
 
+		// Nonnull
 		implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.2'
 
 		implementation group: 'com.github.ben-manes.caffeine', name: 'caffeine', version: '3.0.1'
 
-		compile 'cn.hutool:hutool-all:5.5.4'
+		implementation 'cn.hutool:hutool-all:5.5.4'
 
-		compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
+		implementation group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
 
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
 		testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-		compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+		implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
 
-//		compile group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
-//		compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+//		implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+//		implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 		implementation "io.springfox:springfox-boot-starter:3.0.0"
 
 		// junit 前面需要 useJUnitPlatform()
-		testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2'
-		testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2'
+		testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.6.2'
+		testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.6.2'
 
 		// gradle 集成 lombok
 		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.20'
