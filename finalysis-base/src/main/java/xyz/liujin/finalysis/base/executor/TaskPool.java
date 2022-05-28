@@ -1,41 +1,30 @@
 package xyz.liujin.finalysis.base.executor;
 
-import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 项目通用线程池
  */
 public class TaskPool implements Executor {
     private static final int corePoolSize;
-    private static final int maxPoolSize = 200;
+    private static final int maxPoolSize;
     static {
         corePoolSize = Math.max(availableProcessors(), 100);
+        maxPoolSize = Math.max(corePoolSize, 200);
     }
 
     private static class Singleton {
-        private static ExecutorService INSTANCE = new ThreadPoolExecutor(
-                corePoolSize,
-                maxPoolSize,
-                1, TimeUnit.MINUTES,
-                new ArrayBlockingQueue<>(5000),
-                new ThreadFactory() {
-                    private final AtomicInteger threadNumber = new AtomicInteger(1);
-                    @Override
-                    public Thread newThread(Runnable r) {
-                        Thread t = new Thread(r, "finalysis-thread-pool-" + threadNumber.getAndIncrement());
-
-                        if (t.isDaemon()) {
-                            t.setDaemon(false);
-                        }
-
-                        if (t.getPriority() != Thread.NORM_PRIORITY) {
-                            t.setPriority(Thread.NORM_PRIORITY);
-                        }
-                        return t;
-                    }
-                }
-        );
+        private static final ExecutorService INSTANCE = ThreadPoolBuilder.builder()
+                .poolName("finalysis-thread-pool")
+                .corePoolSize(corePoolSize)
+                .maximumPoolSize(maxPoolSize)
+                .keepAliveTime(1)
+                .timeUnit(TimeUnit.MINUTES)
+                .workQueue(new ArrayBlockingQueue<>(5000))
+                .build();
     }
 
     public static ExecutorService getInstance() {
