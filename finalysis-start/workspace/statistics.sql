@@ -1,6 +1,3 @@
--- 查看最新股票日期
-select date from daily_indicator group by date order by date desc limit 10;
-
 -- 查看每日爬取的数据量
 select * from data_count();
 
