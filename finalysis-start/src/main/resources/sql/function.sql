@@ -435,3 +435,68 @@ end;
 $c$ language plpgsql;
 
 select create_data_statistic();
+
+-- 2022-06-06
+-- 每日爬取的数据量统计
+drop function if exists create_data_count();
+create or replace function create_data_count() returns text as $create$
+declare
+
+begin
+    drop function if exists data_count();
+    drop function if exists data_count(date);
+    drop table if exists data_count;
+    create table data_count (
+        name text,
+        date date,
+        count bigint
+    );
+    comment on table data_count is '每日爬取的数据量统计';
+    comment on column data_count.name is '数据名称';
+    comment on column data_count.date is '数据日期';
+    comment on column data_count.count is '数据总数';
+
+    -- 查看 now 日期爬取的数据量
+    create or replace function data_count(now date) returns setof data_count as $$
+    declare
+
+    begin
+        return query
+            (
+                select 'stock', now, count(*) from stock
+            )
+            union all
+            (
+                select 'daily_indicator', now, count(*) from daily_indicator where date = now
+            )
+            union all
+            (
+                select 'k_line', now, count(*) from k_line_2020_2039 where date = now
+            )
+            union all
+            (
+                select 'avg_line', now, count(*) from v_avg_line where date = now
+            );
+    end;
+    $$ language plpgsql;
+
+    comment on function data_count(now date) is '查看 now 日期爬取的数据量';
+
+    -- 查看最新爬取的数据量
+    create or replace function data_count() returns setof data_count as $$
+    declare
+        now date := now();
+    begin
+        -- 获取数据库最新的日期
+        select date into now from k_line_2020_2039 order by date desc limit 1;
+        return query select * from data_count(now);
+    end;
+    $$ language plpgsql;
+
+    comment on function data_count() is '查看最新爬取的数据量';
+
+    return 'success';
+end
+$create$ language plpgsql;
+
+select create_data_count();

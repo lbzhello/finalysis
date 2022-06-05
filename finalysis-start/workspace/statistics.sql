@@ -1,8 +1,8 @@
 -- 查看最新股票日期
 select date from daily_indicator group by date order by date desc limit 10;
 
--- 当日股票指标数统计
-select count(*) from daily_indicator where date = now()::date;
+-- 查看每日爬取的数据量
+select * from data_count();
 
 -- 1. 最近换手与历史换手比值， 说明股价开始异动
 select * from data_statistic(5, 10)
