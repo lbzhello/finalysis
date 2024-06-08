@@ -29,8 +29,9 @@ allprojects {
 	version = '0.0.1-SNAPSHOT'
 
 	java {
-		sourceCompatibility = "17"
-		targetCompatibility = "17"
+		toolchain {
+			languageVersion.set(JavaLanguageVersion.of(17))
+		}
 	}
 
 	// 字符编码
