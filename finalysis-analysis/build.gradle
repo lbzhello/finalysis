@@ -3,5 +3,5 @@ plugins {
 }
 
 dependencies {
-    compile project(":finalysis-base")
+    implementation project(":finalysis-base")
 }

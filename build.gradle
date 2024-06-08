@@ -3,7 +3,7 @@ buildscript {
 	print("hello finalysis")
 
 	ext {
-		springBootVersion = '2.4.1'
+		springBootVersion = '3.3.0'
 	}
 
 	repositories {
@@ -27,7 +27,11 @@ allprojects {
 
 	group = 'xyz.liujin'
 	version = '0.0.1-SNAPSHOT'
-	sourceCompatibility = '15'
+
+	java {
+		sourceCompatibility = "17"
+		targetCompatibility = "17"
+	}
 
 	// 字符编码
 	tasks.withType(JavaCompile) {
@@ -86,29 +90,29 @@ allprojects {
 
 subprojects {
 	dependencies {
-		compile 'cn.hutool:hutool-all:5.5.4'
+		implementation 'cn.hutool:hutool-all:5.5.4'
 
-		compile group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
+		implementation group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
 
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
-		compile group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
+		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-webflux'
 
 		testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
-		compile group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
+		implementation group: 'org.postgresql', name: 'postgresql', version: '42.2.18'
 
-//		compile group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
-//		compile group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
+//		implementation group: 'io.springfox', name: 'springfox-swagger2', version: '3.0.0'
+//		implementation group: 'io.springfox', name: 'springfox-swagger-ui', version: '3.0.0'
 		implementation "io.springfox:springfox-boot-starter:3.0.0"
 
-		testCompile group: 'junit', name: 'junit', version: '4.12'
+		testImplementation group: 'junit', name: 'junit', version: '4.12'
 
 		// gradle 集成 lombok
-		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
-		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.16'
+		compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+		annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+		testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
+		testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.32'
 	}
 }
 

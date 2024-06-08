@@ -16,6 +16,6 @@ rootProject.name = 'finalysis'
 include 'finalysis-extractor'
 include 'finalysis-start'
 include 'finalysis-base'
-include 'finalysis-test'
+//include 'finalysis-test'
 include 'finalysis-analysis'
 
