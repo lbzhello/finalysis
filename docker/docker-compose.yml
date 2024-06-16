@@ -1,0 +1,14 @@
+services:
+  db:
+    image: lbz/postgres
+    container_name: postgres
+    #depends_on:
+    # - ubuntu
+    # build: .
+    ports:
+      - 5432:5432
+    restart: always
+    volumes:
+      - /d/postgresql/data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_PASSWORD: 191908577
