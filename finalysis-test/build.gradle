@@ -6,9 +6,9 @@ plugins {
 
 dependencies {
 
-    compile group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
+    implementation group: 'org.mybatis.generator', name: 'mybatis-generator-core', version: '1.4.0'
 
-    compile 'org.codehaus.groovy:groovy-all:2.3.11'
+    implementation 'org.codehaus.groovy:groovy-all:2.3.11'
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
 }

@@ -1,5 +1,6 @@
 package xyz.liujin.finalysis.analysis.strategy;
 
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -7,7 +8,6 @@ import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.base.util.MyLogger;
 
 import javax.annotation.Nullable;
-import javax.annotation.PostConstruct;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;

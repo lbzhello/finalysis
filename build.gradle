@@ -3,7 +3,7 @@ buildscript {
 	print("hello finalysis")
 
 	ext {
-		springBootVersion = '2.4.1'
+		springBootVersion = '3.3.0'
 	}
 
 	repositories {
@@ -27,7 +27,12 @@ allprojects {
 
 	group = 'xyz.liujin'
 	version = '0.0.1-SNAPSHOT'
-	sourceCompatibility = '15'
+
+	java {
+		toolchain {
+			languageVersion.set(JavaLanguageVersion.of(20))
+		}
+	}
 
 	// 字符编码
 	tasks.withType(JavaCompile) {
