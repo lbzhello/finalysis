@@ -1,12 +1,12 @@
 services:
   db:
-    image: lbz/postgres
+    build: postgres
+    #image: lbz/postgres
     container_name: postgres
     #depends_on:
     # - ubuntu
-    # build: .
     ports:
-      - 5432:5432
+      - 127.0.0.1:5432:5432
     restart: always
     volumes:
       - /d/postgresql/data:/var/lib/postgresql/data

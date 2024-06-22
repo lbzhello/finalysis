@@ -76,8 +76,8 @@ public class DailyService {
         }
         return DateUtils.iterateDays(start, end)
                 .flatMap(date -> Flux.create((Consumer<FluxSink<LocalDate>>) fluxSink -> {
-                    Integer kCount = kLineService.lambdaQuery().eq(KLine::getDate, date).count();
-                    Integer dCount = dailyIndicatorService.lambdaQuery().eq(DailyIndicator::getDate, date).count();
+                    Long kCount = kLineService.lambdaQuery().eq(KLine::getDate, date).count();
+                    Long dCount = dailyIndicatorService.lambdaQuery().eq(DailyIndicator::getDate, date).count();
                     // 日线数据和指标数据应该一样
                     if (!Objects.equals(kCount, dCount)) {
                         logger.error("data lack: date {} k_line total {} daily_indicator total {}", date, kCount, dCount);

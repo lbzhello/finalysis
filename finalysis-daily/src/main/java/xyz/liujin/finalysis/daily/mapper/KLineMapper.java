@@ -28,7 +28,9 @@ public interface KLineMapper extends BaseMapper<KLine> {
 
     /**
      * 保存或更新
+     *
      * @param kLine
+     * @return
      */
-    void insertOrUpdate(KLine kLine);
+    boolean insertOrUpdate(KLine kLine);
 }

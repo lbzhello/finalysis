@@ -100,7 +100,10 @@ subprojects {
 
 		implementation 'cn.hutool:hutool-all:5.5.4'
 
-		implementation group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.4.1'
+		// spring-boot 3 版本
+		// implementation group: 'com.baomidou', name: 'mybatis-plus-boot-starter', version: '3.5.7'
+		implementation group: 'com.baomidou', name: 'mybatis-plus-spring-boot3-starter', version: '3.5.7'
+
 
 		implementation group: 'org.springframework.boot', name: 'spring-boot-starter-jdbc'
 
