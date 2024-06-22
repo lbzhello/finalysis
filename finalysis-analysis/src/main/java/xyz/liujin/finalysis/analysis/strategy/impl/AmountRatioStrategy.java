@@ -19,7 +19,6 @@ import java.util.Objects;
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/27
  */
-@Service
 public class AmountRatioStrategy extends ScoreStrategy<AmountRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(AmountRatioStrategy.class);
 

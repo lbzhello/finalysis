@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Configuration;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
+import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
 import xyz.liujin.finalysis.analysis.service.ScoreService;
 import xyz.liujin.finalysis.analysis.service.StockScoreService;
 import xyz.liujin.finalysis.base.util.MyLogger;
@@ -25,7 +26,7 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
     private DailyService dailyService;
 
     @Autowired
-    private StockScoreService stockScoreService;
+    private StockScoreMapper stockScoreMapper;
 
     @Autowired
     private ScoreService scoreService;
@@ -58,7 +59,7 @@ public abstract class ScoreStrategy<QO extends StrategyQo> implements Strategy<Q
         }
 
         // 删除当日，具有该分数码的股票，因为每次计分输出的股票是不一样的
-        stockScoreService.deleteByDateAndScoreCode(date, score.getScoreCode());
+        stockScoreMapper.deleteByDateAndTag(date, score.getScoreCode());
 
         return this.findCodes(strategyQo)
                 .map(stockCode -> StockScore.builder()
