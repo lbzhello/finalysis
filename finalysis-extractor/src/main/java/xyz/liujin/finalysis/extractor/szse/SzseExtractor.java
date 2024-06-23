@@ -87,6 +87,7 @@ public class SzseExtractor implements StockExtractor, KLineExtractor {
                         return picupdata;
                     } catch (Exception e) {
                         logger.error("failed to get kline: " + stockCode, e);
+                        response.close();
                     }
                     return new JSONArray();
                 })
@@ -140,7 +141,7 @@ public class SzseExtractor implements StockExtractor, KLineExtractor {
                         return pagecount;
                     } catch (Exception e) {
                         logger.error("failed to get total page", e);
-                        e.printStackTrace();
+                        response.close();
                     }
                     return 0;
                 })
@@ -166,12 +167,13 @@ public class SzseExtractor implements StockExtractor, KLineExtractor {
      * @return
      */
     private Flux<Stock> retrieveStockFromResponse(Flux<Response> responseFlux) {
-        return responseFlux.map(response -> {
+        return responseFlux.<String>handle((response, sink) -> {
             try {
-                return response.body().string();
+                sink.next(response.body().string());
             } catch (Exception e) {
                 logger.error("failed to retrieve response data", e);
-                throw new RuntimeException("szse failed to get response data");
+                response.close();
+                sink.error(new RuntimeException("szse failed to get response data"));
             }
         })
                 // 解析响应数据

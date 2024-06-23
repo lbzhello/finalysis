@@ -209,6 +209,7 @@ public class HttpUtils {
                         call.enqueue(new Callback() {
                             @Override
                             public void onFailure(Call call, IOException e) {
+                                logger.error("failed to call http", e);
                                 fluxSink.error(e);
                                 fluxSink.complete();
                             }
@@ -236,6 +237,7 @@ public class HttpUtils {
                     }
                 } catch (Exception e) {
                     logger.error("failed to get body str {}", response.toString());
+                    response.close();
                 }
                 return "";
             });
