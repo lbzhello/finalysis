@@ -38,3 +38,10 @@ logging:
 #  #开启驼峰命名
 #  configuration:
 #    map-underscore-to-camel-case: true
+
+# 默认路径
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html

@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.analysis.dto;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -23,34 +23,34 @@ import java.util.Objects;
  * 最近几天股票增幅巨大，过去几天涨幅较小，龙抬头
  * 说明股票可能有重大利好消息
  */
-@ApiModel("增幅指标")
+@Tag(name = "增幅指标")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class IncreaseRatioQo implements Scoreable, StrategyQo {
-    @ApiModelProperty
+    @Schema
     private LocalDate date;
 
-    @ApiModelProperty(value = "需要统计的最近的天数", example = "3")
+    @Schema(description = "需要统计的最近的天数", example = "3")
     private Integer recDays;
 
-    @ApiModelProperty(value = "需要统计的过去的天数", example = "5")
+    @Schema(description = "需要统计的过去的天数", example = "5")
     private Integer hisDays;
 
-    @ApiModelProperty(value = "过去天数与最近天数增幅比值最小值", example = "2")
+    @Schema(description = "过去天数与最近天数增幅比值最小值", example = "2")
     private BigDecimal minRatio;
 
-    @ApiModelProperty(value = "最近最小增幅", example = "10")
+    @Schema(description = "最近最小增幅", example = "10")
     private BigDecimal minRecInc;
 
-    @ApiModelProperty(value = "最近最大增幅", example = "50")
+    @Schema(description = "最近最大增幅", example = "50")
     private BigDecimal maxRecInc;
 
-    @ApiModelProperty(value = "需要统计的股票列表", hidden = true)
+    @Schema(description = "需要统计的股票列表", hidden = true)
     private List<String> codes;
 
-    @ApiModelProperty("分页信息")
+    @Schema(description = "分页信息")
     private PageQo page;
 
     private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO.getType() + "(";

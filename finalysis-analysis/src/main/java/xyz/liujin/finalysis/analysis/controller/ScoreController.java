@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.analysis.controller;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -18,7 +18,7 @@ import xyz.liujin.finalysis.base.page.PageQo;
 import java.util.ArrayList;
 import java.util.List;
 
-@Api("股票计分接口")
+@Tag(name = "股票计分接口")
 @RestController
 @RequestMapping("score")
 public class ScoreController {
@@ -26,7 +26,7 @@ public class ScoreController {
     @Autowired
     private StockScoreService stockScoreService;
 
-    @ApiOperation("股票计分")
+    @Operation(summary = "股票计分")
     @GetMapping
     public Flux<String> score() {
         List<StrategyQo> strategies = new ArrayList<>();

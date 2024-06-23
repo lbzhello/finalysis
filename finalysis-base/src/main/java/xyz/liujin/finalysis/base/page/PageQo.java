@@ -1,6 +1,6 @@
 package xyz.liujin.finalysis.base.page;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,23 +17,23 @@ public class PageQo {
     public static final int DEFAULT_PAGE_NO = 1;
     public static final int DEFAULT_PAGE_SIZE = 1000;
 
-    @ApiModelProperty(value = "当前页面", example = "1")
+    @Schema(description = "当前页面", example = "1")
     @Builder.Default
     private Integer pageNo = DEFAULT_PAGE_NO;
-    @ApiModelProperty(value = "每页大小", example = "1000")
+    @Schema(description = "每页大小", example = "1000")
     @Builder.Default
     private Integer pageSize = DEFAULT_PAGE_SIZE;
 
-    @ApiModelProperty(value = "总条目数", hidden = true)
+    @Schema(description = "总条目数", hidden = true)
     private Integer total;
-    @ApiModelProperty(value = "总页数", hidden = true)
+    @Schema(description = "总页数", hidden = true)
     private Integer totalPage;
 
-    @ApiModelProperty(value = "返回数量限制", example = "1000")
+    @Schema(description = "返回数量限制", example = "1000")
     private Integer limit;
-    @ApiModelProperty(value = "偏移量", example = "0")
+    @Schema(description = "偏移量", example = "0")
     private Integer offset;
 
-    @ApiModelProperty(value = "order by 从句", hidden = true)
+    @Schema(description = "order by 从句", hidden = true)
     private String orderBy;
 }

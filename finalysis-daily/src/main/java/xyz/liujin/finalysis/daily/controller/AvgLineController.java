@@ -1,7 +1,7 @@
 package xyz.liujin.finalysis.daily.controller;
 
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,16 +21,16 @@ public class AvgLineController {
     @Autowired
     private AvgLineService avgLineService;
 
-    @ApiOperation("更新均线并入库")
+    @Operation(summary = "更新均线并入库")
     @GetMapping("/refresh")
     public Flux<String> refresh(
-            @ApiParam(value = "开始日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
+            @Parameter(description = "开始日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
             @RequestParam(name = "start", required = false) LocalDate start,
 
-            @ApiParam(value = "结束日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
+            @Parameter(description = "结束日期 yyyy-MM-dd；默认当天", example = "2021-02-12")
             @RequestParam(name = "end", required = false) LocalDate end,
 
-            @ApiParam(value = "股票代码；默认所有股票", example = "000001,000002")
+            @Parameter(description = "股票代码；默认所有股票", example = "000001,000002")
             @RequestParam(name = "codes", required = false) String codes) {
 
         List<String> stockCodes = Optional.ofNullable(codes).map(it -> Arrays.asList(it.split(","))).orElse(List.of());

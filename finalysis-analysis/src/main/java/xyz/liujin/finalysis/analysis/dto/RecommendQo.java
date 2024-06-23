@@ -1,6 +1,6 @@
 package xyz.liujin.finalysis.analysis.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,19 +18,19 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class RecommendQo {
-    @ApiModelProperty("分析日期")
+    @Schema(description = "分析日期")
     private LocalDate date;
-    @ApiModelProperty("量比放量指标")
+    @Schema(description = "量比放量指标")
     private HeavenVolRatioQo heavenVolRatio;
-    @ApiModelProperty("日线突破指标，5 X 10")
+    @Schema(description = "日线突破指标，5 X 10")
     private FiveCrossTenQo fiveCrossTen;
-    @ApiModelProperty("日线增势指标，5 > 10")
+    @Schema(description = "日线增势指标，5 > 10")
     private FiveAboveTenQo fiveAboveTen;
-    @ApiModelProperty(value = "成交额指标", example = "100000000")
+    @Schema(description = "成交额指标", example = "100000000")
     private BigDecimal minAmount;
-    @ApiModelProperty(value = "结果是否入库", example = "false")
+    @Schema(description = "结果是否入库", example = "false")
     private boolean store;
-    @ApiModelProperty("分页信息")
+    @Schema(description = "分页信息")
     private PageQo page;
 
 }

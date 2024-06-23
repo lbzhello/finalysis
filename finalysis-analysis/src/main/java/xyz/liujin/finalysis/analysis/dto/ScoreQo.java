@@ -1,6 +1,6 @@
 package xyz.liujin.finalysis.analysis.dto;
 
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,23 +18,23 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScoreQo {
-    @ApiModelProperty("分析日期")
+    @Schema(description = "分析日期")
     private LocalDate date;
-    @ApiModelProperty("增幅比指标")
+    @Schema(description = "增幅比指标")
     private IncreaseRatioQo increaseRatio;
-    @ApiModelProperty("换手比指标")
+    @Schema(description = "换手比指标")
     private TurnRatioQo turnRatio;
-    @ApiModelProperty("最低价支撑指标")
+    @Schema(description = "最低价支撑指标")
     private MinimumPriceSupportQo minimumPriceSupport;
-    @ApiModelProperty("成交额持续放量指标")
+    @Schema(description = "成交额持续放量指标")
     private SustainHighAmountReq sustainHighAmount;
-    @ApiModelProperty("量比放量指标")
+    @Schema(description = "量比放量指标")
     private HeavenVolRatioQo heavenVolRatio;
-    @ApiModelProperty("日线突破指标，5 X 10")
+    @Schema(description = "日线突破指标，5 X 10")
     private FiveCrossTenQo fiveCrossTen;
-    @ApiModelProperty("日线增势指标，5 > 10")
+    @Schema(description = "日线增势指标，5 > 10")
     private FiveAboveTenQo fiveAboveTen;
-    @ApiModelProperty("分页信息")
+    @Schema(description = "分页信息")
     private PageQo page;
 
 }
