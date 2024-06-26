@@ -23,13 +23,13 @@ public class ExtractorController {
 
     @Operation(summary = "启动所有任务", description = "1. 更新股票数据；2. 更新 k 线数据；")
     @GetMapping("all")
-    public Flux<String> all(@Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2021-02-12")
+    public Flux<String> all(@Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2024-01-01")
                             @RequestParam(name = "start", required = false) LocalDate start,
 
-                            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
+                            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日")
                             @RequestParam(name = "end", required = false) LocalDate end,
 
-                            @Parameter(description = "股票列表，默认所有股票", example = "000001,600001")
+                            @Parameter(description = "股票列表，默认所有股票")
                             @RequestParam(name = "codes", required = false) List<String> codes) {
         return tushareManager.refreshAll(start, end, codes);
     }
@@ -51,13 +51,13 @@ public class ExtractorController {
     @Operation(summary = "更新 K 线数据")
     @GetMapping("k")
     public Flux<String> extractKLine(
-            @Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2021-02-12")
+            @Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2024-01-01")
             @RequestParam(name = "start", required = false) LocalDate start,
 
-            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
+            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日")
             @RequestParam(name = "end", required = false) LocalDate end,
 
-            @Parameter(description = "股票列表，默认所有股票", example = "000001,600001")
+            @Parameter(description = "股票列表，默认所有股票")
             @RequestParam(name = "codes", required = false) List<String> codes) {
         return Flux.create(sink -> {
             tushareManager.refreshKLine(start, end, codes)
@@ -73,13 +73,13 @@ public class ExtractorController {
     @Operation(summary = "更新股票每日指标")
     @GetMapping("indicator")
     public Flux<String> extractDailyIndicator(
-            @Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2021-02-12")
+            @Parameter(description = "开始日期 yyyy-MM-dd；默认数据库最新数据", example = "2024-01-01")
             @RequestParam(name = "start", required = false) LocalDate start,
 
-            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日", example = "2021-02-12")
+            @Parameter(description = "结束日期 yyyy-MM-dd；默认当日")
             @RequestParam(name = "end", required = false) LocalDate end,
 
-            @Parameter(description = "股票列表，默认所有股票", example = "000001,600001")
+            @Parameter(description = "股票列表，默认所有股票")
             @RequestParam(name = "codes", required = false) List<String> codes) {
         return Flux.create(sink -> {
             tushareManager.refreshDailyIndicator(start, end, codes)
