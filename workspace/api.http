@@ -1,14 +1,14 @@
 ### 爬取所有股票信息
-GET http://localhost:8080/extract/all
+GET {{host}}/extract/all
 Accept: */*
 
 ### 推荐股票-最近存在放量的股票，根据成交额排序
-POST http://localhost:8080/analysis/recommend
+POST {{host}}/analysis/recommend
 Content-Type: application/json
 
 {
   "store": false,
-  "date": "2021-06-15",
+  "date": "2024-06-28",
   "heavenVolRatio": {
     "days": 6,
     "minVolRatio": 2
@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ### 推荐股票-突破形态，最近存在放量
-POST http://localhost:8080/analysis/recommend
+POST {{host}}/analysis/recommend
 Content-Type: application/json
 
 {
@@ -41,7 +41,7 @@ Content-Type: application/json
 }
 
 ### 推荐股票
-POST http://localhost:8080/analysis/recommend
+POST {{host}}/analysis/recommend
 Content-Type: application/json
 
 {

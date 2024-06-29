@@ -23,7 +23,7 @@ import java.time.LocalDate;
 @TableName(autoResultMap = true)
 public class StockScore {
     @TableId(type = IdType.AUTO)
-    private int id;
+    private Integer id;
     // 股票得分日期
     private LocalDate date;
     // 股票代码
