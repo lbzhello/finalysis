@@ -1,6 +1,6 @@
 services:
   db:
-    build: postgres
+    build: ./postgres
     #image: lbz/postgres
     container_name: postgres
     #depends_on:
