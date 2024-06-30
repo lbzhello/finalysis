@@ -10,7 +10,11 @@ import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategyService;
 import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
+import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.MyLogger;
+import xyz.liujin.finalysis.base.util.ObjectUtils;
+import xyz.liujin.finalysis.daily.entity.DailyIndicator;
+import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -24,12 +28,21 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     @Autowired
     private ScoreStrategyService scoreStrategyService;
 
+    @Autowired
+    private DailyIndicatorService dailyIndicatorService;
+
     /**
      * 根据条件计算股票得分并入库
      * @return
      */
     public Flux<StockScore> scoreAndSave(ScoreQo scoreQo) {
         logger.debug("start to score", "scoreQO", scoreQo);
+
+        LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), LocalDate.now());
+        PageQo pageQo = ObjectUtils.firstNonNull(scoreQo.getPage(), PageQo.builder()
+                        .limit(100)
+                        .offset(0)
+                        .build());
 
         // scoreQo 转换成策略查询对象
         List<StrategyQo> strategies = new ArrayList<>();
@@ -43,6 +56,8 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
                             field.setAccessible(true);
                             StrategyQo strategyQo = (StrategyQo) field.get(scoreQo);
                             if (Objects.nonNull(strategyQo)) {
+                                strategyQo.setDate(date);
+                                strategyQo.setPage(pageQo);
                                 strategies.add(strategyQo);
                             }
                         }

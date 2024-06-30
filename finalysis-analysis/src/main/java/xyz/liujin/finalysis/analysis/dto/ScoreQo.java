@@ -26,8 +26,8 @@ public class ScoreQo {
     private TurnRatioQo turnRatio;
     @Schema(description = "最低价支撑指标")
     private MinimumPriceSupportQo minimumPriceSupport;
-    @Schema(description = "成交额持续放量指标")
-    private SustainHighAmountReq sustainHighAmount;
+    @Schema(description = "持续放量指标")
+    private AmountRatioQo amountRatio;
     @Schema(description = "量比放量指标")
     private HeavenVolRatioQo heavenVolRatio;
     @Schema(description = "日线突破指标，5 X 10")

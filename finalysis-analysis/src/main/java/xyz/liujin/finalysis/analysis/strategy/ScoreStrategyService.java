@@ -34,10 +34,6 @@ public class ScoreStrategyService {
      * @return
      */
     public @Nullable ScoreStrategy<? extends StrategyQo> findStrategy(StrategyQo strategyQo) {
-        if (Objects.isNull(strategyQo)) {
-            return null;
-        }
-
         ScoreStrategy<? extends StrategyQo> scoreStrategy = scoreStrategies.get(strategyQo.getType());
         if (Objects.isNull(scoreStrategy)) {
             logger.warn("can't find strategy", "strategyQo", strategyQo.getClass());

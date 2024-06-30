@@ -66,3 +66,45 @@ Content-Type: application/json
 }
 
 ###
+POST {{host}}/analysis/score
+Content-Type: application/json
+
+{
+  "date": "2024-06-30",
+  "increaseRatio": {
+    "recDays": 3,
+    "hisDays": 5,
+    "minRatio": 2,
+    "minRecInc": 10,
+    "maxRecInc": 50
+  },
+  "turnRatio": {
+    "recDays": 3,
+    "hisDays": 5,
+    "minRatio": 2,
+    "minAvgAmount": 1000000000
+  },
+  "minimumPriceSupport": {
+    "recDays": 3
+  },
+  "amountRatio": {
+    "minRatio": 2,
+    "recentDays": 3,
+    "historyDays": 5
+  },
+  "heavenVolRatio": {
+    "days": 5,
+    "minVolRatio": 2
+  },
+  "fiveCrossTen": {
+    "days": 3
+  },
+  "fiveAboveTen": {
+    "days": 3
+  },
+  "page": {
+    "limit": 100,
+    "offset": 0
+  }
+}
+###

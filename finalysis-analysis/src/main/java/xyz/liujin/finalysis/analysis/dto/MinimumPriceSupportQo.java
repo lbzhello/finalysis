@@ -27,7 +27,7 @@ import java.util.List;
 @AllArgsConstructor
 @ScoreConfig(value = ScoreType.MINIMUM_PRICE_SUPPORT, score = 5)
 public class MinimumPriceSupportQo implements StrategyQo {
-    @Schema(name = "日期")
+    @Schema(description = "日期")
     private LocalDate date;
 
     @Schema(description = "最近的天数，当前股价没有跌破最近最低价", example = "3")
