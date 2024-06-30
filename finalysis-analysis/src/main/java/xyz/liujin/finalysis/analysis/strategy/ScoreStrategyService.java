@@ -28,22 +28,6 @@ public class ScoreStrategyService {
     @Autowired
     private Map<String, ScoreStrategy<? extends StrategyQo>> scoreStrategies;
 
-    // 查询对象和计分策略之间的对应关系 qo -> ScoreStrategy
-    private final Map<Class<? extends StrategyQo>, ScoreStrategy<? super StrategyQo>> strategyMap = new HashMap<>();
-
-    @PostConstruct
-    public void init() {
-        Flux.fromIterable(scoreStrategies.values())
-                // 计分策略和对应的查询类映射关系
-                .subscribe(scoreStrategy -> {
-                    logger.debug("find score strategy", "scoreStrategy", scoreStrategy);
-                    Type genericSuperclass = scoreStrategy.getClass().getGenericSuperclass();
-                    Type[] actualTypeArguments = ((ParameterizedType) genericSuperclass).getActualTypeArguments();
-                    Class<? extends StrategyQo> actualClass = (Class<? extends StrategyQo>) actualTypeArguments[0];
-                    strategyMap.put(actualClass, (ScoreStrategy<? super StrategyQo>) scoreStrategy);
-                }, e -> logger.error("init scoreStrategies failed", e));
-    }
-
     /**
      * 根据策略查询类查找对应的策略类
      * @param strategyQo
@@ -103,41 +87,6 @@ public class ScoreStrategyService {
 
         logger.info("score by strategy", "scoreStrategy", scoreStrategy.getClass());
         return scoreStrategy.score(strategyQo);
-    }
-
-    private static MethodHandle mh;
-    static {
-        try {
-            mh = MethodHandles.lookup().findVirtual(ScoreStrategy.class, "score", MethodType.methodType(Flux.class, StrategyQo.class));
-        } catch (NoSuchMethodException | IllegalAccessException e) {
-            logger.error("", e);
-        }
-    }
-
-    /**
-     * 根据策略查询类查到对应的策略类
-     * 反射方式调用
-     * @param strategyQo
-     * @return
-     * @deprecated 使用 {@link #score(StrategyQo)} 方法
-     */
-    @Deprecated
-    public Flux<StockScore> scoreOld(StrategyQo strategyQo) {
-        if (Objects.isNull(strategyQo)) {
-            return Flux.empty();
-        }
-
-        try {
-            ScoreStrategy<?> strategy = strategyMap.get(strategyQo.getClass());
-            if (Objects.isNull(strategy)) {
-                logger.debug("can't find strategy", "strategyQo", strategyQo.getClass());
-                return Flux.empty();
-            }
-            return  (Flux<StockScore>) mh.invoke(strategy, strategyQo);
-        } catch (Throwable e) {
-            logger.error("failed to score", e);
-        }
-        return Flux.empty();
     }
 
 }
