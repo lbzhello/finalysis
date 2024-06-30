@@ -91,7 +91,7 @@ public class TushareManager {
      * @return
      */
     public Flux<String> refreshAll(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
-        logger.debug("start to refresh all tasks...");
+        logger.info("start to refresh all tasks...");
 
         refreshStock()
                 // 先更新股票数据，再更新 K 线和日指标表
@@ -104,7 +104,7 @@ public class TushareManager {
                 .flux()
                 .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
                 .subscribe(it -> {
-                    logger.debug("refresh all tasks success, tasks {}", it);
+                    logger.info("refresh all tasks success, tasks {}", it);
 
                     // 检查数据是否正确，是否爬取失败
                     dailyService.checkDataIntegrity(start, end)
@@ -146,7 +146,7 @@ public class TushareManager {
      * @return
      */
     public Flux<Integer> refreshStock() {
-        logger.debug("start extract stock {}", tushareKLineExtractor.getClass());
+        logger.info("start extract stock {}", tushareKLineExtractor.getClass());
 
         List<String> addCodes = new ArrayList<>();
         return tushareStockExtractor.extractStock()
@@ -166,7 +166,7 @@ public class TushareManager {
                 .flux()
                 // 发布股票变更事件
                 .doOnNext(count -> {
-                    logger.debug("refresh stock success, count {}", count);
+                    logger.info("refresh stock success, count {}", count);
                     SpringUtils.getApplicationContext().publishEvent(StockChangeEvent.builder()
                             .addCodes(addCodes)
                             .build());
@@ -201,7 +201,7 @@ public class TushareManager {
                     LocalDate endDate = tuple.getT2();
                     List<String> codes = tuple.getT3();
 
-                    logger.debug("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
+                    logger.info("start to extract k line [startDate:{}, endDate:{}]", startDate, endDate);
 
                     return tushareKLineExtractor.extractKLine(startDate, endDate, codes)
 //                            .subscribeOn(Schedulers.fromExecutor(TaskPool.getInstance()))
@@ -217,7 +217,7 @@ public class TushareManager {
                             .reduce(Integer::sum)
                             // 发布 k 线变更事件
                             .doOnNext(count -> {
-                                logger.debug("refresh k line success, refreshed {}", count);
+                                logger.info("refresh k line success, refreshed {}", count);
                                 SpringUtils.getApplicationContext().publishEvent(KLineChangeEvent.builder()
                                         .start(startDate)
                                         .end(endDate)
@@ -236,7 +236,7 @@ public class TushareManager {
      */
     public Flux<Integer> refreshDailyIndicator(@Nullable LocalDate start, @Nullable LocalDate end, @Nullable List<String> codes) {
         return Flux.create((Consumer<FluxSink<Tuple3<LocalDate, LocalDate, List<String>>>>) sink -> {
-            logger.debug("start refresh daily indicator {}", tushareKLineExtractor.getClass());
+            logger.info("start refresh daily indicator {}", tushareKLineExtractor.getClass());
 
             // 默认从数据库获取最新日期的下一个日期
             LocalDate startDate = ObjectUtils.firstNonNull(start, dailyIndicatorService.getNextDate(), LocalDate.now());
@@ -267,7 +267,7 @@ public class TushareManager {
                             .reduce(Integer::sum)
                             // 发布股票日指标变更事件
                             .doOnNext(count -> {
-                                logger.debug("refresh daily indicator success, refreshed {}", count);
+                                logger.info("refresh daily indicator success, refreshed {}", count);
                                 SpringUtils.getApplicationContext().publishEvent(DailyIndicatorChangeEvent.builder()
                                         .build());
                             });

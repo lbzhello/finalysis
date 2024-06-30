@@ -24,6 +24,22 @@ import java.util.Objects;
 public class ScoreUtil {
     private static final MyLogger logger = MyLogger.getLogger(ScoreUtil.class);
 
+    public static String getScoreType(Object obj) {
+        ScoreConfigAnnotationMetaData annotationMetaData = getAnnotationMetaData(obj);
+        return annotationMetaData.getType();
+    }
+
+    public static ScoreConfigAnnotationMetaData getAnnotationMetaData(Object obj) {
+        ScoreConfigAnnotationMetaData scoreConfigAnnotationMetaData = new ScoreConfigAnnotationMetaData();
+        // 根据注解解析
+        Class<?> objClass = obj.getClass();
+        ScoreConfig sc = objClass.getAnnotation(ScoreConfig.class);
+        scoreConfigAnnotationMetaData.setType(sc.value());
+        scoreConfigAnnotationMetaData.setScore(sc.score());
+
+        return scoreConfigAnnotationMetaData;
+    }
+
     /**
      * 计算分数
      *
@@ -34,10 +50,7 @@ public class ScoreUtil {
      * @param obj
      * @return
      */
-    public static Score calculateScore(@Nullable Object obj) {
-        if (Objects.isNull(obj)) {
-            return null;
-        }
+    public static Score calculateScore(Object obj) {
 
         // 如果实现了 Scoreable 接口，则通过接口生成 Score
         if (obj instanceof Scoreable) {

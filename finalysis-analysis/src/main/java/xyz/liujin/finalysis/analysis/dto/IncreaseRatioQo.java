@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import xyz.liujin.finalysis.analysis.entity.Score;
 import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.score.Scoreable;
+import xyz.liujin.finalysis.analysis.score.annotation.ScoreConfig;
 import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 
@@ -28,6 +29,7 @@ import java.util.Objects;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@ScoreConfig(value = ScoreType.INCREASE_RATIO)
 public class IncreaseRatioQo implements Scoreable, StrategyQo {
     @Schema
     private LocalDate date;

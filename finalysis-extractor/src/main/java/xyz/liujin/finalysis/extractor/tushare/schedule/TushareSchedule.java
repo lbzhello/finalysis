@@ -35,8 +35,7 @@ public class TushareSchedule {
      */
     @Scheduled(cron = "0 20 17 * * ?")
     public void refreshDaily() {
-        logger.debug("auto refresh data daily {}", LocalDateTime.now());
-
+        logger.info("auto refresh data daily {}", LocalDateTime.now());
         tushareManager.refreshAll(null, null, null).subscribe();
     }
 
