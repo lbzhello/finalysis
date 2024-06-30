@@ -23,4 +23,12 @@ public interface StrategyQo {
     PageQo getPage();
 
     void setPage(PageQo page);
+
+    /**
+     * 策略类型，根据此名称找到对应策略类
+     *
+     * @see xyz.liujin.finalysis.analysis.score.ScoreType
+     * @return
+     */
+    String getType();
 }

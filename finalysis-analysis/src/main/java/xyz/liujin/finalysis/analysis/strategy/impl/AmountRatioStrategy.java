@@ -1,10 +1,12 @@
 package xyz.liujin.finalysis.analysis.strategy.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.AmountRatioQo;
 import xyz.liujin.finalysis.analysis.mapper.ScoreStrategyMapper;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.daily.service.DailyService;
@@ -19,6 +21,7 @@ import java.util.Objects;
  * @author liubaozhu lbzhello@qq.com
  * @since 2021/9/27
  */
+@Component(ScoreType.AMOUNT_RATIO)
 public class AmountRatioStrategy extends ScoreStrategy<AmountRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(AmountRatioStrategy.class);
 

@@ -53,7 +53,12 @@ public class IncreaseRatioQo implements Scoreable, StrategyQo {
     @Schema(description = "分页信息")
     private PageQo page;
 
-    private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO.getType() + "(";
+    @Override
+    public String getType() {
+        return ScoreType.INCREASE_RATIO;
+    }
+
+    private static final String TAG_PREFIX = ScoreType.INCREASE_RATIO + "(";
     @Override
     public Score getScore() {
         // 格式：increase_ratio(recDays=3, hisDays=5)
@@ -104,7 +109,7 @@ public class IncreaseRatioQo implements Scoreable, StrategyQo {
         descStr += ";";
 
         return Score.builder()
-                .type(ScoreType.INCREASE_RATIO.getType())
+                .type(ScoreType.INCREASE_RATIO)
                 .scoreCode(scoreCodeStr)
                 .score(10)
                 .description(descStr)

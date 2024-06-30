@@ -1,7 +1,5 @@
 package xyz.liujin.finalysis.analysis.score.annotation;
 
-import xyz.liujin.finalysis.analysis.score.ScoreType;
-
 import java.lang.annotation.*;
 
 /**
@@ -25,7 +23,7 @@ public @interface ScoreConfig {
      * 分数类型
      * @return
      */
-    ScoreType value();
+    String value();
 
     /**
      * 得分

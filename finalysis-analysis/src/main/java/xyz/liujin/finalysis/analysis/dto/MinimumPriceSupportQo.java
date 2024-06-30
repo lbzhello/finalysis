@@ -41,4 +41,8 @@ public class MinimumPriceSupportQo implements StrategyQo {
     @ScorePage
     private PageQo page;
 
+    @Override
+    public String getType() {
+        return ScoreType.MINIMUM_PRICE_SUPPORT;
+    }
 }

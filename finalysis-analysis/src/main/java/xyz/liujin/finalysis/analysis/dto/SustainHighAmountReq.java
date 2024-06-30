@@ -38,4 +38,9 @@ public class SustainHighAmountReq implements StrategyQo {
     private Integer historyDays = 5;
     @Schema(description = "分页信息")
     private PageQo page;
+
+    @Override
+    public String getType() {
+        return "deprecated";
+    }
 }

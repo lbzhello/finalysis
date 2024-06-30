@@ -52,4 +52,9 @@ public class AmountRatioQo implements StrategyQo {
     @Schema(description = "分页信息")
     @ScorePage
     private PageQo page;
+
+    @Override
+    public String getType() {
+        return ScoreType.AMOUNT_RATIO;
+    }
 }

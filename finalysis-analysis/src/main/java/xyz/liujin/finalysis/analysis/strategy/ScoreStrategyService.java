@@ -14,7 +14,6 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,14 +26,14 @@ public class ScoreStrategyService {
     private static final MyLogger logger = MyLogger.getLogger(ScoreStrategyService.class);
 
     @Autowired
-    private List<ScoreStrategy<? extends StrategyQo>> scoreStrategies;
+    private Map<String, ScoreStrategy<? extends StrategyQo>> scoreStrategies;
 
     // 查询对象和计分策略之间的对应关系 qo -> ScoreStrategy
     private final Map<Class<? extends StrategyQo>, ScoreStrategy<? super StrategyQo>> strategyMap = new HashMap<>();
 
     @PostConstruct
     public void init() {
-        Flux.fromIterable(scoreStrategies)
+        Flux.fromIterable(scoreStrategies.values())
                 // 计分策略和对应的查询类映射关系
                 .subscribe(scoreStrategy -> {
                     logger.debug("find score strategy", "scoreStrategy", scoreStrategy);
@@ -50,12 +49,12 @@ public class ScoreStrategyService {
      * @param strategyQo
      * @return
      */
-    public @Nullable ScoreStrategy<? super StrategyQo> findStrategy(StrategyQo strategyQo) {
+    public @Nullable ScoreStrategy<? extends StrategyQo> findStrategy(StrategyQo strategyQo) {
         if (Objects.isNull(strategyQo)) {
             return null;
         }
 
-        ScoreStrategy<? super StrategyQo> scoreStrategy = strategyMap.get(strategyQo.getClass());
+        ScoreStrategy<? extends StrategyQo> scoreStrategy = scoreStrategies.get(strategyQo.getType());
         if (Objects.isNull(scoreStrategy)) {
             logger.warn("can't find strategy", "strategyQo", strategyQo.getClass());
             return null;
@@ -68,9 +67,9 @@ public class ScoreStrategyService {
      * @param strategyQo
      * @return
      */
-    public Flux<String> findCodes(StrategyQo strategyQo) {
+    public <QO extends StrategyQo> Flux<String> findCodes(QO strategyQo) {
         logger.debug("strategy condition", "strategyQo", strategyQo);
-        ScoreStrategy<? super StrategyQo> strategy = findStrategy(strategyQo);
+        ScoreStrategy<? super StrategyQo> strategy = (ScoreStrategy<? super StrategyQo>) findStrategy(strategyQo);
         if (Objects.isNull(strategy)) {
             return Flux.empty();
         }
@@ -95,9 +94,9 @@ public class ScoreStrategyService {
      * @param strategyQo
      * @return
      */
-    public Flux<StockScore> score(StrategyQo strategyQo) {
+    public <QO extends StrategyQo> Flux<StockScore> score(QO strategyQo) {
         logger.debug("strategy condition", "strategyQo", strategyQo);
-        ScoreStrategy<? super StrategyQo> scoreStrategy = findStrategy(strategyQo);
+        ScoreStrategy<? super StrategyQo> scoreStrategy = (ScoreStrategy<? super StrategyQo>) findStrategy(strategyQo);
         if (Objects.isNull(scoreStrategy)) {
             return Flux.empty();
         }

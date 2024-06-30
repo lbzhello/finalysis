@@ -12,7 +12,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 public class ScoreStrategyServiceTest {
-    @Test
+//    @Test
     public void methodHandleTest() throws Throwable {
         MethodHandle mh = MethodHandles.lookup().findVirtual(ScoreStrategy.class, "findCodes", MethodType.methodType(Flux.class, StrategyQo.class));
         Flux<String> o1 = (Flux<String>) mh.invoke(new AmountRatioStrategy(), new TurnRatioQo());

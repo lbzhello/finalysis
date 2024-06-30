@@ -128,8 +128,8 @@ public class ScoreUtil {
                 });
 
 
-        ScoreType scoreType = st.value();
-        String scoreCode = scoreType.getType() + st.codePrefix() +
+        String scoreType = st.value();
+        String scoreCode = scoreType + st.codePrefix() +
                 CollectionUtil.join(scoreCodes, st.codeSeparator()) +
                 st.codeSuffix();
 
@@ -140,7 +140,7 @@ public class ScoreUtil {
         return Score.builder()
                 .scoreCode(scoreCode)
                 .score(score)
-                .type(scoreType.getType())
+                .type(scoreType)
                 .description(description)
                 .build();
     }

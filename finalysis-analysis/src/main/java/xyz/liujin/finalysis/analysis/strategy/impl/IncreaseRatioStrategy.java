@@ -1,10 +1,12 @@
 package xyz.liujin.finalysis.analysis.strategy.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import xyz.liujin.finalysis.analysis.dto.IncreaseRatioQo;
 import xyz.liujin.finalysis.analysis.mapper.IncreaseRatioMapper;
+import xyz.liujin.finalysis.analysis.score.ScoreType;
 import xyz.liujin.finalysis.analysis.strategy.ScoreStrategy;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
@@ -18,7 +20,7 @@ import java.time.LocalDate;
  * 数值大，说明最近几天股票增幅巨大，过去几天涨幅较小，龙抬头
  * 说明股票可能有重大利好消息
  */
-@Service
+@Component(ScoreType.INCREASE_RATIO)
 public class IncreaseRatioStrategy extends ScoreStrategy<IncreaseRatioQo> {
     private static final MyLogger logger = MyLogger.getLogger(IncreaseRatioStrategy.class);
 

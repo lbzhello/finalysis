@@ -62,4 +62,9 @@ public class TurnRatioQo implements StrategyQo, ScoreCustomizer {
 
     @Schema(description = "得分")
     private int score;
+
+    @Override
+    public String getType() {
+        return ScoreType.TURN_RATIO;
+    }
 }
