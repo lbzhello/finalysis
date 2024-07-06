@@ -43,7 +43,7 @@ public class AmountRatioQo implements StrategyQo {
     private Integer hisDays;
 
     @Schema(description = "最近成交额与历史成交额比值最小值")
-    @ScoreField("成交额比值大于 s%")
+    @ScoreField("成交额比值大于 %s")
     private BigDecimal minRatio;
 
     @Schema(description = "股票代码", hidden = true)

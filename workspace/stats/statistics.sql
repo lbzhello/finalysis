@@ -7,7 +7,8 @@ where rec_avg_turn_f >= 1
   and turn_ratio >= 1.5
   and rec_avg_amount >= 1e8
 --   and rec_avg_turn_f >= 10 and rec_avg_turn_f <=30
-order by turn_ratio desc;
+order by rec_avg_amount*rec_avg_vol_ratio desc;
+-- order by turn_ratio desc;
 -- order by rec_avg_amount desc
 
 -- 2. 根据股票得分大小, 换手比排序
@@ -28,3 +29,5 @@ order by score desc, turn_ratio desc;
 
 -- 查询股票统计数据
 select * from data_statistic(3, 5) where stock_code = '002548';
+
+select * from stock_score;
