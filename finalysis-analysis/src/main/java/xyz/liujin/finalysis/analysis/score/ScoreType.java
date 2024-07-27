@@ -16,4 +16,7 @@ public class ScoreType {
     public static final String MINIMUM_PRICE_SUPPORT = "minimum_price_support";
     // 成交额比指标，最近几日平均成交额，与过去几日平均成交额比值；成交额比大，说明股票开始放量
     public static final String AMOUNT_RATIO = "amount_ratio";
+    // 日线突破指标，最近
+    public static final String FIVE_CROSS_TEN = "five_cross_ten";
+    public static final String FIVE_ABOVE_TEN = "five_above_ten";
 }

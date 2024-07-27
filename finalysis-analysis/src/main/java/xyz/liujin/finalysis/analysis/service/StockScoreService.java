@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
+import xyz.liujin.finalysis.analysis.dto.DailyDataQo;
 import xyz.liujin.finalysis.analysis.dto.ScoreQo;
 import xyz.liujin.finalysis.analysis.entity.StockScore;
 import xyz.liujin.finalysis.analysis.mapper.StockScoreMapper;
@@ -13,6 +14,7 @@ import xyz.liujin.finalysis.analysis.strategy.StrategyQo;
 import xyz.liujin.finalysis.base.page.PageQo;
 import xyz.liujin.finalysis.base.util.MyLogger;
 import xyz.liujin.finalysis.base.util.ObjectUtils;
+import xyz.liujin.finalysis.daily.dto.DailyData;
 import xyz.liujin.finalysis.daily.entity.DailyIndicator;
 import xyz.liujin.finalysis.daily.service.DailyIndicatorService;
 
@@ -20,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore> implements IService<StockScore> {
@@ -31,11 +34,14 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
     @Autowired
     private DailyIndicatorService dailyIndicatorService;
 
+    @Autowired
+    private AnalysisService analysisService;
+
     /**
      * 根据条件计算股票得分并入库
      * @return
      */
-    public Flux<StockScore> scoreAndSave(ScoreQo scoreQo) {
+    public Flux<DailyData> scoreAndSave(ScoreQo scoreQo) {
         logger.debug("start to score", "scoreQO", scoreQo);
 
         LocalDate date = ObjectUtils.firstNonNull(scoreQo.getDate(), LocalDate.now());
@@ -66,7 +72,30 @@ public class StockScoreService extends ServiceImpl<StockScoreMapper, StockScore>
                     }
                 });
 
-        return scoreAndSave(Flux.fromIterable(strategies));
+        // 默认根据量比排序
+        String orderBy = Optional.ofNullable(scoreQo.getPage())
+                .map(PageQo::getOrderBy)
+                .orElse("vol_amount desc");
+
+        // 返回条目限制，默认 1000
+        Integer limit = Optional.ofNullable(scoreQo.getPage())
+                .map(PageQo::getLimit)
+                .orElse(1000);
+
+        return scoreAndSave(Flux.fromIterable(strategies))
+                .map(StockScore::getStockCode)
+                .collectList()
+                .flux()
+                .flatMap(codes -> analysisService.dailyData(DailyDataQo.builder()
+                        .date(date)
+                        .codes(codes)
+                        .minAmount(scoreQo.getMinAmount())
+                        .page(PageQo.builder()
+                                .limit(limit)
+                                .orderBy(orderBy)
+                                .build())
+                        .build()));
+
     }
 
     /**

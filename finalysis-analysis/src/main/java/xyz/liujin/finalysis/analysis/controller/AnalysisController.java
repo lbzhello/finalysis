@@ -35,7 +35,7 @@ public class AnalysisController {
 
     @Operation(summary = "股票计分")
     @PostMapping("score")
-    public Flux<StockScore> score(@RequestBody ScoreQo scoreQo) {
+    public Flux<DailyData> score(@RequestBody ScoreQo scoreQo) {
         return stockScoreService.scoreAndSave(scoreQo);
     }
 

@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import xyz.liujin.finalysis.base.page.PageQo;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -34,6 +35,8 @@ public class ScoreQo {
     private FiveCrossTenQo fiveCrossTen;
     @Schema(description = "日线增势指标，5 > 10")
     private FiveAboveTenQo fiveAboveTen;
+    @Schema(description = "成交额指标", example = "100000000")
+    private BigDecimal minAmount;
     @Schema(description = "分页信息")
     private PageQo page;
 
